@@ -7,8 +7,12 @@
 - Added Character Propeties (STOLEN from Pluma-Team/FNF-PsychEngine-Pluma lol)
 - Added lua functions callFromObject and callFromClass (STOLEN from Cherif107/FNF-PsychEngine lol)
 - Added new Psych Alphabet instead old
+- Returned some paths (menucharacters, portraits, title)
+- on HTML5 no more outdated screen
 - Fixed Game Over Precaches
 - Fixed Song's Inst on Mods
 - Fixed Week Locks
+- Fixed HTML5 Loading
+- Fixed Inst and Voices for other difficulties (again)
 - Fixed Note Color Shader
 - Fixed Shader paths

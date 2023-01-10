@@ -154,7 +154,9 @@ class TitleState extends MusicBeatState
 				startIntro();
 			});
 		}
-		else {
+		else
+		{
+			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 			startIntro();
 		}
 
@@ -186,7 +188,6 @@ class TitleState extends MusicBeatState
 		if (titleJSON.gfscalex == null) titleJSON.gfscalex = 1;
 		if (titleJSON.gfscaley == null) titleJSON.gfscaley = 1;
 
-		FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 		Conductor.changeBPM(titleJSON.bpm);
 
 		var bg:FlxSprite = new FlxSprite();

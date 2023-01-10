@@ -473,13 +473,20 @@ class StoryMenuState extends MusicBeatState
 
 		var newDifficulty:String = curWeek.difficulties[1][curDifficulty];
 
+		if (Paths.fileExists('images/menudifficulties.png', IMAGE)) {
+			sprDifficulty.loadGraphic(Paths.getImage('menudifficulties/' + newDifficulty));
+		}
+		else {
+			sprDifficulty.loadGraphic(Paths.getImage('storymenu/menudifficulties/' + newDifficulty));
+		}
+
+		sprDifficulty.x = leftArrow.x + 60;
+		sprDifficulty.x += (308 - sprDifficulty.width) / 2;
+		sprDifficulty.y = leftArrow.y + 15;
+
 		if (curDifficultyString != newDifficulty)
 		{
-			sprDifficulty.loadGraphic(Paths.getImage('storymenu/menudifficulties/' + newDifficulty));
-			sprDifficulty.x = leftArrow.x + 60;
-			sprDifficulty.x += (308 - sprDifficulty.width) / 2;
 			sprDifficulty.alpha = 0;
-			sprDifficulty.y = leftArrow.y - 15;
 
 			if (tweenDifficulty != null) tweenDifficulty.cancel();
 
@@ -489,13 +496,6 @@ class StoryMenuState extends MusicBeatState
 					tweenDifficulty = null;
 				}
 			});
-		}
-		else
-		{
-			sprDifficulty.loadGraphic(Paths.getImage('storymenu/menudifficulties/' + newDifficulty));
-			sprDifficulty.x = leftArrow.x + 60;
-			sprDifficulty.x += (308 - sprDifficulty.width) / 2;
-			sprDifficulty.y = leftArrow.y + 15;
 		}
 
 		curDifficultyString = newDifficulty;

@@ -1,4 +1,4 @@
-1.6.3;
+1.6.4;
 - the main programmer left the alsuh engine to work on 754$@&*$&*@$(!$?*/> lol
 - Added Custom Achievements (STOLEN from TheWorldMachinima/FNF-PsychEngine lol)
 - Added Playback Rate in other platforms (STOLEN from Raltyro/FNF-PsychEngine lol)
@@ -9,6 +9,7 @@
 - Added new Psych Alphabet instead old
 - Returned some paths (menucharacters, portraits, title)
 - on HTML5 no more outdated screen
+- Fixed Difficulty Image
 - Fixed Game Over Precaches
 - Fixed Song's Inst on Mods
 - Fixed Week Locks

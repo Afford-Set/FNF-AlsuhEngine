@@ -61,10 +61,8 @@ class TankmenBG extends FlxSprite
 		{
 			var speed:Float = (Conductor.songPosition - strumTime) * tankSpeed;
 
-			if (goingRight)
-				x = (0.02 * FlxG.width - endingOffset) + speed;
-			else
-				x = (0.74 * FlxG.width + endingOffset) - speed;
+			if (goingRight) x = (0.02 * FlxG.width - endingOffset) + speed;
+			else x = (0.74 * FlxG.width + endingOffset) - speed;
 		}
 		else if (animation.curAnim.finished) {
 			kill();
@@ -74,7 +72,7 @@ class TankmenBG extends FlxSprite
 		{
 			animation.play('shot');
 	
-			if(goingRight)
+			if (goingRight)
 			{
 				offset.x = 300;
 				offset.y = 200;

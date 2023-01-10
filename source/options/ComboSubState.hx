@@ -10,6 +10,7 @@ import flixel.text.FlxText;
 import flixel.math.FlxPoint;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
+import flixel.system.FlxSound;
 import options.OptionsMenuState;
 import flixel.group.FlxSpriteGroup;
 
@@ -125,6 +126,12 @@ class ComboSubState extends BaseSubState
 	public override function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
+
+		var pauseMusic:FlxSound = PauseSubState.pauseMusic;
+
+		if (pauseMusic != null && pauseMusic.volume < 0.5) {
+			pauseMusic.volume += 0.01 * elapsed;
+		}
 
 		var addNum:Int = 1;
 

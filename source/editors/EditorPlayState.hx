@@ -6,6 +6,11 @@ import StageData;
 import FunkinLua;
 import PhillyGlow;
 
+#if sys
+import sys.io.File;
+import sys.FileSystem;
+#end
+
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxSubState;
@@ -21,6 +26,7 @@ import flixel.system.FlxSound;
 import flixel.tweens.FlxTween;
 import openfl.events.KeyboardEvent;
 import flixel.input.keyboard.FlxKey;
+import openfl.utils.Assets as OpenFlAssets;
 
 using StringTools;
 
@@ -89,7 +95,12 @@ class EditorPlayState extends MusicBeatState
 		];
 
 		var bg:FlxSprite = new FlxSprite();
-		bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
+			bg.loadGraphic(Paths.getImage('menuDesat'));
+		}
+		else {
+			bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+		}
 		bg.scrollFactor.set();
 		bg.color = FlxColor.fromHSB(FlxG.random.int(0, 359), FlxG.random.float(0, 0.8), FlxG.random.float(0.3, 1));
 		add(bg);
@@ -130,27 +141,66 @@ class EditorPlayState extends MusicBeatState
 		add(grpNumbers);
 
 		if (PlayState.SONG.needsVoices)
-			vocals = new FlxSound().loadEmbedded(Paths.getVoices(PlayState.SONG.songID, PlayState.lastDifficulty));
+			vocals = new FlxSound().loadEmbedded(Paths.getVoices(PlayState.SONG.songID, PlayState.lastDifficulty), #if NO_PRELOAD_ALL true #else false #end);
 		else
 			vocals = new FlxSound();
 
 		generateSong(PlayState.SONG);
 
-		#if (LUA_ALLOWED && MODS_ALLOWED)
+		#if LUA_ALLOWED
 		for (notetype in noteTypeMap.keys())
 		{
+			#if MODS_ALLOWED
 			var luaToLoad:String = Paths.modFolders('custom_notetypes/' + notetype + '.lua');
 
-			if (sys.FileSystem.exists(luaToLoad))
+			if (FileSystem.exists(luaToLoad))
 			{
-				var lua:editors.EditorLua = new editors.EditorLua(luaToLoad);
+				var lua:EditorLua = new EditorLua(luaToLoad);
 
 				new FlxTimer().start(0.1, function(tmr:FlxTimer):Void
 				{
-					lua.stop();
-					lua = null;
+					if (lua != null)
+					{
+						lua.stop();
+						lua = null;
+					}
 				});
 			}
+			else
+			{
+				luaToLoad = Paths.getPreloadPath('custom_notetypes/' + notetype + '.lua');
+
+				if (FileSystem.exists(luaToLoad))
+				{
+					var lua:EditorLua = new EditorLua(luaToLoad);
+
+					new FlxTimer().start(0.1, function(tmr:FlxTimer):Void
+					{
+						if (lua != null)
+						{
+							lua.stop();
+							lua = null;
+						}
+					});
+				}
+			}
+			#elseif sys
+			var luaToLoad:String = Paths.getPreloadPath('custom_notetypes/' + notetype + '.lua');
+
+			if (OpenFlAssets.exists(luaToLoad))
+			{
+				var lua:EditorLua = new EditorLua(luaToLoad);
+
+				new FlxTimer().start(0.1, function(tmr:FlxTimer):Void
+				{
+					if (lua != null)
+					{
+						lua.stop();
+						lua = null;
+					}
+				});
+			}
+			#end
 		}
 		#end
 
@@ -206,7 +256,7 @@ class EditorPlayState extends MusicBeatState
 	{
 		Conductor.changeBPM(songData.bpm);
 
-		FlxG.sound.playMusic(Paths.getInst(songData.songID, PlayState.lastDifficulty), 0, false);
+		FlxG.sound.playMusic(Paths.getInst(songData.songID, PlayState.lastDifficulty), 0, #if NO_PRELOAD_ALL true #else false #end);
 		FlxG.sound.music.pause();
 		FlxG.sound.music.onComplete = endSong;
 		vocals.pause();
@@ -848,6 +898,8 @@ class EditorPlayState extends MusicBeatState
 			}
 		});
 
+		combo = 0;
+
 		if (!daNote.ignoreNote)
 		{
 			songMisses++;
@@ -886,18 +938,6 @@ class EditorPlayState extends MusicBeatState
 		}
 	}
 
-	public function hitNote(note:Note):Void
-	{
-		if (!note.ignoreNote)
-		{
-			popUpScore(note);
-
-			if (!note.isSustainNote) {
-				if (combo > 9999) combo = 9999;
-			}
-		}
-	}
-
 	function goodNoteHit(note:Note):Void
 	{
 		if (!note.wasGoodHit)
@@ -927,7 +967,14 @@ class EditorPlayState extends MusicBeatState
 					spawnNoteSplashOnNote(note);
 				}
 
-				hitNote(note);
+				if (!note.ignoreNote)
+				{
+					popUpScore(note);
+
+					if (!note.isSustainNote) {
+						if (combo > 9999) combo = 9999;
+					}
+				}
 			}
 
 			playerStrums.forEach(function(spr:StrumNote):Void
@@ -951,7 +998,7 @@ class EditorPlayState extends MusicBeatState
 
 	function spawnNoteSplashOnNote(note:Note)
 	{
-		if (OptionData.noteSplashes && note != null)
+		if (OptionData.splashOpacity > 0 && note != null)
 		{
 			var strum:StrumNote = null;
 
@@ -968,24 +1015,35 @@ class EditorPlayState extends MusicBeatState
 
 	public function spawnNoteSplash(x:Float, y:Float, data:Int, ?note:Note = null):Void
 	{
-		var skin:String = PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0 ? PlayState.SONG.splashSkin : 'noteSplashes';
+		var skin:String = 'noteSplashes';
+
+		if (note.mustPress)
+		{
+			if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) {
+				skin = PlayState.SONG.splashSkin;
+			}
+		}
+		else
+		{
+			if (PlayState.SONG.splashSkin2 != null && PlayState.SONG.splashSkin2.length > 0) {
+				skin = PlayState.SONG.splashSkin2;
+			}
+		}
 
 		var hue:Float = OptionData.arrowHSV[data % 4][0] / 360;
 		var sat:Float = OptionData.arrowHSV[data % 4][1] / 100;
 		var brt:Float = OptionData.arrowHSV[data % 4][2] / 100;
 
-		if (note != null)
+		if (data > -1 && data < OptionData.arrowHSV.length)
 		{
-			skin = note.noteSplashTexture;
+			hue = OptionData.arrowHSV[data][0] / 360;
+			sat = OptionData.arrowHSV[data][1] / 100;
+			brt = OptionData.arrowHSV[data][2] / 100;
 
-			if (note.isCustomNoteSplash)
+			if (note != null)
 			{
-				hue = note.noteSplashHueCustom;
-				sat = note.noteSplashSatCustom;
-				brt = note.noteSplashBrtCustom;
-			}
-			else
-			{
+				skin = note.noteSplashTexture;
+
 				hue = note.noteSplashHue;
 				sat = note.noteSplashSat;
 				brt = note.noteSplashBrt;
@@ -993,7 +1051,7 @@ class EditorPlayState extends MusicBeatState
 		}
 
 		var splash:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
-		splash.setupNoteSplash(x, y, data, skin, hue, sat, brt);
+		splash.setupNoteSplash(x, y, data, skin, note.mustPress, hue, sat, brt);
 		grpNoteSplashes.add(splash);
 	}
 

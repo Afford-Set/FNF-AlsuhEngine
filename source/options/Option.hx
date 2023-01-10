@@ -15,10 +15,7 @@ class Option
 	public var selected:Bool = false; // If false, then skip the label.
 
 	public var onPause:Bool = false;
-	public var luaAllowed:Bool = false;
-	public var luaVarAltShit:String = '';
-
-	public var isPause(default, set):Bool = false;
+	public var blockedOnPause(default, set):Bool = false;
 
 	public var isIgnoriteFunctionOnReset:Bool = false;
 
@@ -115,24 +112,27 @@ class Option
 		Reflect.setProperty(OptionData, variable, value);
 
 		#if LUA_ALLOWED
-		if (onPause && luaAllowed) // for lua shit
+		if (onPause && !blockedOnPause) // for lua shit
 		{
-			PlayState.instance.setOnLuas(variable, getValue());
+			var existsShit:Bool = OptionData.luaPrefsMap.exists(variable);
+			var ourName:String = existsShit ? OptionData.luaPrefsMap.get(variable)[0] : null;
 
-			if (luaVarAltShit != null || luaVarAltShit.length > 0) {
-				PlayState.instance.setOnLuas(luaVarAltShit, getValue());
+			if (existsShit && ourName != null) {
+				PlayState.instance.setOnLuas(ourName, value);
 			}
+
+			OptionData.loadLuaPrefs();
 		}
 		#end
 	}
 
-	private function set_isPause(value:Bool):Bool
+	private function set_blockedOnPause(value:Bool):Bool
 	{
 		if (value) {
 			description = 'This preference cannot be toggled in the pause menu.';
 		}
 
-		return isPause = value;
+		return blockedOnPause = value;
 	}
 
 	public function setChild(child:Alphabet):Void

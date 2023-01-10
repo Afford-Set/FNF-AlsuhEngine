@@ -1,10 +1,10 @@
 package flixel.addons.display;
 
+import flixel.system.FlxAssets.FlxShader;
 import lime.utils.Float32Array;
 import openfl.display.BitmapData;
 import openfl.display.ShaderInput;
 import openfl.display.ShaderParameter;
-import flixel.system.FlxAssets.FlxShader;
 import openfl.display.ShaderParameterType;
 
 /**
@@ -202,12 +202,12 @@ class FlxRuntimeShader extends FlxShader
 
 		if (fragmentSource == null)
 		{
-			Debug.logInfo('Loading default fragment source...');
+			trace('Loading default fragment source...');
 			glFragmentSource = processFragmentSource(DEFAULT_FRAGMENT_SOURCE);
 		}
 		else
 		{
-			Debug.logInfo('Loading fragment source from argument...');
+			trace('Loading fragment source from argument...');
 			glFragmentSource = processFragmentSource(fragmentSource);
 		}
 
@@ -350,6 +350,7 @@ class FlxRuntimeShader extends FlxShader
 		}
 	}
 
+	//#if (openfl < "9.3.0")
 	private var __fieldList:Array<String> = null;
 	private function thisHasField(name:String) {
 		// Reflect.hasField(this, name) is REALLY expensive so we use a cache.
@@ -359,6 +360,7 @@ class FlxRuntimeShader extends FlxShader
 		}
 		return __fieldList.indexOf(name) != -1;
 	}
+	//#end
 
 	/**
 	 * The parent function that initializes the shader.
@@ -529,7 +531,7 @@ class FlxRuntimeShader extends FlxShader
 		@:privateAccess
 		if (prop == null)
 		{
-			Debug.logWarn('[WARN] Shader float property ${name} not found.');
+			trace('[WARN] Shader float property ${name} not found.');
 			return;
 		}
 		prop.value = [value];
@@ -545,7 +547,7 @@ class FlxRuntimeShader extends FlxShader
 		var prop:ShaderParameter<Float> = Reflect.field(this.data, name);
 		if (prop == null)
 		{
-			Debug.logWarn('[WARN] Shader float[] property ${name} not found.');
+			trace('[WARN] Shader float[] property ${name} not found.');
 			return;
 		}
 		prop.value = value;
@@ -561,7 +563,7 @@ class FlxRuntimeShader extends FlxShader
 		var prop:ShaderParameter<Int> = Reflect.field(this.data, name);
 		if (prop == null)
 		{
-			Debug.logWarn('[WARN] Shader int property ${name} not found.');
+			trace('[WARN] Shader int property ${name} not found.');
 			return;
 		}
 		prop.value = [value];
@@ -577,7 +579,7 @@ class FlxRuntimeShader extends FlxShader
 		var prop:ShaderParameter<Int> = Reflect.field(this.data, name);
 		if (prop == null)
 		{
-			Debug.logWarn('[WARN] Shader int[] property ${name} not found.');
+			trace('[WARN] Shader int[] property ${name} not found.');
 			return;
 		}
 		prop.value = value;
@@ -593,7 +595,7 @@ class FlxRuntimeShader extends FlxShader
 		var prop:ShaderParameter<Bool> = Reflect.field(this.data, name);
 		if (prop == null)
 		{
-			Debug.logWarn('[WARN] Shader bool property ${name} not found.');
+			trace('[WARN] Shader bool property ${name} not found.');
 			return;
 		}
 		prop.value = [value];
@@ -609,7 +611,7 @@ class FlxRuntimeShader extends FlxShader
 		var prop:ShaderParameter<Bool> = Reflect.field(this.data, name);
 		if (prop == null)
 		{
-			Debug.logWarn('[WARN] Shader bool[] property ${name} not found.');
+			trace('[WARN] Shader bool[] property ${name} not found.');
 			return;
 		}
 		prop.value = value;
@@ -623,13 +625,11 @@ class FlxRuntimeShader extends FlxShader
 	public function setSampler2D(name:String, value:BitmapData)
 	{
 		var prop:ShaderInput<BitmapData> = Reflect.field(this.data, name);
-
-		if (prop == null)
+		if(prop == null)
 		{
-			Debug.logWarn('[WARNING] Shader sampler2D property ${name} not found.');
+			trace('[WARNING] Shader sampler2D property ${name} not found.');
 			return;
 		}
-
 		prop.input = value;
 	}
 
@@ -642,7 +642,7 @@ class FlxRuntimeShader extends FlxShader
 		var prop:ShaderParameter<Float> = Reflect.field(this.data, name);
 		if (prop == null || prop.value.length == 0)
 		{
-			Debug.logWarn('[WARN] Shader float property ${name} not found.');
+			trace('[WARN] Shader float property ${name} not found.');
 			return null;
 		}
 		return prop.value[0];
@@ -657,7 +657,7 @@ class FlxRuntimeShader extends FlxShader
 		var prop:ShaderParameter<Float> = Reflect.field(this.data, name);
 		if (prop == null)
 		{
-			Debug.logWarn('[WARN] Shader float[] property ${name} not found.');
+			trace('[WARN] Shader float[] property ${name} not found.');
 			return null;
 		}
 		return prop.value;
@@ -672,7 +672,7 @@ class FlxRuntimeShader extends FlxShader
 		var prop:ShaderParameter<Int> = Reflect.field(this.data, name);
 		if (prop == null || prop.value.length == 0)
 		{
-			Debug.logWarn('[WARN] Shader int property ${name} not found.');
+			trace('[WARN] Shader int property ${name} not found.');
 			return null;
 		}
 		return prop.value[0];
@@ -687,7 +687,7 @@ class FlxRuntimeShader extends FlxShader
 		var prop:ShaderParameter<Int> = Reflect.field(this.data, name);
 		if (prop == null)
 		{
-			Debug.logWarn('[WARN] Shader int[] property ${name} not found.');
+			trace('[WARN] Shader int[] property ${name} not found.');
 			return null;
 		}
 		return prop.value;
@@ -702,7 +702,7 @@ class FlxRuntimeShader extends FlxShader
 		var prop:ShaderParameter<Bool> = Reflect.field(this.data, name);
 		if (prop == null || prop.value.length == 0)
 		{
-			Debug.logWarn('[WARN] Shader bool property ${name} not found.');
+			trace('[WARN] Shader bool property ${name} not found.');
 			return null;
 		}
 		return prop.value[0];
@@ -717,7 +717,7 @@ class FlxRuntimeShader extends FlxShader
 		var prop:ShaderParameter<Bool> = Reflect.field(this.data, name);
 		if (prop == null)
 		{
-			Debug.logWarn('[WARN] Shader bool[] property ${name} not found.');
+			trace('[WARN] Shader bool[] property ${name} not found.');
 			return null;
 		}
 		return prop.value;

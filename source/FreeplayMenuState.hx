@@ -11,8 +11,10 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxEase;
 import flixel.group.FlxGroup;
+import transition.Transition;
 import flixel.system.FlxSound;
 import flixel.tweens.FlxTween;
+import transition.TransitionableState;
 
 using StringTools;
 
@@ -31,6 +33,7 @@ class FreeplayMenuState extends TransitionableState
 
 	var bg:FlxSprite;
 
+	var startingTweenBGColor:Bool = true;
 	var intendedColor:Int = 0xFFFFFFFF;
 	var colorTween:FlxTween;
 
@@ -88,7 +91,12 @@ class FreeplayMenuState extends TransitionableState
 		WeekData.loadTheFirstEnabledMod();
 
 		bg = new FlxSprite();
-		bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
+			bg.loadGraphic(Paths.getImage('menuDesat'));
+		}
+		else {
+			bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+		}
 		bg.updateHitbox();
 		bg.screenCenter();
 		bg.scrollFactor.set();
@@ -103,11 +111,13 @@ class FreeplayMenuState extends TransitionableState
 
 		for (i in 0...songsArray.length)
 		{
+			if (curSelected < 0) curSelected = i;
 			var leSong:SongMetaData = songsArray[i];
 
-			var songText:Alphabet = new Alphabet(0, (70 * i) + 30, leSong.songName, true);
+			var songText:Alphabet = new Alphabet(90, 320, leSong.songName, true);
 			songText.isMenuItem = true;
-			songText.targetY = i;
+			songText.targetY = i - curSelected;
+			songText.setPosition(0, (70 * i) + 30);
 			grpSongs.add(songText);
 
 			var maxWidth:Float = 980;
@@ -123,8 +133,6 @@ class FreeplayMenuState extends TransitionableState
 			icon.ID = i;
 			icon.snapToPosition();
 			grpIcons.add(icon);
-
-			if (curSelected < 0) curSelected = i;
 		}
 
 		WeekData.setDirectoryFromWeek();
@@ -240,6 +248,10 @@ class FreeplayMenuState extends TransitionableState
 		{
 			persistentUpdate = false;
 
+			if (colorTween != null) {
+				colorTween.cancel();
+			}
+
 			FlxG.sound.play(Paths.getSound('cancelMenu'));
 			FlxG.switchState(new MainMenuState());
 		}
@@ -251,14 +263,12 @@ class FreeplayMenuState extends TransitionableState
 			if (controls.UI_UP_P)
 			{
 				changeSelection(-shiftMult, true);
-
 				holdTime = 0;
 			}
 
 			if (controls.UI_DOWN_P)
 			{
 				changeSelection(shiftMult, true);
-
 				holdTime = 0;
 			}
 
@@ -283,14 +293,12 @@ class FreeplayMenuState extends TransitionableState
 			if (controls.UI_LEFT_P)
 			{
 				changeDifficulty(-1);
-
 				holdTimeHos = 0;
 			}
 
 			if (controls.UI_RIGHT_P)
 			{
 				changeDifficulty(1);
-
 				holdTimeHos = 0;
 			}
 
@@ -315,27 +323,27 @@ class FreeplayMenuState extends TransitionableState
 			persistentUpdate = false;
 			openSubState(new GameplayChangersSubState(false));
 		}
+		#if PRELOAD_ALL
 		else if (FlxG.keys.justPressed.SPACE)
 		{
-			if (instPlaying != curSelected)
+			var diffic:String = CoolUtil.getDifficultySuffix(curDifficultyString, curSong.difficulties);
+
+			if (Paths.fileExists('data/' + curSong.songID + '/' + curSong.songID + diffic + '.json', TEXT) && instPlaying != curSelected)
 			{
-				#if PRELOAD_ALL
 				destroyFreeplayVocals();
 
 				FlxG.sound.music.volume = 0;
 				Paths.currentModDirectory = curSong.folder;
 
-				var diffic:String = CoolUtil.getDifficultySuffix(curDifficultyString, curSong.difficulties);
-
 				PlayState.SONG = Song.loadFromJson(curSong.songID + diffic, curSong.songID);
 
 				if (PlayState.SONG.needsVoices)
-					vocals = new FlxSound().loadEmbedded(Paths.getVoices(PlayState.SONG.songID, CoolUtil.getDifficultySuffix(curDifficultyString, curSong.difficulties)));
+					vocals = new FlxSound().loadEmbedded(Paths.getVoices(PlayState.SONG.songID, CoolUtil.getDifficultySuffix(curDifficultyString, curSong.difficulties), #if NO_PRELOAD_ALL true #else false #end));
 				else
 					vocals = new FlxSound();
 
 				FlxG.sound.list.add(vocals);
-				FlxG.sound.playMusic(Paths.getInst(PlayState.SONG.songID, CoolUtil.getDifficultySuffix(curDifficultyString, curSong.difficulties)), 0.7);
+				FlxG.sound.playMusic(Paths.getInst(PlayState.SONG.songID, CoolUtil.getDifficultySuffix(curDifficultyString, curSong.difficulties), #if NO_PRELOAD_ALL true #else false #end), 0.7);
 
 				vocals.play();
 				vocals.persist = true;
@@ -343,9 +351,12 @@ class FreeplayMenuState extends TransitionableState
 				vocals.volume = 0.7;
 
 				instPlaying = curSelected;
-				#end
+			}
+			else {
+				Debug.logError('File "' + curSong.songID + '/' + curSong.songID + diffic + '.json' + '" does not exist!');
 			}
 		}
+		#end
 		else if (controls.ACCEPT || FlxG.mouse.justPressed)
 		{
 			persistentUpdate = false;
@@ -369,16 +380,16 @@ class FreeplayMenuState extends TransitionableState
 				if (!OptionData.loadingScreen)
 				{
 					FlxG.sound.music.volume = 0;
-
 					destroyFreeplayVocals();
 				}
 
+				#if MODS_ALLOWED
 				if (FlxG.keys.pressed.SHIFT) {
 					LoadingState.loadAndSwitchState(new editors.ChartingState(), true);
 				}
-				else {
+				else { #end
 					LoadingState.loadAndSwitchState(new PlayState(), true);
-				}
+				#if MODS_ALLOWED } #end
 			}
 			else {
 				Debug.logError('File "' + curSong.songID + '/' + curSong.songID + diffic + '.json' + '" does not exist!');
@@ -393,26 +404,12 @@ class FreeplayMenuState extends TransitionableState
 		}
 	}
 
-	public override function onTransIn():Void
-	{
-		super.onTransIn();
-
-		if (colorTween != null) {
-			colorTween.cancel();
-		}
-	}
-
-	var startShit:Bool = true;
-
 	public override function openSubState(SubState:FlxSubState):Void
 	{
 		super.openSubState(SubState);
 
-		if (!startShit)
-		{
-			if (colorTween != null) {
-				colorTween.active = false;
-			}
+		if (!startingTweenBGColor && colorTween != null) {
+			colorTween.active = false;
 		}
 	}
 
@@ -420,7 +417,7 @@ class FreeplayMenuState extends TransitionableState
 	{
 		super.closeSubState();
 
-		if (startShit)
+		if (startingTweenBGColor)
 		{
 			colorTween = FlxTween.color(bg, 1, 0xFFFFFFFF, curSong.color,
 			{
@@ -428,9 +425,8 @@ class FreeplayMenuState extends TransitionableState
 					colorTween = null;
 				}
 			});
-	
-			persistentUpdate = true;
-			startShit = false;
+
+			startingTweenBGColor = false;
 		}
 		else
 		{
@@ -474,7 +470,7 @@ class FreeplayMenuState extends TransitionableState
 			}
 		}
 
-		if (!startShit)
+		if (!startingTweenBGColor)
 		{
 			var newColor:Int = curSong.color;
 

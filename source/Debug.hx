@@ -2,6 +2,10 @@ package;
 
 import Song;
 
+#if desktop
+import sys.io.FileOutput;
+#end
+
 import haxe.Log;
 import flixel.FlxG;
 import haxe.PosInfos;
@@ -124,7 +128,7 @@ class Debug
 	 * @param value 
 	 * @param name 
 	 */
-	public inline static function quickWatch(value:Dynamic, name:String)
+	public inline static function quickWatch(value:Dynamic, name:String):Void
 	{
 		#if debug
 		FlxG.watch.addQuick(name == null ? "QuickWatch" : name, value);
@@ -135,7 +139,7 @@ class Debug
 	 * The Console window already supports most hScript, meaning you can do most things you could already do in Haxe.
 	 		* However, you can also add custom commands using this function.
 	 */
-	public inline static function addConsoleCommand(name:String, callbackFn:Dynamic)
+	public inline static function addConsoleCommand(name:String, callbackFn:Dynamic):Void
 	{
 		FlxG.console.registerFunction(name, callbackFn);
 	}
@@ -143,7 +147,7 @@ class Debug
 	/**
 	 * Add an object with a custom alias so that it can be accessed via the console.
 	 */
-	public inline static function addObject(name:String, object:Dynamic)
+	public inline static function addObject(name:String, object:Dynamic):Void
 	{
 		FlxG.console.registerObject(name, object);
 	}
@@ -155,7 +159,7 @@ class Debug
 	 * 
 	 * @param obj The object to display.
 	 */
-	public inline static function trackObject(obj:Dynamic)
+	public inline static function trackObject(obj:Dynamic):Void
 	{
 		if (obj == null)
 		{
@@ -170,7 +174,7 @@ class Debug
 	 * The game runs this function immediately when it starts.
 	 		* Use onGameStart() if it can wait until a little later.
 	 */
-	public static function onInitProgram()
+	public static function onInitProgram():Void
 	{
 		trace('Initializing Debug tools...'); // Initialize logging tools.
 
@@ -312,10 +316,11 @@ class Debug
 	inline static function loadSong(songName:String, difficulty:String, isCharting:Bool = false):Void
 	{
 		var diffName:String = CoolUtil.formatToName(difficulty);
+		var ourDiffPath:String = CoolUtil.getDifficultyFilePath(difficulty);
 
-		if (Paths.fileExists('data/' + songName + '/' + songName + (difficulty == 'normal' ? '' : ('-' + difficulty)) + '.json', TEXT))
+		if (Paths.fileExists('data/' + songName + '/' + songName + ourDiffPath + '.json', TEXT))
 		{
-			var difficulties:Array<Array<String>> = [[diffName], [difficulty], [CoolUtil.getDifficultyFilePath(difficulty)]];
+			var difficulties:Array<Array<String>> = [[diffName], [difficulty], [ourDiffPath]];
 
 			PlayState.SONG = Song.loadFromJson(songName + CoolUtil.getDifficultySuffix(difficulty, false, difficulties), songName);
 			PlayState.gameMode = 'freeplay';
@@ -361,21 +366,18 @@ class Debug
 
 class DebugLogWriter
 {
-	static final LOG_FOLDER = "logs";
-
-	public static final LOG_LEVELS = ['ERROR', 'WARN', 'INFO', 'TRACE'];
+	static final LOG_FOLDER:String = "logs";
+	public static final LOG_LEVELS:Array<String> = ['ERROR', 'WARN', 'INFO', 'TRACE'];
 
 	/**
 	 * Set this to the current timestamp that the game started.
 	 */
 	var startTime:Float = 0;
-
 	var logLevel:Int;
-
-	var active = false;
+	var active:Bool = false;
 
 	#if desktop
-	var file:sys.io.FileOutput;
+	var file:FileOutput;
 	#end
 
 	public function new(logLevelParam:String):Void

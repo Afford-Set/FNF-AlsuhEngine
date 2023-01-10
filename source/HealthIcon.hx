@@ -33,24 +33,20 @@ class HealthIcon extends FlxSprite
 			if (Paths.fileExists('images/' + name + '.png', IMAGE))
 			{
 				var file:Dynamic = Paths.getImage(name);
-
 				loadGraphic(file); // Load stupidly first for getting the file size
 
 				if (width >= 450)
 				{
 					loadGraphic(file, true, Math.floor(width / 3), Math.floor(height)); // Then load it fr
-
 					animation.add(char, [0, 1, 2], 0, false, this.isPlayer);
 				}
 				else
 				{
 					loadGraphic(file, true, Math.floor(width / 2), Math.floor(height)); // Then load it fr
-
 					animation.add(char, [0, 1], 0, false, this.isPlayer);
 				}
 
 				animation.play(char);
-
 				this.character = char;
 			}
 			else {

@@ -1,23 +1,43 @@
 # Friday Night Funkin' Alsuh Engine
 
-**Alsuh Engine** - This is modified connecting version of Psych Engine and Kade Engine by AlanSurtaev2008.
+**Alsuh Engine** - This is modified connecting version of Psych Engine, Kade Engine and other pull requests from both engines.
+Some pull requests from Psych Engine that are not needed to merge with ShadowMario/FNF-PsychEngine-main may be useful for Alsuh Engine.
 
 ## Installation:
 You must have [version 4.2.5 of Haxe](https://haxe.org/download/version/4.2.5/), seriously, stop using 4.1.5, it misses some stuff.
 
-Follow a Friday Night Funkin' source code compilation tutorial, after this you will need to install LuaJIT.
+open up a Command Prompt/PowerShell or Terminal, type `haxelib install hmm`
+after it finishes, simply type `haxelib run hmm install` in order to install all the needed libraries for *Alsuh Engine!*
 
-To install LuaJIT do this: `haxelib git linc_luajit https://github.com/nebulazorua/linc_luajit` on a Command prompt/PowerShell
-...Or if you don't want your mod to be able to run .lua scripts, delete the "LUA_ALLOWED" line on Project.xml
+## Customization:
 
-Install Actuate do this: `haxelib install actuate` on a Command prompt/PowerShell.
+if you wish to disable things like *Lua Scripts* or *.MP4 Cutscenes* or *.Webm Cutscenes*, you can read over to `Project.xml`
+inside `Project.xml`, you will find several variables to customize Alsuh Engine to your liking
 
-If you want video support on your mod, simply do `haxelib git hxCodec https://github.com/polybiusproxy/hxCodec` or `haxelib git extension-webm https://github.com/GrowtopiaFli/extension-webm` or generally install them both on a Command prompt/PowerShell
-otherwise, you can delete the "VIDEOS_ALLOWED" Line on Project.xml
+to start you off, disabling *.MP4 Cutscenes* should be simple, simply Delete the line `"MP4_ALLOWED"` or comment it out by wrapping the line in XML-like comments, like this `<!-- YOUR_LINE_HERE -->`
+
+same goes for *Lua Scripts*, comment out or delete the line with `LUA_ALLOWED`, this and other customization options are all available within the `Project.xml` file,
+
+and again also same goes for *.Webm Cutscenes*, comment out or delete the line with `WEBM_ALLOWED`, but you understood everything.
+
+# Features
+
+It's the same as in the Psych Engine, only there are changes and additions shown below.
+
+### Additions
+- Custom Inst and Voices on other difficulties
+- .WEBM Videos Support
+- Replays
+- Custom Achievements (original by [TheWorldMachinima](https://github.com/TheWorldMachinima))
+- PlayBack Rate/Pitch on other platforms (original by [Raltyro](https://github.com/Raltyro))
+
+### Changes:
+- Menu Character dances to every beat on Story Menu
+- Preferences Menu cambacked
 
 ## Credits:
 ### Alsuh Engine by
-- AlanSurtaev2008 - Programmer
+- AlanSurtaev2008 (Null) - Programmer
 
 ### Psych Engine Team
 - Shadow Mario - Programmer

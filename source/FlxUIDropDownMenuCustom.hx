@@ -172,8 +172,7 @@ class FlxUIDropDownMenuCustom extends FlxUIGroup implements IFlxUIWidget impleme
 		header = Header;
 		dropPanel = DropPanel;
 
-		if (header == null)
-			header = new FlxUIDropDownHeader();
+		if (header == null) header = new FlxUIDropDownHeader();
 
 		if (dropPanel == null)
 		{
@@ -222,10 +221,8 @@ class FlxUIDropDownMenuCustom extends FlxUIGroup implements IFlxUIWidget impleme
 		var buttonHeight = header.background.height;
 		dropPanel.y = header.background.y;
 
-		if (dropsUp())
-			dropPanel.y -= getPanelHeight();
-		else
-			dropPanel.y += buttonHeight;
+		if (dropsUp()) dropPanel.y -= getPanelHeight();
+		else dropPanel.y += buttonHeight;
 
 		var offset = dropPanel.y;
 
@@ -233,8 +230,7 @@ class FlxUIDropDownMenuCustom extends FlxUIGroup implements IFlxUIWidget impleme
 		{
 			var button:FlxUIButton = list[i];
 
-			if (button != null)
-			{
+			if (button != null) {
 				button.y = -99999;
 			}
 		}
@@ -321,8 +317,7 @@ class FlxUIDropDownMenuCustom extends FlxUIGroup implements IFlxUIWidget impleme
 						}
 					}
 				}
-				else
-				{
+				else {
 					list = [];
 				}
 
@@ -521,13 +516,11 @@ class FlxUIDropDownMenuCustom extends FlxUIGroup implements IFlxUIWidget impleme
 		selectSomething(item.name, item.label.text);
 		showList(false);
 
-		if (callback != null)
-		{
+		if (callback != null) {
 			callback(item.name);
 		}
 
-		if (broadcastToFlxUI)
-		{
+		if (broadcastToFlxUI) {
 			FlxUI.event(CLICK_EVENT, this, item.name, params);
 		}
 	}
@@ -546,7 +539,6 @@ class FlxUIDropDownMenuCustom extends FlxUIGroup implements IFlxUIWidget impleme
 		for (i in 0...StringArray.length)
 		{
 			var ID:String = StringArray[i];
-
 			if (UseIndexID)	ID = Std.string(i);
 
 			strIdArray[i] = new StrNameLabel(ID, StringArray[i]);
@@ -592,8 +584,7 @@ class FlxUIDropDownHeader extends FlxUIGroup
 		text = Text;
 		button = Button;
 
-		if (background == null)
-		{
+		if (background == null) {
 			background = new FlxUI9SliceSprite(0, 0, FlxUIAssets.IMG_BOX, new Rectangle(0, 0, Width, 20), [1, 1, 14, 14]);
 		}
 

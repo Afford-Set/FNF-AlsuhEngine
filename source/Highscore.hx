@@ -21,7 +21,7 @@ class Highscore
 
 	public static function saveWeekScore(week:String, score:Int = 0):Void
 	{
-		if (weekScores.exists(week) == true)
+		if (weekScores.exists(week))
 		{
 			if (weekScores.get(week) < score) {
 				setWeekScore(week, score);
@@ -34,7 +34,7 @@ class Highscore
 
 	public static function getWeekScore(week:String):Int
 	{
-		if (weekScores.exists(week) == false) {
+		if (!weekScores.exists(week)) {
 			weekScores.set(week, 0);
 		}
 
@@ -46,7 +46,7 @@ class Highscore
 		weekScores.set(week, score);
 
 		var save:FlxSave = new FlxSave();
-		save.bind('highscore_v2', 'afford-set');
+		save.bind('highscore_v2', CoolUtil.getSavePath());
 		
 		save.data.weekScores = weekScores;
 		save.flush();
@@ -54,7 +54,7 @@ class Highscore
 
 	public static function saveScore(daSong:String, score:Int = 0, accuracy:Float = 0):Void
 	{
-		if (songScores.exists(daSong) == true)
+		if (songScores.exists(daSong))
 		{
 			if (songScores.get(daSong) < score)
 			{
@@ -73,7 +73,7 @@ class Highscore
 
 	public static function getScore(daSong:String):Int
 	{
-		if (songScores.exists(daSong) == false) {
+		if (!songScores.exists(daSong)) {
 			songScores.set(daSong, 0);
 		}
 
@@ -85,7 +85,7 @@ class Highscore
 		songScores.set(daSong, score);
 
 		var save:FlxSave = new FlxSave();
-		save.bind('highscore_v2', 'afford-set');
+		save.bind('highscore_v2', CoolUtil.getSavePath());
 
 		save.data.songScores = songScores;
 		save.flush();
@@ -93,7 +93,7 @@ class Highscore
 
 	public static function getAccuracy(daSong:String):Float 
 	{
-		if (songAccuracy.exists(daSong) == false) {
+		if (!songAccuracy.exists(daSong)) {
 			songAccuracy.set(daSong, 0);
 		}
 
@@ -105,7 +105,7 @@ class Highscore
 		songAccuracy.set(daSong, accuracy);
 
 		var save:FlxSave = new FlxSave();
-		save.bind('highscore_v2', 'afford-set');
+		save.bind('highscore_v2', CoolUtil.getSavePath());
 
 		save.data.songAccuracy = songAccuracy;
 		save.flush();
@@ -114,7 +114,7 @@ class Highscore
 	public static function load():Void 
 	{
 		var save:FlxSave = new FlxSave();
-		save.bind('highscore_v2', 'afford-set');
+		save.bind('highscore_v2', CoolUtil.getSavePath());
 
 		if (save.data.weekScores != null) {
 			weekScores = save.data.weekScores;

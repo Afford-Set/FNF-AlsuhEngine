@@ -74,7 +74,12 @@ class DialogueEditorState extends MusicBeatUIState
 		add(character);
 
 		box = new FlxSprite(70, 370);
-		box.frames = Paths.getSparrowAtlas('dialogue/speech_bubble');
+		if (Paths.fileExists('images/speech_bubble.png', IMAGE)) {
+			box.frames = Paths.getSparrowAtlas('speech_bubble');
+		}
+		else {
+			box.frames = Paths.getSparrowAtlas('dialogue/speech_bubble');
+		}
 		box.scrollFactor.set();
 		box.antialiasing = OptionData.globalAntialiasing;
 		box.animation.addByPrefix('normal', 'speech bubble normal', 24);

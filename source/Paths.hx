@@ -41,6 +41,7 @@ class Paths
 		'videos',
 		'images',
 		'portraits',
+		'shaders',
 		'stages',
 		'weeks',
 		'fonts',
@@ -67,7 +68,7 @@ class Paths
 		{
 			if (!localTrackedAssets.contains(key) && !dumpExclusions.contains(key))
 			{
-				var obj = currentTrackedAssets.get(key);
+				var obj:Null<FlxGraphic> = currentTrackedAssets.get(key);
 
 				@:privateAccess
 				if (obj != null)
@@ -90,7 +91,7 @@ class Paths
 		@:privateAccess
 		for (key in FlxG.bitmap._cache.keys())
 		{
-			var obj = FlxG.bitmap._cache.get(key);
+			var obj:Null<FlxGraphic> = FlxG.bitmap._cache.get(key);
 			if (obj != null && !currentTrackedAssets.exists(key))
 			{
 				openfl.Assets.cache.removeBitmapData(key);
@@ -109,8 +110,7 @@ class Paths
 		}
 
 		localTrackedAssets = [];
-
-		openfl.Assets.cache.clear("songs");
+		#if !html5 openfl.Assets.cache.clear("songs"); #end
 	}
 
 	public static var currentLevel:String;
@@ -166,6 +166,14 @@ class Paths
 
 	public static function getFile(file:String, type:AssetType = TEXT, ?library:String):String
 	{
+		#if MODS_ALLOWED
+		var path:String = modFolders(file);
+
+		if (FileSystem.exists(path)) {
+			return path;
+		}
+		#end
+
 		return getPath(file, type, library);
 	}
 
@@ -179,6 +187,14 @@ class Paths
 
 	public static function getTxt(key:String, ?library:String):String
 	{
+		#if MODS_ALLOWED
+		var path:String = modsTxt(key);
+
+		if (FileSystem.exists(path)) {
+			return path;
+		}
+		#end
+
 		return getPath('data/$key.txt', TEXT, library);
 	}
 
@@ -192,6 +208,14 @@ class Paths
 
 	public static function getXml(key:String, ?library:String):String
 	{
+		#if MODS_ALLOWED
+		var path:String = modsXml(key);
+
+		if (FileSystem.exists(path)) {
+			return path;
+		}
+		#end
+
 		return getPath('data/$key.xml', TEXT, library);
 	}
 
@@ -205,6 +229,14 @@ class Paths
 
 	public static function getJson(key:String, ?library:String):String
 	{
+		#if MODS_ALLOWED
+		var path:String = modsJson(key);
+
+		if (FileSystem.exists(path)) {
+			return path;
+		}
+		#end
+
 		return getPath('data/$key.json', TEXT, library);
 	}
 
@@ -218,6 +250,14 @@ class Paths
 
 	public static function getLua(key:String, ?library:String):String
 	{
+		#if MODS_ALLOWED
+		var path:String = modsLua(key);
+
+		if (FileSystem.exists(path)) {
+			return path;
+		}
+		#end
+
 		return getPath('$key.lua', TEXT, library);
 	}
 
@@ -293,7 +333,7 @@ class Paths
 			return #if !MODS_ALLOWED 'songs:' + #end 'assets/' + path;
 		}
 
-		if (Assets.exists('songs:assets/' + pathAlt)) {
+		if (fileExists(pathAlt, SOUND) || fileExists(pathAlt, MUSIC)) {
 			return returnSound('songs', song.toLowerCase() + '/Inst' + difficulty);
 		}
 
@@ -333,7 +373,7 @@ class Paths
 			return #if !MODS_ALLOWED 'songs:' + #end 'assets/' + path;
 		}
 
-		if (Assets.exists('songs:assets/' + pathAlt)) {
+		if (fileExists(pathAlt, SOUND) || fileExists(pathAlt, MUSIC)) {
 			return returnSound('songs', song.toLowerCase() + '/Voices' + difficulty);
 		}
 
@@ -510,7 +550,7 @@ class Paths
 
 	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
 
-	public static function returnGraphic(key:String, ?library:String):Any
+	public static function returnGraphic(key:String, ?library:String):FlxGraphic
 	{
 		#if MODS_ALLOWED
 		var modKey:String = modsImages(key);
@@ -527,7 +567,6 @@ class Paths
 			}
 
 			localTrackedAssets.push(modKey);
-
 			return currentTrackedAssets.get(modKey);
 		}
 		#end
@@ -545,7 +584,6 @@ class Paths
 			}
 
 			localTrackedAssets.push(path);
-
 			return currentTrackedAssets.get(path);
 		}
 
@@ -566,7 +604,6 @@ class Paths
 			}
 
 			localTrackedAssets.push(key);
-
 			return currentTrackedSounds.get(file);
 		}
 		#end
@@ -584,17 +621,15 @@ class Paths
 		}
 
 		localTrackedAssets.push(gottenPath);
-
 		return currentTrackedSounds.get(gottenPath);
 	}
 
 	public static function formatToSongPath(path:String):String
 	{
-		var invalidChars = ~/[~&\\;:<>#]/;
-		var hideChars = ~/[.,'"%?!]/;
+		var invalidChars:EReg = ~/[~&\\;:<>#]/;
+		var hideChars:EReg = ~/[.,'"%?!]/;
 
-		var path = invalidChars.split(path.replace(' ', '-')).join("-");
-
+		var path:String = invalidChars.split(path.replace(' ', '-')).join("-");
 		return hideChars.split(path).join("").toLowerCase();
 	}
 
@@ -627,6 +662,11 @@ class Paths
 	public static function modsJson(key:String):String
 	{
 		return modFolders('data/' + key + '.json');
+	}
+
+	public static function modsLua(key:String):String
+	{
+		return modFolders(key + '.lua');
 	}
 
 	public static function modsVideo(key:String):String
@@ -706,7 +746,7 @@ class Paths
 				if (dat[1] == "1")
 				{
 					var folder = dat[0];
-					var path = Paths.mods(folder + '/pack.json');
+					var path:String = Paths.mods(folder + '/pack.json');
 			
 					if (FileSystem.exists(path))
 					{
@@ -742,7 +782,7 @@ class Paths
 		{
 			for (folder in FileSystem.readDirectory(modsFolder))
 			{
-				var path = haxe.io.Path.join([modsFolder, folder]);
+				var path:String = haxe.io.Path.join([modsFolder, folder]);
 
 				if (sys.FileSystem.isDirectory(path) && !ignoreModFolders.contains(folder) && !list.contains(folder)) {
 					list.push(folder);

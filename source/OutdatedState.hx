@@ -5,9 +5,11 @@ import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxTween;
+import transition.TransitionableState;
 
 using StringTools;
 
+#if CHECK_FOR_UPDATES
 class OutdatedState extends TransitionableState
 {
 	public static var leftState:Bool = false;
@@ -23,7 +25,12 @@ class OutdatedState extends TransitionableState
 		super.create();
 
 		bg = new FlxSprite();
-		bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
+			bg.loadGraphic(Paths.getImage('menuDesat'));
+		}
+		else {
+			bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+		}
 		bg.antialiasing = OptionData.globalAntialiasing;
 		bg.color = 0xFF0F0F0F;
 		add(bg);
@@ -57,7 +64,6 @@ class OutdatedState extends TransitionableState
 			});
 
 			FlxTween.tween(bg, {alpha: 0}, 0.5);
-
 			FlxG.sound.play(Paths.getSound('cancelMenu'));
 		}
 
@@ -66,3 +72,4 @@ class OutdatedState extends TransitionableState
 		}
 	}
 }
+#end

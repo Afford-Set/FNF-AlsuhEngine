@@ -5,18 +5,7 @@ environment:
     HAXELIB_ROOT: C:\projects\haxelib
 
 install:
-  - haxelib install lime 7.9.0
-  - haxelib install openfl
-  - haxelib install flixel
-  - haxelib install flixel-addons
-  - haxelib install flixel-ui
-  - haxelib install hscript
-  - haxelib install actuate
-  - haxelib git linc_luajit https://github.com/nebulazorua/linc_luajit
-  - haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc
-  - haxelib git hxCodec https://github.com/polybiusproxy/hxCodec
-  - haxelib git https://github.com/GrowtopiaFli/extension-webm
-  - haxelib run lime rebuild extension-webm windows
+  - haxelib install hmm
   - haxelib list
 
 test_script:

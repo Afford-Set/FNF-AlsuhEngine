@@ -14,6 +14,7 @@ import haxe.xml.Access;
 #else
 import haxe.xml.Fast as Access;
 #end
+import transition.TransitionableState;
 
 /**
  * This is a simple extension of FlxState that does two things:
@@ -119,7 +120,7 @@ class FlxUIState extends TransitionableState implements IEventGetter implements 
 			}
 			catch (msg:String)
 			{
-				FlxG.log.warn(msg);
+				Debug.logWarn(msg);
 				Debug.logError(msg);
 				liveFile = null;
 			}

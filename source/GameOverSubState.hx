@@ -10,6 +10,7 @@ import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
+import flixel.system.FlxSound;
 
 using StringTools;
 
@@ -60,6 +61,9 @@ class GameOverSubState extends MusicBeatSubState
 	{
 		super();
 
+		FlxG.camera.fade(FlxColor.WHITE, 0.01, true);
+		FlxG.camera.flash(FlxColor.WHITE, 0.01);
+
 		PlayState.instance.setOnLuas('inGameOver', true);
 
 		Conductor.changeBPM(100);
@@ -79,7 +83,12 @@ class GameOverSubState extends MusicBeatSubState
 		boyfriend.y += boyfriend.positionArray[1];
 		add(boyfriend);
 
-		FlxG.sound.play(Paths.getSound(deathSoundName));
+		var deathSound:FlxSound = new FlxSound();
+		deathSound.loadEmbedded(Paths.getSound(deathSoundName), false, true);
+		deathSound.play();
+		FlxG.sound.list.add(deathSound);
+		@:privateAccess
+		if (deathSound._paused) deathSound.resume();
 
 		FlxG.camera.scroll.set();
 		FlxG.camera.target = null;
@@ -101,7 +110,7 @@ class GameOverSubState extends MusicBeatSubState
 		});
 	}
 
-	var micIsDown:Bool = false;
+	public var micIsDown:Bool = false;
 	var isFollowingAlready:Bool = false;
 
 	public override function update(elapsed:Float):Void
@@ -180,7 +189,13 @@ class GameOverSubState extends MusicBeatSubState
 			boyfriend.playAnim('deathConfirm', true);
 
 			FlxG.sound.music.stop();
-			FlxG.sound.play(Paths.getMusic(endSoundName));
+
+			var deathSound:FlxSound = new FlxSound();
+			deathSound.loadEmbedded(Paths.getMusic(endSoundName), false, true);
+			deathSound.play();
+			FlxG.sound.list.add(deathSound);
+			@:privateAccess
+			if (deathSound._paused) deathSound.resume();
 
 			new FlxTimer().start(0.7, function(tmr:FlxTimer):Void
 			{
@@ -207,27 +222,7 @@ class GameOverSubState extends MusicBeatSubState
 							}
 							case 'replay':
 							{
-								if (FlxG.save.data.botPlay != null) {
-									PlayStateChangeables.botPlay = FlxG.save.data.botPlay;
-								}
-								else {
-									PlayStateChangeables.botPlay = false;
-								}
-
-								if (FlxG.save.data.scrollSpeed != null) {
-									PlayStateChangeables.scrollSpeed = FlxG.save.data.scrollSpeed;
-								}
-								else {
-									PlayStateChangeables.scrollSpeed = 1.0;
-								}
-			
-								if (FlxG.save.data.downScroll != null) {
-									OptionData.downScroll = FlxG.save.data.downScroll;
-								}
-								else {
-									OptionData.downScroll = false;
-								}
-	
+								Replay.resetVariables();
 								FlxG.switchState(new options.ReplaysMenuState());
 							}
 							default:

@@ -51,7 +51,6 @@ class Prompt extends BaseSubState
 		buttonNo = new FlxButton(633.3, 450, op2, function():Void
 		{
 			if (cancelc != null) cancelc();
-	
 			close();
 		});
 
@@ -65,7 +64,6 @@ class Prompt extends BaseSubState
 		if (goAnyway)
 		{
 			if (okc != null) okc();
-	
 			close();
 		}
 		else
@@ -86,7 +84,7 @@ class Prompt extends BaseSubState
 			add(buttonAccept);
 			add(buttonNo);
 
-			var textshit:FlxText = new FlxText(buttonNo.width*2, panel.y, 300, theText, 16);
+			var textshit:FlxText = new FlxText(buttonNo.width * 2, panel.y, 300, theText, 16);
 			textshit.alignment = 'center';
 			add(textshit);
 

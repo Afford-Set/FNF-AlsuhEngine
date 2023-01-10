@@ -141,7 +141,6 @@ class Song
 			}
 	
 			onLoadJson(songJson);
-
 			return songJson;
 		}
 
@@ -150,8 +149,14 @@ class Song
 
 	public static function parseJSONshit(rawJson:String):SwagSong
 	{
-		if (rawJson != null) {
-			return cast Json.parse(rawJson).song;
+		if (rawJson != null)
+		{
+			try {
+				return cast Json.parse(rawJson).song;
+			}
+			catch (e:Dynamic) {
+				Debug.logError(e);
+			}
 		}
 
 		return null;

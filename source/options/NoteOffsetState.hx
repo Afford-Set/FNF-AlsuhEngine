@@ -7,6 +7,7 @@ import flixel.ui.FlxBar;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
+import transition.Transition;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
@@ -19,9 +20,9 @@ class NoteOffsetState extends MusicBeatState
 	var boyfriend:Character;
 	var gf:Character;
 
-	public var camHUD:FlxCamera;
-	public var camGame:FlxCamera;
-	public var camOther:FlxCamera;
+	var camHUD:FlxCamera;
+	var camGame:FlxCamera;
+	var camOther:FlxCamera;
 
 	var coolText:FlxText;
 	var rating:FlxSprite;
@@ -168,7 +169,14 @@ class NoteOffsetState extends MusicBeatState
 		updateNoteDelay();
 		
 		timeBarBG = new FlxSprite(0, timeTxt.y + 8);
-		timeBarBG.loadGraphic(Paths.getImage('ui/timeBar'));
+
+		if (Paths.fileExists('images/timeBar.png', IMAGE)) {
+			timeBarBG.loadGraphic(Paths.getImage('timeBar'));
+		}
+		else {
+			timeBarBG.loadGraphic(Paths.getImage('ui/timeBar'));
+		}
+
 		timeBarBG.setGraphicSize(Std.int(timeBarBG.width * 1.2));
 		timeBarBG.updateHitbox();
 		timeBarBG.cameras = [camHUD];
@@ -307,8 +315,7 @@ class NoteOffsetState extends MusicBeatState
 
 				if (controls.RESET)
 				{
-					for (i in 0...OptionData.comboOffset.length)
-					{
+					for (i in 0...OptionData.comboOffset.length) {
 						OptionData.comboOffset[i] = 0;
 					}
 
@@ -349,6 +356,12 @@ class NoteOffsetState extends MusicBeatState
 				}
 
 				if (controls.UI_LEFT_R || controls.UI_RIGHT_R) holdTime = 0;
+
+				if (FlxG.mouse.wheel != 0)
+				{
+					barPercent += -(menu == 'dance' ? 10 : 100) * FlxG.mouse.wheel;
+					barPercent = Math.max(delayMin, Math.min(barPercent, delayMax));
+				}
 
 				if (holdTime > 0.5)
 				{
@@ -405,9 +418,8 @@ class NoteOffsetState extends MusicBeatState
 			FlxG.sound.music.pause();
 			FlxG.sound.music.volume = 0;
 
-			FlxG.switchState(new OptionsMenuState());
-
 			FlxG.mouse.visible = false;
+			FlxG.switchState(new OptionsMenuState());
 		}
 
 		Conductor.songPosition = FlxG.sound.music.time;
@@ -422,8 +434,7 @@ class NoteOffsetState extends MusicBeatState
 	{
 		super.beatHit();
 
-		if (lastBeatHit == curBeat)
-		{
+		if (lastBeatHit == curBeat) {
 			return;
 		}
 
@@ -483,8 +494,7 @@ class NoteOffsetState extends MusicBeatState
 			dumbTexts.add(text);
 			text.cameras = [camHUD];
 
-			if(i > 1)
-			{
+			if (i > 1) {
 				text.y += 24;
 			}
 		}

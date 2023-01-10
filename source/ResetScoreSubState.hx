@@ -80,6 +80,8 @@ class ResetScoreSubState extends BaseSubState
 		updateOptions();
 	}
 
+	var holdTime:Float = 0;
+
 	public override function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
@@ -97,9 +99,19 @@ class ResetScoreSubState extends BaseSubState
 
 		if (controls.UI_LEFT_P || controls.UI_RIGHT_P)
 		{
-			FlxG.sound.play(Paths.getSound('scrollMenu'), 1);
-			onYes = !onYes;
-			updateOptions();
+			holdTime = 0;
+			switchYes();
+		}
+
+		if (controls.UI_LEFT || controls.UI_RIGHT)
+		{
+			var checkLastHold:Int = Math.floor((holdTime - 0.5) * 10);
+			holdTime += elapsed;
+			var checkNewHold:Int = Math.floor((holdTime - 0.5) * 10);
+
+			if (holdTime > 0.5 && checkNewHold - checkLastHold > 0) {
+				switchYes();
+			}
 		}
 
 		if (controls.BACK || FlxG.mouse.justPressedRight)
@@ -122,6 +134,13 @@ class ResetScoreSubState extends BaseSubState
 			FlxG.sound.play(Paths.getSound('cancelMenu'), 1);
 			close();
 		}
+	}
+
+	function switchYes():Void
+	{
+		FlxG.sound.play(Paths.getSound('scrollMenu'));
+		onYes = !onYes;
+		updateOptions();
 	}
 
 	function updateOptions():Void

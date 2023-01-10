@@ -119,4 +119,28 @@ class Replay
 		}
 		#end
 	}
+
+	public static function resetVariables():Void
+	{
+		if (FlxG.save.data.botPlay != null) {
+			PlayStateChangeables.botPlay = FlxG.save.data.botPlay;
+		}
+		else {
+			PlayStateChangeables.botPlay = false;
+		}
+
+		if (FlxG.save.data.scrollSpeed != null) {
+			PlayStateChangeables.scrollSpeed = FlxG.save.data.scrollSpeed;
+		}
+		else {
+			PlayStateChangeables.scrollSpeed = 1;
+		}
+
+		if (FlxG.save.data.downScroll != null) {
+			OptionData.downScroll = FlxG.save.data.downScroll;
+		}
+		else {
+			OptionData.downScroll = false;
+		}
+	}
 }

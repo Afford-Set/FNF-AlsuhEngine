@@ -1,6 +1,16 @@
 package;
 
+import haxe.Json;
+import haxe.format.JsonParser;
+
+#if MODS_ALLOWED
+import sys.io.File;
+import haxe.io.Path;
+import sys.FileSystem;
+#end
+
 import flixel.FlxG;
+import openfl.Assets;
 import flixel.FlxSprite;
 import flixel.FlxCamera;
 import flixel.text.FlxText;
@@ -9,6 +19,37 @@ import flixel.tweens.FlxTween;
 import flixel.group.FlxSpriteGroup;
 
 using StringTools;
+
+typedef AchievementMeta =
+{
+	public var name:String;
+	public var desc:String;
+	public var save_tag:String;
+	public var hidden:Bool;
+	public var ?song:String;
+
+	public var ?week_nomiss:String;
+	public var ?lua_code:String;
+
+	/**
+		If null or -1, gets pushed instead of getting inserting to specified index.
+	**/
+	public var ?index:Int;
+
+	/**
+		If not null, replaces achievements completely.
+		
+		Using global is dangerous and it should be used just once in a modpack.
+	**/
+	public var ?global:Array<Dynamic>;
+
+	/**
+	    If true, clears the vanilla achievements.
+		
+		Same goes for clearAchievements, it should be used just once in a modpack and global should be null aswell.
+	**/
+	public var ?clearAchievements:Bool; 
+}
 
 class Achievements
 {
@@ -32,6 +73,7 @@ class Achievements
 		["Debugger",					"Beat the \"Test\" Stage from the Chart Editor.",	'debugger',				 true]
 	];
 
+	public static var copyAchievements = achievementsStuff.copy();
 	public static var achievementsMap:Map<String, Bool> = new Map<String, Bool>();
 
 	public static var henchmenDeath:Int = 0;
@@ -42,6 +84,15 @@ class Achievements
 		achievementsMap.set(name, true);
 
 		FlxG.sound.play(Paths.getSound('confirmMenu'), 0.7);
+	}
+
+	public static function exists(name:String):Bool
+	{
+		for (i in achievementsStuff) {
+			if (i[2] == name) return true;
+		}
+
+		return false;
 	}
 
 	public static function isAchievementUnlocked(name:String):Bool
@@ -63,6 +114,10 @@ class Achievements
 
 	public static function loadAchievements():Void
 	{
+		#if MODS_ALLOWED
+		loadModAchievements();
+		#end
+
 		if (FlxG.save.data != null)
 		{
 			if (FlxG.save.data.achievementsMap != null) {
@@ -74,6 +129,132 @@ class Achievements
 			}
 		}
 	}
+
+	#if MODS_ALLOWED
+	public static function loadModAchievements():Void
+	{
+		achievementsStuff = copyAchievements.copy();
+
+		var oldPath:Array<String> = Paths.globalMods.copy();
+		Paths.globalMods = [];
+
+		var paths:Array<String> = [Paths.modFolders('achievements/'),Paths.getPreloadPath('achievements/'),];
+		Paths.globalMods = oldPath;
+
+		for (i in paths.copy())
+		{
+			if (FileSystem.exists(i))
+			{
+				for (l in FileSystem.readDirectory(i))
+				{
+					if (l.endsWith('.json'))
+					{
+						var meta:AchievementMeta = cast haxe.Json.parse(File.getContent(i + l));
+
+						if (meta != null)
+						{
+							if (meta.global != null && meta.global.length > 0 && !FileSystem.exists(i + l.substring(0, l.length - 4) + 'lua'))
+								throw "(" + l + ") global needs a lua file to work.\nCreate a lua file named \"" + l.substring(0, l.length - 5) + "\" in \"" + i + "\".";
+
+							if (meta.clearAchievements) {
+								achievementsStuff = [];
+							}
+
+							if (meta.global == null || meta.global.length < 1)
+							{
+								var achievement:Array<Dynamic> = [];
+
+								achievement.push(meta.name);
+								achievement.push(meta.desc);
+								achievement.push(meta.save_tag);
+								achievement.push(meta.hidden);
+
+								var index:Null<Int> = meta.index;
+
+								if (!achievementsStuff.contains(achievement))
+								{
+									if (index == null || index < 0) {
+										achievementsStuff.push(achievement.copy());
+									}
+									else {
+										achievementsStuff.insert(index,achievement);
+									}
+								}
+							}
+							else {
+								achievementsStuff = meta.global.copy();
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public static function getModAchievements():Array<String>
+	{
+		var oldPath:Array<String> = Paths.globalMods.copy();
+		Paths.globalMods = [];
+
+		var paths:Array<String> = [Paths.modFolders('achievements/'),Paths.getPreloadPath('achievements/')];
+		Paths.globalMods = oldPath;
+
+		var luas:Array<String> = [];
+
+		for (i in paths)
+		{
+			if (FileSystem.exists(i))
+			{
+				for (l in FileSystem.readDirectory(i))
+				{
+					var pushedLuas:Array<String> = [];
+					var file:String = l.substr(0, l.length - 4);
+
+					if (l.endsWith('.lua') && FileSystem.exists(i + file + '.json') && !pushedLuas.contains(l))
+					{
+						luas.push(i + l);
+						pushedLuas.push(l);
+					}
+				}
+			}
+		}
+
+		return luas.copy();
+	}
+
+	public static function getModAchievementMetas():Array<AchievementMeta>
+	{
+		var oldPath:Array<String> = Paths.globalMods.copy();
+		Paths.globalMods = [];
+	
+		var paths:Array<String> = [Paths.modFolders('achievements/'), Paths.getPreloadPath('achievements/')];
+		Paths.globalMods = oldPath;
+	
+		var metas:Array<AchievementMeta> = [];
+	
+		for (i in paths)
+		{
+			if (FileSystem.exists(i))
+			{
+				for (l in FileSystem.readDirectory(i))
+				{
+					if (l.endsWith('.json'))
+					{
+						try {
+							var meta:AchievementMeta = haxe.Json.parse(File.getContent(i + l));
+							metas.push(meta);
+						}
+						catch (e:Dynamic) {
+							Debug.logError(e.stack);
+						}
+					}
+				}
+			}
+		}
+
+		return metas;
+	}
+	#end
 }
 
 class AttachedAchievement extends FlxSprite
@@ -120,8 +301,6 @@ class AttachedAchievement extends FlxSprite
 	}
 }
 
-@:access(flixel.FlxCamera._defaultCameras)
-
 class AchievementObject extends FlxSpriteGroup
 {
 	public var onFinish:Void->Void = null;
@@ -157,7 +336,8 @@ class AchievementObject extends FlxSpriteGroup
 		add(achievementText);
 		add(achievementIcon);
 
-		var cam:Array<FlxCamera> = FlxCamera._defaultCameras;
+		@:privateAccess
+		var cam:Array<FlxCamera> = FlxG.cameras.defaults;
 
 		if (camera != null) {
 			cam = [camera];

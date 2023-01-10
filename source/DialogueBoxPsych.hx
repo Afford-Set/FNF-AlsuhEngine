@@ -6,6 +6,8 @@ import sys.FileSystem;
 #end
 
 import haxe.Json;
+import haxe.format.JsonParser;
+
 import flixel.FlxG;
 import flixel.FlxSprite;
 import openfl.utils.Assets;
@@ -89,23 +91,22 @@ class DialogueCharacter extends FlxSprite
 
 	public function reloadCharacterJson(character:String):Void
 	{
-		var characterPath:String = 'images/dialogue/' + character + '.json';
-		var rawJson = null;
+		var rawJson:String = null;
+		var path:String = Paths.getFile('portraits/$DEFAULT_CHARACTER.json', IMAGE);
+
+		if (Paths.fileExists('images/dialogue/$character.json', TEXT)) {
+			path = Paths.getFile('images/dialogue/$character.json', TEXT);
+		}
+		else if (Paths.fileExists('images/dialogue/$character.json', TEXT)) {
+			path = Paths.getFile('images/dialogue/$character.json', TEXT);
+		}
+		else if (Paths.fileExists('portraits/$character.json', TEXT)) {
+			path = Paths.getFile('portraits/$character.json', TEXT);
+		}
 
 		#if MODS_ALLOWED
-		var path:String = Paths.modFolders(characterPath);
-
-		if (!FileSystem.exists(path)) {
-			path = Paths.getPreloadPath(characterPath);
-		}
-
-		if (!FileSystem.exists(path)) {
-			path = Paths.getPreloadPath('images/dialogue/' + DEFAULT_CHARACTER + '.json');
-		}
-
 		rawJson = File.getContent(path);
 		#else
-		var path:String = Paths.getPreloadPath(characterPath);
 		rawJson = Assets.getText(path);
 		#end
 		
@@ -210,7 +211,8 @@ class DialogueBoxPsych extends FlxSpriteGroup
 			FlxG.sound.music.fadeIn(2, 0, 1);
 		}
 		
-		bgFade = new FlxSprite(-500, -500).makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.WHITE);
+		bgFade = new FlxSprite(-500, -500);
+		bgFade.makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.WHITE);
 		bgFade.scrollFactor.set();
 		bgFade.visible = true;
 		bgFade.alpha = 0;
@@ -221,7 +223,12 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		spawnCharacters();
 
 		box = new FlxSprite(70, 370);
-		box.frames = Paths.getSparrowAtlas('dialogue/speech_bubble');
+		if (Paths.fileExists('images/speech_bubble.png', IMAGE)) {
+			box.frames = Paths.getSparrowAtlas('speech_bubble');
+		}
+		else {
+			box.frames = Paths.getSparrowAtlas('dialogue/speech_bubble');
+		}
 		box.scrollFactor.set();
 		box.antialiasing = OptionData.globalAntialiasing;
 		box.animation.addByPrefix('normal', 'speech bubble normal', 24);

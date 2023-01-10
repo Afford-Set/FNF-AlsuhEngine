@@ -23,9 +23,9 @@ typedef WeekFile =
 	var startUnlocked:Bool;
 	var hiddenUntilUnlocked:Bool;
 
-	var songs:Array<SongLabel>;
+	var songs:Array<Dynamic>;
 
-	var difficulties:Array<Array<String>>;
+	var difficulties:Dynamic;
 	var defaultDifficulty:String;
 
 	var weekCharacters:Array<String>;
@@ -46,7 +46,7 @@ typedef SongLabel =
 	var character:String;
 	var color:Array<Int>;
 
-	var difficulties:Array<Array<String>>;
+	var difficulties:Dynamic;
 	var defaultDifficulty:String;
 }
 
@@ -63,7 +63,7 @@ class WeekData
 	public var weekName:String;
 	public var startUnlocked:Bool;
 	public var hiddenUntilUnlocked:Bool;
-	public var songs:Array<SongLabel>;
+	public var songs:Array<Dynamic>;
 	public var difficulties:Array<Array<String>>;
 	public var defaultDifficulty:String;
 	public var weekCharacters:Array<String>;
@@ -78,6 +78,8 @@ class WeekData
 
 	public function new(weekFile:WeekFile, fileName:String):Void
 	{
+		onLoadJson(weekFile, fileName);
+
 		weekID = weekFile.weekID;
 		weekName = weekFile.weekName;
 		startUnlocked = weekFile.startUnlocked;
@@ -96,6 +98,116 @@ class WeekData
 		this.fileName = fileName;
 	}
 
+	public static function onLoadJson(weekFile:WeekFile, fileName:String):Void
+	{
+		if (weekFile.weekID == null) {
+			weekFile.weekID = Paths.formatToSongPath(fileName);
+		}
+
+		if (weekFile.itemFile == null) {
+			weekFile.itemFile = fileName;
+		}
+
+		if (weekFile.difficulties == null || weekFile.difficulties.length < 1)
+		{
+			weekFile.difficulties = [
+				['Easy',	'Normal',	'Hard'],
+				['easy',	'normal',	'hard'],
+				['-easy',	'',			'-hard']
+			];
+		}
+		else if (Std.isOfType(weekFile.difficulties, String) && weekFile.difficulties.length > 0)
+		{
+			var diffArr:Array<String> = [];
+
+			var diffStr:String = weekFile.difficulties;
+			if (diffStr != null) diffStr = diffStr.trim();
+	
+			if (diffStr != null && diffStr.length > 0)
+			{
+				var diffs:Array<String> = diffStr.split(',');
+				var i:Int = diffs.length - 1;
+
+				while (i > 0)
+				{
+					if (diffs[i] != null)
+					{
+						diffs[i] = diffs[i].trim();
+						if (diffs[i].length < 1) diffs.remove(diffs[i]);
+					}
+
+					--i;
+				}
+	
+				if (diffs.length > 0 && diffs[0].length > 0) {
+					diffArr = diffs.copy();
+				}
+			}
+
+			var diffArrIDs:Array<String> = diffArr.copy();
+
+			for (i in 0...diffArrIDs.length) {
+				diffArrIDs[i] = Paths.formatToSongPath(diffArrIDs[i]);
+			}
+
+			var diffArrSuffixes:Array<String> = diffArrIDs.copy();
+
+			for (i in 0...diffArrSuffixes.length) {
+				diffArrSuffixes[i] = CoolUtil.getDifficultyFilePath(diffArrSuffixes[i]);
+			}
+
+			weekFile.difficulties = [diffArr, diffArrIDs, diffArrSuffixes];
+		}
+
+		if (weekFile.defaultDifficulty == null || weekFile.defaultDifficulty.length < 1) {
+			weekFile.defaultDifficulty = 'normal';
+		}
+
+		var newSongs:Array<Dynamic> = [];
+		var targetBool:Array<Bool> = [];
+
+		for (i in 0...weekFile.songs.length)
+		{
+			var oldSongOrNot:Dynamic = weekFile.songs[i];
+			targetBool[i] = false;
+
+			if (Std.isOfType(oldSongOrNot, Array))
+			{
+				targetBool[i] = true;
+
+				var newSong:SongLabel =
+				{
+					songID: 'bopeebo',
+					songName: 'Bopeebo',
+					character: 'dad',
+					color: [146, 113, 253],
+					difficulties: [
+						['Easy',	'Normal',	'Hard'],
+						['easy',	'normal',	'hard'],
+						['-easy',	'',			'-hard']
+					],
+					defaultDifficulty: 'normal'
+				};
+
+				newSong.songID = Paths.formatToSongPath(oldSongOrNot[0]);
+				newSong.songName = CoolUtil.formatToName(oldSongOrNot[0]);
+				newSong.character = oldSongOrNot[1];
+				newSong.color = oldSongOrNot[2];
+				newSong.difficulties = weekFile.difficulties.copy();
+				newSong.defaultDifficulty = weekFile.defaultDifficulty;
+
+				newSongs[i] = newSong;
+			}
+		}
+
+		for (i in 0...targetBool.length)
+		{
+			if (targetBool[i]) {
+				weekFile.songs[i] = newSongs[i];
+			}
+		}
+	}
+
 	public static function createWeekFile():WeekFile
 	{
 		return {
@@ -110,7 +222,7 @@ class WeekData
 						['easy',	'normal',	'hard'],
 						['-easy',	'',			'-hard']
 					],
-					defaultDifficulty: 'normal',
+					defaultDifficulty: 'normal'
 				},
 				{
 					songID: 'fresh',
@@ -122,7 +234,7 @@ class WeekData
 						['easy',	'normal',	'hard'],
 						['-easy',	'',			'-hard']
 					],
-					defaultDifficulty: 'normal',
+					defaultDifficulty: 'normal'
 				},
 				{
 					songID: 'dad-battle',
@@ -134,7 +246,7 @@ class WeekData
 						['easy',	'normal',	'hard'],
 						['-easy',	'',			'-hard']
 					],
-					defaultDifficulty: 'normal',
+					defaultDifficulty: 'normal'
 				}
 			],
 			weekCharacters: ['dad', 'bf', 'gf'],
@@ -181,7 +293,7 @@ class WeekData
 				}
 				else // Sort mod loading order based on modsList.txt file
 				{
-					var path = haxe.io.Path.join([Paths.mods(), splitName[0]]);
+					var path:String = Path.join([Paths.mods(), splitName[0]]);
 
 					if (sys.FileSystem.isDirectory(path) && !Paths.ignoreModFolders.contains(splitName[0]) && !disabledMods.contains(splitName[0]) && !directories.contains(path + '/')) {
 						directories.push(path + '/');
@@ -194,7 +306,7 @@ class WeekData
 	
 		for (folder in modsDirectories)
 		{
-			var pathThing:String = haxe.io.Path.join([Paths.mods(), folder]) + '/';
+			var pathThing:String = Path.join([Paths.mods(), folder]) + '/';
 		
 			if (!disabledMods.contains(folder) && !directories.contains(pathThing)) {
 				directories.push(pathThing);
@@ -257,7 +369,7 @@ class WeekData
 
 				for (file in FileSystem.readDirectory(directory))
 				{
-					var path = haxe.io.Path.join([directory, file]);
+					var path:String = Path.join([directory, file]);
 			
 					if (!sys.FileSystem.isDirectory(path) && file.endsWith('.json')) {
 						addWeek(file.substr(0, file.length - 5), path, directories[i], i, originalLength);

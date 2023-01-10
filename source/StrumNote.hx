@@ -3,12 +3,13 @@ package;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import shaders.ColorSwap;
+import flixel.graphics.FlxGraphic;
 
 using StringTools;
 
 class StrumNote extends FlxSprite
 {
-	private var colorSwap:ColorSwap;
+	public var colorSwap:ColorSwap;
 
 	public var noteData:Int = 0;
 	public var resetAnim:Float = 0;
@@ -48,12 +49,27 @@ class StrumNote extends FlxSprite
 
 		if (PlayState.isPixelStage)
 		{
-			loadGraphic(Paths.getImage('notes/pixel/' + skin));
+			var ourGraphic:FlxGraphic = null;
+
+			if (Paths.fileExists('images/' + skin + '.png', IMAGE)) {
+				ourGraphic = Paths.getImage(skin);
+			}
+			else if (Paths.fileExists('images/pixelUI/' + skin + '.png', IMAGE)) {
+				ourGraphic = Paths.getImage('pixelUI/' + skin);
+			}
+			else if (Paths.fileExists('images/notes/pixel/' + skin + '.png', IMAGE)) {
+				ourGraphic = Paths.getImage('notes/pixel/' + skin);
+			}
+			else {
+				ourGraphic = Paths.getImage('notes/' + skin);
+			}
+
+			loadGraphic(ourGraphic);
 
 			width = width / 4;
 			height = height / 5;
 
-			loadGraphic(Paths.getImage('notes/pixel/' + skin), true, Math.floor(width), Math.floor(height));
+			loadGraphic(ourGraphic, true, Math.floor(width), Math.floor(height));
 		
 			animation.add('green', [6]);
 			animation.add('red', [7]);
@@ -94,7 +110,12 @@ class StrumNote extends FlxSprite
 		}
 		else
 		{
-			frames = Paths.getSparrowAtlas('notes/' + skin);
+			if (Paths.fileExists('images/' + skin + '.png', IMAGE)) {
+				frames = Paths.getSparrowAtlas(skin);
+			}
+			else {
+				frames = Paths.getSparrowAtlas('notes/' + skin);
+			}
 
 			animation.addByPrefix('green', 'arrowUP');
 			animation.addByPrefix('blue', 'arrowDOWN');
@@ -188,9 +209,12 @@ class StrumNote extends FlxSprite
 		}
 		else
 		{
-			colorSwap.hue = OptionData.arrowHSV[noteData % 4][0] / 360;
-			colorSwap.saturation = OptionData.arrowHSV[noteData % 4][1] / 100;
-			colorSwap.brightness = OptionData.arrowHSV[noteData % 4][2] / 100;
+			if (noteData > -1 && noteData < OptionData.arrowHSV.length)
+			{
+				colorSwap.hue = OptionData.arrowHSV[noteData][0] / 360;
+				colorSwap.saturation = OptionData.arrowHSV[noteData][1] / 100;
+				colorSwap.brightness = OptionData.arrowHSV[noteData][2] / 100;
+			}
 
 			if (animation.curAnim.name == 'confirm' && !PlayState.isPixelStage) {
 				centerOrigin();

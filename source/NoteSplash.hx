@@ -7,6 +7,7 @@ import shaders.ColorSwap;
 class NoteSplash extends FlxSprite
 {
 	public var colorSwap:ColorSwap = null;
+	public var note:Int = 0;
 
 	private var idleAnim:String;
 	private var textureLoaded:String = null;
@@ -14,6 +15,8 @@ class NoteSplash extends FlxSprite
 	public function new(x:Float = 0, y:Float = 0, ?note:Int = 0):Void
 	{
 		super(x, y);
+
+		this.note = note;
 
 		var skin:String = 'noteSplashes';
 		if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) skin = PlayState.SONG.splashSkin;
@@ -31,7 +34,9 @@ class NoteSplash extends FlxSprite
 	public function setupNoteSplash(x:Float, y:Float, note:Int = 0, texture:String = null, mustPress:Bool = true, hueColor:Float = 0, satColor:Float = 0, brtColor:Float = 0):Void
 	{
 		setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
-		alpha = 0.6;
+		alpha = OptionData.splashOpacity;
+
+		this.note = note;
 
 		if (texture == null)
 		{
@@ -51,8 +56,7 @@ class NoteSplash extends FlxSprite
 			}
 		}
 
-		if (textureLoaded != texture)
-		{
+		if (textureLoaded != texture) {
 			loadAnims(texture);
 		}
 
@@ -69,7 +73,15 @@ class NoteSplash extends FlxSprite
 
 	function loadAnims(skin:String):Void
 	{
-		frames = Paths.getSparrowAtlas('notes/' + skin);
+		if (Paths.fileExists('images/' + skin + '.png', IMAGE)) {
+			frames = Paths.getSparrowAtlas(skin);
+		}
+		else if (Paths.fileExists('images/pixelUI/' + skin + '.png', IMAGE)) {
+			frames = Paths.getSparrowAtlas('pixelUI/' + skin);
+		}
+		else {
+			frames = Paths.getSparrowAtlas('notes/' + skin);
+		}
 
 		for (i in 1...3)
 		{

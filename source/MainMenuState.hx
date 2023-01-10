@@ -20,6 +20,7 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.effects.FlxFlicker;
 import flixel.input.keyboard.FlxKey;
+import transition.TransitionableState;
 
 using StringTools;
 
@@ -48,7 +49,9 @@ class MainMenuState extends TransitionableState
 	var camFollowPos:FlxObject;
 	var camFollow:FlxPoint;
 
-	public static var engineVersion:String = '1.6.2h';
+	public static var engineVersion:String = '1.6.3';
+	public static var psychEngineVersion:String = '0.6.4';
+
 	public static var gameVersion:String = '0.2.8';
 
 	var debugKeys:Array<FlxKey>;
@@ -87,7 +90,12 @@ class MainMenuState extends TransitionableState
 		var yScroll:Float = Math.max(0.25 - (0.05 * (menuItems.length - 4)), 0.1);
 
 		var bg:FlxSprite = new FlxSprite(-80);
-		bg.loadGraphic(Paths.getImage('bg/menuBG'));
+		if (Paths.fileExists('images/menuBG.png', IMAGE)) {
+			bg.loadGraphic(Paths.getImage('menuBG'));
+		}
+		else {
+			bg.loadGraphic(Paths.getImage('bg/menuBG'));
+		}
 		bg.scrollFactor.set(0, yScroll);
 		bg.setGraphicSize(Std.int(bg.width * 1.175));
 		bg.updateHitbox();
@@ -96,7 +104,12 @@ class MainMenuState extends TransitionableState
 		add(bg);
 
 		magenta = new FlxSprite(-80);
-		magenta.loadGraphic(Paths.getImage('bg/menuDesat'));
+		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
+			magenta.loadGraphic(Paths.getImage('menuDesat'));
+		}
+		else {
+			magenta.loadGraphic(Paths.getImage('bg/menuDesat'));
+		}
 		magenta.scrollFactor.set(0, yScroll);
 		magenta.setGraphicSize(Std.int(magenta.width * 1.175));
 		magenta.updateHitbox();

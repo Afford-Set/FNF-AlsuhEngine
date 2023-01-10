@@ -11,6 +11,7 @@ using StringTools;
 class OptionData
 {
 	public static var fullScreen:Bool = false;
+	public static var screenRes:String = '1280x720';
 	public static var lowQuality:Bool = false;
 	public static var globalAntialiasing:Bool = true;
 	public static var shaders:Bool = true;
@@ -41,7 +42,7 @@ class OptionData
 
 	public static var iconZooms:Bool = true;
 	public static var sustainsType:String = 'New';
-	public static var noteSplashes:Bool = true;
+	public static var splashOpacity:Float = 0.6;
 	public static var danceOffset:Int = 2;
 	public static var songPositionType:String = 'Time Left and Elapsed';
 	public static var scoreText:Bool = true;
@@ -56,7 +57,9 @@ class OptionData
 	public static var rainFPS:Bool = false;
 	public static var memoryCounter:Bool = false;
 	public static var rainMemory:Bool = false;
+	#if CHECK_FOR_UPDATES
 	public static var checkForUpdates:Bool = true;
+	#end
 	public static var autoPause:Bool = false;
 	public static var watermarks:Bool = true;
 	public static var loadingScreen:Bool = #if NO_PRELOAD_ALL true #else false #end;
@@ -65,105 +68,200 @@ class OptionData
 	public static var comboOffset:Array<Int> = [0, 0, 0, 0];
 	public static var arrowHSV:Array<Array<Int>> = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]];
 
-	private static var ignoredFields:Array<String> = ['keyBinds', 'defaultKeys'];
+	private static var importantMap:Map<String, Array<String>> =
+	[
+		"saveBlackList" => ["keyBinds", "defaultKeys"],
+		"saveAchievements" => ["achievementsMap", "henchmenDeath"],
+		"flixelSound" => ["volume", "sound"],
+		"loadBlackList" => ["keyBinds", "defaultKeys", "loadCtrls", "saveCtrls"],
+	];
 
 	public static function savePrefs():Void
 	{
-		FlxG.save.bind('alsuh-engine', 'afford-set');
+		FlxG.save.bind('alsuh-engine', CoolUtil.getSavePath());
 
-		var fieldsArray:Array<String> = Reflect.fields(OptionData);
-
-		for (i in 0...ignoredFields.length)
+		for (field in Type.getClassFields(OptionData))
 		{
-			var ignoredField:String = ignoredFields[i];
-
-			if (fieldsArray.contains(ignoredField)) {
-				fieldsArray.remove(ignoredField);
+			if (Type.typeof(Reflect.field(OptionData, field)) != TFunction)
+			{
+				if (!importantMap.get("saveBlackList").contains(field)) {
+					Reflect.setField(FlxG.save.data, field, Reflect.field(OptionData, field));
+				}
 			}
 		}
 
-		for (i in 0...fieldsArray.length)
-		{
-			var field:String = fieldsArray[i];
-
-			Reflect.setField(FlxG.save.data, field, Reflect.field(OptionData, field));
-			FlxG.save.flush();
+		for (achievement in importantMap.get("saveAchievements")) {
+			Reflect.setField(FlxG.save.data, achievement, Reflect.field(Achievements, achievement));
 		}
 
-		FlxG.save.data.achievementsMap = Achievements.achievementsMap;
-		FlxG.save.data.henchmenDeath = Achievements.henchmenDeath;
-		FlxG.save.flush();
+		for (flixelS in importantMap.get("flixelSound")) {
+			Reflect.setField(FlxG.save.data, flixelS, Reflect.field(FlxG.sound, flixelS));
+		}
+
+		for (flixelS in importantMap.get("flixelSound"))
+		{
+			var flxProp:Dynamic = Reflect.field(FlxG.save.data, flixelS);
+
+			if (flxProp != null) {
+				Reflect.setProperty(FlxG.sound, flixelS, flxProp);
+			}
+		}
 	}
 
 	public static function loadPrefs():Void
 	{
-		FlxG.save.bind('alsuh-engine', 'afford-set');
+		FlxG.save.bind('alsuh-engine', CoolUtil.getSavePath());
 
-		var fieldsArray:Array<String> = Reflect.fields(OptionData);
-
-		for (i in 0...ignoredFields.length)
+		for (field in Type.getClassFields(OptionData))
 		{
-			var ignoredField:String = ignoredFields[i];
-
-			if (fieldsArray.contains(ignoredField)) {
-				fieldsArray.remove(ignoredField);
-			}
-		}
-
-		for (i in 0...fieldsArray.length)
-		{
-			var field:String = fieldsArray[i];
-			var valueFromSave:Dynamic = Reflect.field(OptionData, field);
-
-			if (valueFromSave != null) {
-				Reflect.setField(OptionData, field, valueFromSave);
-			}
-
-			switch (field)
+			if (Type.typeof(Reflect.field(OptionData, field)) != TFunction)
 			{
-				case 'fullScreen':
+				if (!importantMap.get("loadBlackList").contains(field))
 				{
-					FlxG.fullscreen = fullScreen;
-				}
-				case 'framerate':
-				{
-					if (framerate > FlxG.drawFramerate)
+					var defaultValue:Dynamic = Reflect.field(OptionData, field);
+					var flxProp:Dynamic = Reflect.field(FlxG.save.data, field);
+
+					Reflect.setField(OptionData, field, (flxProp != null ? flxProp : defaultValue));
+
+					switch (field)
 					{
-						FlxG.updateFramerate = framerate;
-						FlxG.drawFramerate = framerate;
+						case 'fullScreen':
+						{
+							FlxG.fullscreen = fullScreen;
+						}
+						case 'screenRes':
+						{
+							var res:Array<String> = OptionData.screenRes.split('x');
+							FlxG.resizeWindow(Std.parseInt(res[0]), Std.parseInt(res[1]));
+					
+							FlxG.fullscreen = false;
+					
+							if (!FlxG.fullscreen) {
+								FlxG.fullscreen = OptionData.fullScreen;
+							}
+						}
+						case 'framerate':
+						{
+							if (framerate > FlxG.drawFramerate)
+							{
+								FlxG.updateFramerate = framerate;
+								FlxG.drawFramerate = framerate;
+							}
+							else
+							{
+								FlxG.drawFramerate = framerate;
+								FlxG.updateFramerate = framerate;
+							}
+						}
+						case 'opponentStrumsType':
+						{
+							if (FlxG.save.data.cpuStrumsType != null)
+							{
+								FlxG.save.data.opponentStrumsType = FlxG.save.data.cpuStrumsType;
+								FlxG.save.data.cpuStrumsType = null;
+					
+								FlxG.save.flush();
+							}
+
+							if (FlxG.save.data.opponentStrumsType != null)
+							{
+								if (FlxG.save.data.opponentStrumsType == 'Light Up')
+								{
+									FlxG.save.data.opponentStrumsType = 'Glow';
+									FlxG.save.flush();
+								}
+					
+								if (FlxG.save.data.opponentStrumsType == 'Normal')
+								{
+									FlxG.save.data.opponentStrumsType = 'Static';
+									FlxG.save.flush();
+								}
+
+								opponentStrumsType = FlxG.save.data.opponentStrumsType;
+							}
+						}
+						case 'songPositionType':
+						{
+							if (FlxG.save.data.songPositionType != null)
+							{
+								if (FlxG.save.data.songPositionType == 'Multiplicative')
+								{
+									FlxG.save.data.songPositionType = 'Time Left and Elapsed';
+									FlxG.save.flush();
+								}
+					
+								songPositionType = FlxG.save.data.songPositionType;
+							}
+						}
+						case 'splashOpacity':
+						{
+							if (FlxG.save.data.noteSplashes != null)
+							{
+								splashOpacity = FlxG.save.data.noteSplashes ? 0.6 : 0;
+								FlxG.save.data.noteSplashes = null;
+
+								FlxG.save.data.splashOpacity = splashOpacity;
+								FlxG.save.flush();
+							}
+						}
+						case 'fpsCounter':
+						{
+							if (Main.fpsCounter != null) {
+								Main.fpsCounter.visible = fpsCounter;
+							}
+						}
+						case 'memoryCounter':
+						{
+							if (Main.memoryCounter != null) {
+								Main.memoryCounter.visible = memoryCounter;
+							}
+						}
+						case 'autoPause':
+						{
+							FlxG.autoPause = autoPause;
+						}
 					}
-					else
-					{
-						FlxG.drawFramerate = framerate;
-						FlxG.updateFramerate = framerate;
-					}
-				}
-				case 'fpsCounter':
-				{
-					if (Main.fpsCounter != null) {
-						Main.fpsCounter.visible = fpsCounter;
-					}
-				}
-				case 'memoryCounter':
-				{
-					if (Main.memoryCounter != null) {
-						Main.memoryCounter.visible = memoryCounter;
-					}
-				}
-				case 'autoPause':
-				{
-					FlxG.autoPause = autoPause;
 				}
 			}
 		}
+	}
 
-		if (FlxG.save.data.volume != null) {
-			FlxG.sound.volume = FlxG.save.data.volume;
-		}
+	public static var luaPrefsMap:Map<String, Array<Dynamic>> = new Map<String, Array<Dynamic>>();
 
-		if (FlxG.save.data.mute != null) {
-			FlxG.sound.muted = FlxG.save.data.mute;
-		}
+	public static function loadLuaPrefs():Void
+	{
+		luaPrefsMap.clear();
+
+		luaPrefsMap.set('ratingOffset', ['ratingOffset', OptionData.ratingOffset]);
+		luaPrefsMap.set('noteSplashes', ['noteSplashes', OptionData.splashOpacity > 0]);
+		luaPrefsMap.set('splashOpacity', ['splashOpacity', OptionData.splashOpacity]);
+		luaPrefsMap.set('naughtyness', ['naughtyness', OptionData.naughtyness]);
+		luaPrefsMap.set('safeFrames', ['safeFrames', OptionData.safeFrames]);
+		luaPrefsMap.set('downScroll', ['downscroll', OptionData.downScroll]);
+		luaPrefsMap.set('danceOffset', ['danceOffset', OptionData.danceOffset]);
+		luaPrefsMap.set('pauseMusic', ['pauseMusic', OptionData.pauseMusic]);
+		luaPrefsMap.set('middleScroll', ['middlescroll', OptionData.middleScroll]);
+		luaPrefsMap.set('framerate', ['framerate', OptionData.framerate]);
+		luaPrefsMap.set('ghostTapping', ['ghostTapping', OptionData.ghostTapping]);
+		luaPrefsMap.set('scoreText', ['scoreText', OptionData.scoreText]);
+		luaPrefsMap.set('showRatings', ['showRatings', OptionData.showRatings]);
+		luaPrefsMap.set('showNumbers', ['showNumbers', OptionData.showNumbers]);
+		luaPrefsMap.set('songPositionType', ['songPositionType', OptionData.songPositionType]);
+		luaPrefsMap.set('camZooms', ['camZooms', OptionData.camZooms]);
+		luaPrefsMap.set('camZooms', ['cameraZoomOnBeat', OptionData.camZooms]);
+		luaPrefsMap.set('camShakes', ['cameraShakes', OptionData.camShakes]);
+		luaPrefsMap.set('iconZooms', ['iconZooms', OptionData.iconZooms]);
+		luaPrefsMap.set('flashingLights', ['flashingLights', OptionData.flashingLights]);
+		luaPrefsMap.set('flashingLights', ['flashing', OptionData.flashingLights]);
+		luaPrefsMap.set('noteOffset', ['noteOffset', OptionData.noteOffset]);
+		luaPrefsMap.set('healthBarAlpha', ['healthBarAlpha', OptionData.healthBarAlpha]);
+		luaPrefsMap.set('noReset', ['noResetButton', OptionData.noReset]);
+		luaPrefsMap.set('lowQuality', ['lowQuality', OptionData.lowQuality]);
+		luaPrefsMap.set('sickWindow', ['sickWindow', OptionData.sickWindow]);
+		luaPrefsMap.set('goodWindow', ['goodWindow', OptionData.goodWindow]);
+		luaPrefsMap.set('badWindow', ['badWindow', OptionData.badWindow]);
+		luaPrefsMap.set('shitWindow', ['shitWindow', OptionData.shitWindow]);
+		luaPrefsMap.set('opponentStrumsType', ['opponentStrumsType', OptionData.opponentStrumsType]);
 	}
 
 	public static var keyBinds:Map<String, Array<FlxKey>> =
@@ -201,7 +299,7 @@ class OptionData
 	public static function saveCtrls():Void
 	{
 		var save:FlxSave = new FlxSave();
-		save.bind('controls_v3', 'afford-set');
+		save.bind('controls_v3', CoolUtil.getSavePath());
 		save.data.keyBinds = keyBinds;
 		save.flush();
 	}
@@ -209,14 +307,13 @@ class OptionData
 	public static function loadCtrls():Void
 	{
 		var save:FlxSave = new FlxSave();
-		save.bind('controls_v3', 'afford-set');
+		save.bind('controls_v3', CoolUtil.getSavePath());
 
 		if (save != null && save.data.keyBinds != null)
 		{
 			var loadedControls:Map<String, Array<FlxKey>> = save.data.keyBinds;
 
-			for (control => keys in loadedControls)
-			{
+			for (control => keys in loadedControls) {
 				keyBinds.set(control, keys);
 			}
 		}
@@ -231,9 +328,6 @@ class OptionData
 		TitleState.muteKeys = copyKey(keyBinds.get('volume_mute'));
 		TitleState.volumeDownKeys = copyKey(keyBinds.get('volume_down'));
 		TitleState.volumeUpKeys = copyKey(keyBinds.get('volume_up'));
-
-		PlayState.debugKeysChart = OptionData.copyKey(OptionData.keyBinds.get('debug_1'));
-		PlayState.debugKeysCharacter = OptionData.copyKey(OptionData.keyBinds.get('debug_2'));
 
 		FlxG.sound.muteKeys = TitleState.muteKeys;
 		FlxG.sound.volumeDownKeys = TitleState.volumeDownKeys;

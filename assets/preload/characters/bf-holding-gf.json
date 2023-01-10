@@ -1,5 +1,11 @@
 {
 	"char_name": "Boyfriend and Girlfriend",
+	"gameover_properties": [
+		"bf-holding-gf-dead",
+		"fnf_loss_sfx",
+		"gameOver",
+		"gameOverEnd"
+	],
 	"animations": [
 		{
 			"offsets": [

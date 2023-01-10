@@ -14,12 +14,13 @@ import flixel.tweens.FlxEase;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxTween;
 import flixel.input.keyboard.FlxKey;
+import flixel.graphics.frames.FlxAtlasFrames;
 
 using StringTools;
 
 class StoryMenuState extends MusicBeatState
 {
-	private static var curSelected:Int = -1;
+	private static var curSelected:Int = 0;
 	private static var curDifficultyString:String = '';
 
 	private var curDifficulty:Int = -1;
@@ -52,6 +53,7 @@ class StoryMenuState extends MusicBeatState
 		super.create();
 
 		WeekData.reloadWeekFiles(true);
+		if (curSelected >= WeekData.weeksList.length) curSelected = 0;
 
 		#if desktop
 		DiscordClient.changePresence("In the Story Menu", null); // Updating Discord Rich Presence
@@ -86,6 +88,15 @@ class StoryMenuState extends MusicBeatState
 		grpWeekCharacters = new FlxTypedGroup<MenuCharacter>();
 		add(grpWeekCharacters);
 
+		var ourUIShit:FlxAtlasFrames = null;
+
+		if (Paths.fileExists('images/campaign_menu_UI_assets.png', IMAGE)) {
+			ourUIShit = Paths.getSparrowAtlas('campaign_menu_UI_assets');
+		}
+		else {
+			ourUIShit = Paths.getSparrowAtlas('storymenu/campaign_menu_UI_assets');
+		}
+
 		var num:Int = 0;
 
 		for (i in 0...WeekData.weeksList.length)
@@ -111,7 +122,7 @@ class StoryMenuState extends MusicBeatState
 				if (isLocked)
 				{
 					var lock:FlxSprite = new FlxSprite(weekThing.width + 10 + weekThing.x);
-					lock.frames = Paths.getSparrowAtlas('storymenu/campaign_menu_UI_assets');
+					lock.frames = ourUIShit;
 					lock.animation.addByPrefix('lock', 'lock');
 					lock.animation.play('lock');
 					lock.ID = i;
@@ -121,8 +132,6 @@ class StoryMenuState extends MusicBeatState
 
 				num++;
 			}
-
-			if (curSelected < 0) curSelected = i;
 		}
 
 		WeekData.setDirectoryFromWeek(weeksArray[0]);
@@ -136,21 +145,23 @@ class StoryMenuState extends MusicBeatState
 			grpWeekCharacters.add(weekCharacterThing);
 		}
 
-		leftArrow = new FlxSprite(grpWeeks.members[0].x + grpWeeks.members[0].width + 10, grpWeeks.members[0].y + 10);
-		leftArrow.frames = Paths.getSparrowAtlas('storymenu/campaign_menu_UI_assets');
-		leftArrow.animation.addByPrefix('idle', "arrow left");
-		leftArrow.animation.addByPrefix('press', "arrow push left");
+		var weekSpr:MenuItem = grpWeeks.members[0];
+
+		leftArrow = new FlxSprite(weekSpr.x + weekSpr.width + 10, weekSpr.y + 10);
+		leftArrow.frames = ourUIShit;
+		leftArrow.animation.addByPrefix('idle', "arrow left", 24, false);
+		leftArrow.animation.addByPrefix('press', "arrow push left", 24, false);
 		leftArrow.animation.play('idle');
 		leftArrow.antialiasing = OptionData.globalAntialiasing;
 		add(leftArrow);
-		
+
 		sprDifficulty = new FlxSprite(0, leftArrow.y);
 		sprDifficulty.antialiasing = OptionData.globalAntialiasing;
 		add(sprDifficulty);
 
 		rightArrow = new FlxSprite(leftArrow.x + 376, leftArrow.y);
-		rightArrow.frames = Paths.getSparrowAtlas('storymenu/campaign_menu_UI_assets');
-		rightArrow.animation.addByPrefix('idle', 'arrow right');
+		rightArrow.frames = ourUIShit;
+		rightArrow.animation.addByPrefix('idle', 'arrow right', 24, false);
 		rightArrow.animation.addByPrefix('press', "arrow push right", 24, false);
 		rightArrow.animation.play('idle');
 		rightArrow.antialiasing = OptionData.globalAntialiasing;
@@ -270,36 +281,29 @@ class StoryMenuState extends MusicBeatState
 				if (FlxG.mouse.wheel != 0 && !FlxG.keys.pressed.ALT)
 				{
 					FlxG.sound.play(Paths.getSound('scrollMenu'));
-
 					changeSelection(-shiftMult * FlxG.mouse.wheel);
 				}
 			}
 
 			if (curWeek.difficulties[1].length > 1 && !WeekData.weekIsLocked(curWeek.weekID))
 			{
-				if (controls.UI_LEFT)
-					leftArrow.animation.play('press');
-				else
-					leftArrow.animation.play('idle');
-
 				if (controls.UI_LEFT_P)
 				{
-					changeDifficulty(-1);
+					leftArrow.animation.play('press');
 
+					changeDifficulty(-1);
 					holdTimeHos = 0;
 				}
+				else if (controls.UI_LEFT_R) leftArrow.animation.play('idle');
 
 				if (controls.UI_RIGHT_P)
 				{
-					changeDifficulty(1);
+					rightArrow.animation.play('press');
 
+					changeDifficulty(1);
 					holdTimeHos = 0;
 				}
-	
-				if (controls.UI_RIGHT)
-					rightArrow.animation.play('press')
-				else
-					rightArrow.animation.play('idle');
+				else if (controls.UI_RIGHT_R) rightArrow.animation.play('idle');
 
 				if (controls.UI_LEFT || controls.UI_RIGHT)
 				{
@@ -337,12 +341,15 @@ class StoryMenuState extends MusicBeatState
 				{
 					selectedWeek = true;
 
-					for (i in 0...grpWeekCharacters.length)
+					if (grpWeekCharacters.length > 0)
 					{
-						var char:MenuCharacter = grpWeekCharacters.members[i];
-
-						if (char.character != '' && char.hasConfirmAnimation) {
-							char.hey();
+						for (i in 0...grpWeekCharacters.length)
+						{
+							var char:MenuCharacter = grpWeekCharacters.members[i];
+	
+							if (char.character != '' && char.hasConfirmAnimation) {
+								char.hey();
+							}
 						}
 					}
 
@@ -500,8 +507,11 @@ class StoryMenuState extends MusicBeatState
 
 	function updateText():Void
 	{
-		for (i in 0...grpWeekCharacters.length) {
-			grpWeekCharacters.members[i].changeCharacter(curWeek.weekCharacters[i]);
+		if (grpWeekCharacters.length > 0)
+		{
+			for (i in 0...grpWeekCharacters.length) {
+				grpWeekCharacters.members[i].changeCharacter(curWeek.weekCharacters[i]);
+			}
 		}
 
 		var leName:String = curWeek.storyName;
@@ -533,8 +543,17 @@ class StoryMenuState extends MusicBeatState
 		if (assetName == null || assetName.length < 1) {
 			bgSprite.visible = false;
 		}
-		else {
-			bgSprite.loadGraphic(Paths.getImage('storymenu/menubackgrounds/menu_' + assetName));
+		else
+		{
+			if (Paths.fileExists('images/menubackgrounds/menu_' + assetName + '.png', IMAGE)) {
+				bgSprite.loadGraphic(Paths.getImage('menubackgrounds/menu_' + assetName));
+			}
+			else if (Paths.fileExists('images/storymenu/menubackgrounds/menu_' + assetName + '.png', IMAGE)) {
+				bgSprite.loadGraphic(Paths.getImage('storymenu/menubackgrounds/menu_' + assetName));
+			}
+			else {
+				bgSprite.visible = false;
+			}
 		}
 	}
 
@@ -542,17 +561,20 @@ class StoryMenuState extends MusicBeatState
 	{
 		super.beatHit();
 
-		for (i in 0...grpWeekCharacters.length)
+		if (grpWeekCharacters.length > 0)
 		{
-			var leChar:MenuCharacter = grpWeekCharacters.members[i];
-
-			if (leChar.isDanced && !leChar.heyed) {
-				leChar.dance();
-			}
-			else
+			for (i in 0...grpWeekCharacters.length)
 			{
-				if (curBeat % OptionData.danceOffset == 0 && !leChar.heyed) {
+				var leChar:MenuCharacter = grpWeekCharacters.members[i];
+
+				if (leChar.isDanced && !leChar.heyed) {
 					leChar.dance();
+				}
+				else
+				{
+					if (curBeat % OptionData.danceOffset == 0 && !leChar.heyed) {
+						leChar.dance();
+					}
 				}
 			}
 		}

@@ -10,8 +10,10 @@ import flash.media.Sound;
 import flixel.math.FlxMath;
 import openfl.utils.Assets;
 import flixel.util.FlxTimer;
+import transition.Transition;
 import lime.utils.AssetLibrary;
 import lime.utils.AssetManifest;
+import transition.TransitionableState;
 import lime.utils.Assets as LimeAssets;
 
 using StringTools;
@@ -45,7 +47,8 @@ class LoadingState extends TransitionableState
 		add(bg);
 
 		funkay = new FlxSprite();
-		funkay.loadGraphic(Paths.getImage('bg/funkay'));
+		if (Paths.fileExists('images/funkay.png', IMAGE)) funkay.loadGraphic(Paths.getImage('funkay'));
+		else funkay.loadGraphic(Paths.getImage('bg/funkay'));
 		funkay.setGraphicSize(0, FlxG.height);
 		funkay.updateHitbox();
 		funkay.antialiasing = OptionData.globalAntialiasing;
@@ -69,8 +72,7 @@ class LoadingState extends TransitionableState
 			initSongsManifest().onComplete(function(lib:AssetLibrary):Void
 			{
 				callbacks = new MultiCallback(onLoad);
-	
-				var introComplete = callbacks.add('introComplete');
+				var introComplete:Void->Void = callbacks.add('introComplete');
 	
 				if (PlayState.SONG != null) {
 					checkLoadSong(getSongPath());
@@ -87,53 +89,46 @@ class LoadingState extends TransitionableState
 		});
 	}
 
-	private static var cachedFiles:Map<String, Bool> = #if (haxe >= "4.0.0") new Map() #else new Map<String, Bool>() #end;
-
 	function checkLoadSong(path:String):Void
 	{
-		if (#if MODS_ALLOWED !cachedFiles.exists(path) #else !Assets.cache.hasSound(path) #end)
+		if (#if PRELOAD_ALL !Paths.currentTrackedSounds.exists(path) #else !Assets.cache.hasSound(path) #end)
 		{
-			var callback = callbacks.add("song:" + path);
+			var callback:Void->Void = callbacks.add("song:" + path);
 
 			#if MODS_ALLOWED
 			Sound.loadFromFile(path).onComplete(function(sound:Sound):Void
 			{
 				Debug.logInfo('loaded path: ' + path);
-				cachedFiles.set(path, true);
+
+				#if PRELOAD_ALL
+				Paths.currentTrackedSounds.set(path, sound);
+				#end
 
 				callback();
-
-				sound;
 
 				if (PlayState.SONG != null && PlayState.SONG.needsVoices) {
 					checkLoadSong(getVocalPath());
 				}
-			}).onError(function(error:Dynamic):Void
-			{
-				Debug.logWarn('path not found: ' + path);
-
-				callback();
-			});
+			})
 			#else
 			Assets.loadSound(path).onComplete(function(sound:Sound):Void
 			{
 				Debug.logInfo('loaded path: ' + path);
-				cachedFiles.set(path, true);
+
+				#if PRELOAD_ALL
+				Paths.currentTrackedSounds.set(path, sound);
+				#end
 
 				callback();
-
-				sound;
 
 				if (PlayState.SONG != null && PlayState.SONG.needsVoices) {
 					checkLoadSong(getVocalPath());
 				}
-			}).onError(function(error:Dynamic):Void
+			})#end.onError(function(error:Dynamic):Void
 			{
 				Debug.logWarn('path not found: ' + path);
-
 				callback();
 			});
-			#end
 		}
 	}
 
@@ -147,10 +142,9 @@ class LoadingState extends TransitionableState
 			if (!LimeAssets.libraryPaths.exists(library))
 				throw "Missing library: " + library;
 			
-			var callback = callbacks.add("library:" + library);
+			var callback:Void->Void = callbacks.add("library:" + library);
 
-			Assets.loadLibrary(library).onComplete(function(library:AssetLibrary):Void
-			{
+			Assets.loadLibrary(library).onComplete(function(library:AssetLibrary):Void {
 				callback();
 			});
 		}
@@ -191,7 +185,6 @@ class LoadingState extends TransitionableState
 		}
 
 		FreeplayMenuState.destroyFreeplayVocals();
-
 		FlxG.switchState(target);
 	}
 
@@ -232,22 +225,21 @@ class LoadingState extends TransitionableState
 			if (!loaded) {
 				return new LoadingState(target, stopMusic, directory);
 			}
-
-			if (stopMusic && FlxG.sound.music != null)
-			{
-				FlxG.sound.music.stop();
-				FlxG.sound.music.volume = 0;
-			}
-
-			FreeplayMenuState.destroyFreeplayVocals();
 		}
-		
+
+		if (stopMusic && FlxG.sound.music != null)
+		{
+			FlxG.sound.music.stop();
+			FlxG.sound.music.volume = 0;
+		}
+
+		FreeplayMenuState.destroyFreeplayVocals();
 		return target;
 	}
 
 	static function isSoundLoaded(path:String):Bool
 	{
-		return #if MODS_ALLOWED cachedFiles.exists(path) #else Assets.cache.hasSound(path) #end;
+		return #if PRELOAD_ALL Paths.currentTrackedSounds.exists(path) #else Assets.cache.hasSound(path) #end;
 	}
 	
 	static function isLibraryLoaded(library:String):Bool
@@ -264,17 +256,17 @@ class LoadingState extends TransitionableState
 	
 	static function initSongsManifest():Future<AssetLibrary>
 	{
-		var id = "songs";
-		var promise = new Promise<AssetLibrary>();
+		var id:String = "songs";
+		var promise:Promise<AssetLibrary> = new Promise<AssetLibrary>();
 
-		var library = LimeAssets.getLibrary(id);
+		var library:AssetLibrary = LimeAssets.getLibrary(id);
 
 		if (library != null) {
 			return Future.withValue(library);
 		}
 
-		var path = id;
-		var rootPath = null;
+		var path:String = id;
+		var rootPath:Null<String> = null;
 
 		@:privateAccess
 		var libraryPaths = LimeAssets.libraryPaths;
@@ -305,7 +297,7 @@ class LoadingState extends TransitionableState
 				return;
 			}
 
-			var library = AssetLibrary.fromManifest(manifest);
+			var library:AssetLibrary = AssetLibrary.fromManifest(manifest);
 
 			if (library == null) {
 				promise.error("Cannot open library \"" + id + "\"");
@@ -333,8 +325,8 @@ class MultiCallback
 	public var length(default, null) = 0;
 	public var numRemaining(default, null) = 0;
 	
-	var unfired = new Map<String, Void->Void>();
-	var fired = new Array<String>();
+	var unfired:Map<String, Void->Void> = new Map<String, Void->Void>();
+	var fired:Array<String> = new Array<String>();
 	
 	public function new(callback:Void->Void, logId:String = null):Void
 	{
@@ -386,6 +378,6 @@ class MultiCallback
 			Debug.logInfo('$logId: $msg');
 	}
 	
-	public function getFired() return fired.copy();
-	public function getUnfired() return [for (id in unfired.keys()) id];
+	public function getFired():Array<String> return fired.copy();
+	public function getUnfired():Array<String> return [for (id in unfired.keys()) id];
 }

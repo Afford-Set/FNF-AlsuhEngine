@@ -23,7 +23,7 @@ class Conductor
 
 	public static var bpmChangeMap:Array<BPMChangeEvent> = [];
 
-	public static function judgeNote(note:Note, diff:Float = 0, ?pisspoop:Null<Bool> = false):Any
+	public static function judgeNote(note:Note, diff:Float = 0, ?string:Null<Bool> = false):Any
 	{
 		var data:Array<RatingData> = PlayState.instance.ratingsData; // shortening cuz fuck u
 
@@ -50,11 +50,11 @@ class Conductor
 		for (i in 0...data.length - 1) // skips last window (Shit)
 		{
 			if (diff <= data[i].hitWindow) {
-				return pisspoop ? data[i].image : data[i];
+				return string ? data[i].image : data[i];
 			}
 		}
 	
-		return pisspoop ? data[data.length - 1].image : data[data.length - 1];
+		return string ? data[data.length - 1].image : data[data.length - 1];
 	}
 
 	public static function getCrotchetAtTime(time:Float):Float
@@ -103,23 +103,21 @@ class Conductor
 
 	public static function beatToSeconds(beat:Float):Float
 	{
-		var step = beat * 4;
-		var lastChange = getBPMFromStep(step);
+		var step:Float = beat * 4;
+		var lastChange:BPMChangeEvent = getBPMFromStep(step);
 
 		return lastChange.songTime + ((step - lastChange.stepTime) / (lastChange.bpm / 60) / 4) * 1000; // TODO: make less shit and take BPM into account PROPERLY
 	}
 
 	public static function getStep(time:Float):Float
 	{
-		var lastChange = getBPMFromSeconds(time);
-
+		var lastChange:BPMChangeEvent = getBPMFromSeconds(time);
 		return lastChange.stepTime + (time - lastChange.songTime) / lastChange.stepCrochet;
 	}
 
 	public static function getStepRounded(time:Float):Float
 	{
-		var lastChange = getBPMFromSeconds(time);
-
+		var lastChange:BPMChangeEvent = getBPMFromSeconds(time);
 		return lastChange.stepTime + Math.floor(time - lastChange.songTime) / lastChange.stepCrochet;
 	}
 
@@ -166,7 +164,6 @@ class Conductor
 	static function getSectionBeats(song:SwagSong, section:Int):Float
 	{
 		var val:Null<Float> = song.notes[section] != null ? song.notes[section].sectionBeats : null;
-
 		return val != null ? val : 4;
 	}
 

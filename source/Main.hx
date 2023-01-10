@@ -34,15 +34,17 @@ using StringTools;
 
 class Main extends Sprite
 {
-	public var game:FlxGame;
+	var gamePropeties:Dynamic = {
+		width: 1280, // WINDOW width
+		height: 720, // WINDOW height
+		initialState: TitleState, // initial game state
+		zoom: 1, // game state bounds
+		framerate: 60, // default framerate
+		skipSplash: true, // if the default flixel splash screen should be skipped
+		startFullscreen: false // if the game should start at fullscreen mode
+	};
 
-	var gameWidth:Int = 1280; // Width of the game in pixels (might be less / more in actual pixels depending on your zoom).
-	var gameHeight:Int = 720; // Height of the game in pixels (might be less / more in actual pixels depending on your zoom).
-	var initialState:Class<FlxState> = TitleState; // The FlxState the game starts with.
-	var zoom:Float = -1; // If -1, zoom is automatically calculated to fit the window dimensions.
-	var framerate:Int = 60; // How many frames per second the game should run at.
-	var skipSplash:Bool = true; // Whether to skip the flixel splash screen that appears in release mode.
-	var startFullscreen:Bool = false; // Whether to start the game in fullscreen on desktop targets
+	public var game:FlxGame;
 
 	#if !mobile
 	public static var fpsCounter:FPSCounter;
@@ -79,29 +81,21 @@ class Main extends Sprite
 
 	private function setupGame():Void
 	{
-		var stageWidth:Int = Lib.current.stage.stageWidth;
-		var stageHeight:Int = Lib.current.stage.stageHeight;
-
-		if (zoom == -1)
-		{
-			var ratioX:Float = stageWidth / gameWidth;
-			var ratioY:Float = stageHeight / gameHeight;
-
-			zoom = Math.min(ratioX, ratioY);
-
-			gameWidth = Math.ceil(stageWidth / zoom);
-			gameHeight = Math.ceil(stageHeight / zoom);
-		}
-
 		#if !cpp
-		framerate = 60;
+		gamePropeties.framerate = 60;
 		#end
 
 		Debug.onInitProgram();
-
 		OptionData.loadDefaultKeys();
 
-		game = new FlxGame(gameWidth, gameHeight, initialState, zoom, framerate, framerate, skipSplash, startFullscreen);
+		game = new FlxGame(gamePropeties.width,
+			gamePropeties.height,
+			gamePropeties.initialState,
+			#if (flixel < "5.0.0") gamePropeties.zoom, #end
+			gamePropeties.framerate,
+			gamePropeties.framerate,
+			gamePropeties.skipSplash,
+		gamePropeties.startFullscreen);
 		addChild(game);
 
 		#if WEBM_ALLOWED

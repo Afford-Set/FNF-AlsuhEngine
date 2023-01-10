@@ -1,5 +1,11 @@
 {
 	"char_name": "Boyfriend",
+	"gameover_properties": [
+		"bf-pixel-dead",
+		"fnf_loss_sfx-pixel",
+		"gameOver-pixel",
+		"gameOverEnd-pixel"
+	],
 	"animations": [
 		{
 			"loop": false,

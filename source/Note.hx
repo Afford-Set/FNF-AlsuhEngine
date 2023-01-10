@@ -7,6 +7,7 @@ import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import editors.ChartingState;
 import flash.display.BitmapData;
+import flixel.graphics.FlxGraphic;
 
 using StringTools;
 
@@ -75,11 +76,6 @@ class Note extends FlxSprite
 	public var noteSplashSat:Float = 0;
 	public var noteSplashBrt:Float = 0;
 
-	public var isCustomNoteSplash:Bool = false;
-	public var noteSplashHueCustom:Float = 0;
-	public var noteSplashSatCustom:Float = 0;
-	public var noteSplashBrtCustom:Float = 0;
-
 	public var offsetX:Float = 0;
 	public var offsetY:Float = 0;
 	public var offsetAngle:Float = 0;
@@ -111,9 +107,7 @@ class Note extends FlxSprite
 	public var noMissAnimation:Bool = false;
 
 	public var lowPriority:Bool = false;
-
 	public var texture(default, set):String = null;
-
 	public var hitsoundDisabled:Bool = false;
 
 	private function set_multSpeed(value:Float):Float
@@ -142,7 +136,6 @@ class Note extends FlxSprite
 		}
 
 		texture = value;
-
 		return value;
 	}
 
@@ -150,7 +143,7 @@ class Note extends FlxSprite
 	{
 		noteSplashTexture = PlayState.SONG.splashSkin;
 
-		if (noteData > -1)
+		if (noteData > -1 && noteData < OptionData.arrowHSV.length)
 		{
 			colorSwap.hue = OptionData.arrowHSV[noteData % maxNote][0] / 360;
 			colorSwap.saturation = OptionData.arrowHSV[noteData % maxNote][1] / 100;
@@ -183,8 +176,7 @@ class Note extends FlxSprite
 
 					hitCausesMiss = true;
 				}
-				case 'Alt Animation':
-				{
+				case 'Alt Animation': {
 					animSuffix = '-alt';
 				}
 				case 'No Animation':
@@ -192,14 +184,17 @@ class Note extends FlxSprite
 					noAnimation = true;
 					noMissAnimation = true;
 				}
-				case 'GF Sing':
-				{
+				case 'GF Sing': {
 					gfNote = true;
 				}
 			}
 
 			noteType = value;
 		}
+
+		noteSplashHue = colorSwap.hue;
+		noteSplashSat = colorSwap.saturation;
+		noteSplashBrt = colorSwap.brightness;
 
 		return value;
 	}
@@ -327,23 +322,53 @@ class Note extends FlxSprite
 		{
 			if (isSustainNote)
 			{
-				loadGraphic(Paths.getImage('notes/pixel/' + blahblah + 'ENDS'));
+				var ourGraphic:FlxGraphic = null;
+
+				if (Paths.fileExists('images/' + blahblah + 'ENDS' + '.png', IMAGE)) {
+					ourGraphic = Paths.getImage(blahblah + 'ENDS');
+				}
+				else if (Paths.fileExists('images/pixelUI/' + blahblah + 'ENDS' + '.png', IMAGE)) {
+					ourGraphic = Paths.getImage('pixelUI/' + blahblah + 'ENDS');
+				}
+				else if (Paths.fileExists('images/notes/pixel/' + blahblah + 'ENDS' + '.png', IMAGE)) {
+					ourGraphic = Paths.getImage('notes/pixel/' + blahblah + 'ENDS');
+				}
+				else {
+					ourGraphic = Paths.getImage('notes/' + blahblah + 'ENDS');
+				}
+
+				loadGraphic(ourGraphic);
 
 				width = width / 4;
 				height = height / 2;
 
 				originalHeightForCalcs = height;
 
-				loadGraphic(Paths.getImage('notes/pixel/' + blahblah + 'ENDS'), true, Math.floor(width), Math.floor(height));
+				loadGraphic(ourGraphic, true, Math.floor(width), Math.floor(height));
 			}
 			else
 			{
-				loadGraphic(Paths.getImage('notes/pixel/' + blahblah));
+				var ourGraphic:FlxGraphic = null;
+
+				if (Paths.fileExists('images/' + blahblah + '.png', IMAGE)) {
+					ourGraphic = Paths.getImage(blahblah);
+				}
+				else if (Paths.fileExists('images/pixelUI/' + blahblah + '.png', IMAGE)) {
+					ourGraphic = Paths.getImage('pixelUI/' + blahblah);
+				}
+				else if (Paths.fileExists('images/notes/pixel/' + blahblah + '.png', IMAGE)) {
+					ourGraphic = Paths.getImage('notes/pixel/' + blahblah);
+				}
+				else {
+					ourGraphic = Paths.getImage('notes/' + blahblah);
+				}
+
+				loadGraphic(ourGraphic);
 
 				width = width / 4;
 				height = height / 5;
 
-				loadGraphic(Paths.getImage('notes/pixel/' + blahblah), true, Math.floor(width), Math.floor(height));
+				loadGraphic(ourGraphic, true, Math.floor(width), Math.floor(height));
 			}
 
 			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
@@ -352,10 +377,14 @@ class Note extends FlxSprite
 		}
 		else
 		{
-			frames = Paths.getSparrowAtlas('notes/' + blahblah);
+			if (Paths.fileExists('images/' + blahblah + '.png', IMAGE)) {
+				frames = Paths.getSparrowAtlas(blahblah);
+			}
+			else {
+				frames = Paths.getSparrowAtlas('notes/' + blahblah);
+			}
 
 			loadNoteAnims();
-
 			antialiasing = OptionData.globalAntialiasing;
 		}
 
@@ -413,10 +442,6 @@ class Note extends FlxSprite
 			colorSwap.hue = OptionData.arrowHSV[noteData % maxNote][0] / 360;
 			colorSwap.saturation = OptionData.arrowHSV[noteData % maxNote][1] / 100;
 			colorSwap.brightness = OptionData.arrowHSV[noteData % maxNote][2] / 100;
-
-			noteSplashHue = colorSwap.hue;
-			noteSplashSat = colorSwap.saturation;
-			noteSplashBrt = colorSwap.brightness;
 		}
 
 		if (mustPress)

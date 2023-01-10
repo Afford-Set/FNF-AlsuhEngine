@@ -15,6 +15,7 @@ import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import flixel.math.FlxPoint;
 import flixel.group.FlxGroup;
+import flixel.system.FlxSound;
 import flixel.util.FlxStringUtil;
 import flixel.effects.FlxFlicker;
 
@@ -22,7 +23,7 @@ using StringTools;
 
 class PreferencesSubState extends MusicBeatSubState
 {
-	private static var curSelected:Int = -1;
+	private static var curSelected:Int = 1;
 
 	private var optionsArray:Array<Option>;
 	private var curOption:Option = null;
@@ -34,12 +35,34 @@ class PreferencesSubState extends MusicBeatSubState
 
 		var option:Option = new Option('Full Screen', // Name
 			true, // Selected
-			'If checked, then the game becomes full screen.', // Description
+			'Should the game be maximized?', // Description
 			'fullScreen', //Save data variable name
 			'bool', // Variable type
 			false); // Default value
-		option.onChange = onChangeFullScreen;
+		option.onChange = function():Void {
+			FlxG.fullscreen = OptionData.fullScreen;
+		};
 		addOption(option);
+
+		var option:Option = new Option('Screen Resolution',
+			true,
+			'Choose your preferred screen resolution.',
+			'screenRes',
+			'string',
+			'1280x720',
+			['640x360', '852x480', '960x540', '1280x720', '1920x1080', '3840x2160']);
+		addOption(option);
+		option.onChange = function():Void
+		{
+			var res:Array<String> = OptionData.screenRes.split('x');
+			FlxG.resizeWindow(Std.parseInt(res[0]), Std.parseInt(res[1]));
+	
+			FlxG.fullscreen = false;
+	
+			if (!FlxG.fullscreen) {
+				FlxG.fullscreen = OptionData.fullScreen;
+			}
+		};
 
 		//I'd suggest using "Low Quality" as an example for making your own option since it is the simplest here
 		var option:Option = new Option('Low Quality',
@@ -48,7 +71,7 @@ class PreferencesSubState extends MusicBeatSubState
 			'lowQuality',
 			'bool',
 			false);
-		option.isPause = isPause;
+		option.blockedOnPause = isPause;
 		addOption(option);
 
 		var option:Option = new Option('Anti-Aliasing',
@@ -58,8 +81,19 @@ class PreferencesSubState extends MusicBeatSubState
 			'bool',
 			true);
 		option.showBoyfriend = true;
-		option.isPause = isPause;
-		option.onChange = onChangeAntiAliasing; // Changing onChange is only needed if you want to make a special interaction after it changes the value
+		option.blockedOnPause = isPause;
+		option.onChange = function():Void // Changing onChange is only needed if you want to make a special interaction after it changes the value
+		{
+			for (sprite in members)
+			{
+				var sprite:Dynamic = sprite; // Make it check for FlxSprite instead of FlxBasic
+				var sprite:FlxSprite = sprite; // Don't judge me ok
+	
+				if (sprite != null && (sprite is FlxSprite) && !(sprite is FlxText)) {
+					sprite.antialiasing = OptionData.globalAntialiasing;
+				}
+			}
+		};
 		addOption(option);
 
 		var option:Option = new Option('Shaders', //Name
@@ -81,9 +115,20 @@ class PreferencesSubState extends MusicBeatSubState
 
 		option.minValue = 60;
 		option.maxValue = 240;
-		option.luaAllowed = true;
 		option.displayFormat = '%v FPS';
-		option.onChange = onChangeFramerate;
+		option.onChange = function():Void
+		{
+			if (OptionData.framerate > FlxG.drawFramerate)
+			{
+				FlxG.updateFramerate = OptionData.framerate;
+				FlxG.drawFramerate = OptionData.framerate;
+			}
+			else
+			{
+				FlxG.drawFramerate = OptionData.framerate;
+				FlxG.updateFramerate = OptionData.framerate;
+			}
+		};
 		#end
 
 		addOption(new Option('Gameplay', false));
@@ -94,7 +139,6 @@ class PreferencesSubState extends MusicBeatSubState
 			'ghostTapping',
 			'bool',
 			true);
-		option.luaAllowed = true;
 		addOption(option);
 
 		var option:Option = new Option('Controller Mode',
@@ -103,7 +147,7 @@ class PreferencesSubState extends MusicBeatSubState
 			'controllerMode',
 			'bool',
 			false);
-		option.isPause = isPause;
+		option.blockedOnPause = isPause;
 		addOption(option);
 
 		// I'd suggest using "Downscroll" as an example for making your own option since it is the simplest here
@@ -114,7 +158,7 @@ class PreferencesSubState extends MusicBeatSubState
 			'downScroll',
 			'bool',
 			false);
-		option.isPause = isPause;
+		option.blockedOnPause = isPause;
 		addOption(option);
 
 		var option:Option = new Option('Middlescroll',
@@ -123,7 +167,7 @@ class PreferencesSubState extends MusicBeatSubState
 			'middleScroll',
 			'bool',
 			false);
-		option.isPause = isPause;
+		option.blockedOnPause = isPause;
 		addOption(option);
 
 		var option:Option = new Option('Opponent Notes:',
@@ -137,11 +181,10 @@ class PreferencesSubState extends MusicBeatSubState
 		if (isPause)
 		{
 			if (option.getValue() == 'Disabled') {
-				option.isPause = isPause;
+				option.blockedOnPause = isPause;
 			}
 			else {
 				option.options = ['Glow', 'Glow no Sustains', 'Glow, while Sus', 'Static'];
-				option.luaAllowed = true;
 			}
 		}
 
@@ -153,7 +196,6 @@ class PreferencesSubState extends MusicBeatSubState
 			'noReset',
 			'bool',
 			false);
-		option.luaAllowed = true;
 		addOption(option);
 
 		var option:Option = new Option('Hitsound Type:',
@@ -189,7 +231,6 @@ class PreferencesSubState extends MusicBeatSubState
 			'int',
 			0);
 		option.displayFormat = '%vms';
-		option.luaAllowed = true;
 		option.scrollSpeed = 20;
 		option.minValue = -30;
 		option.maxValue = 30;
@@ -202,7 +243,6 @@ class PreferencesSubState extends MusicBeatSubState
 			'int',
 			45);
 		option.displayFormat = '%vms';
-		option.luaAllowed = true;
 		option.scrollSpeed = 15;
 		option.minValue = 15;
 		option.maxValue = 45;
@@ -215,7 +255,6 @@ class PreferencesSubState extends MusicBeatSubState
 			'int',
 			90);
 		option.displayFormat = '%vms';
-		option.luaAllowed = true;
 		option.scrollSpeed = 30;
 		option.minValue = 15;
 		option.maxValue = 90;
@@ -228,7 +267,6 @@ class PreferencesSubState extends MusicBeatSubState
 			'int',
 			135);
 		option.displayFormat = '%vms';
-		option.luaAllowed = true;
 		option.scrollSpeed = 60;
 		option.minValue = 15;
 		option.maxValue = 135;
@@ -241,7 +279,6 @@ class PreferencesSubState extends MusicBeatSubState
 			'int',
 			160);
 		option.displayFormat = '%vms';
-		option.luaAllowed = true;
 		option.scrollSpeed = 60;
 		option.minValue = 15;
 		option.maxValue = 160;
@@ -253,12 +290,13 @@ class PreferencesSubState extends MusicBeatSubState
 			'safeFrames',
 			'float',
 			10);
-		option.luaAllowed = true;
 		option.scrollSpeed = 5;
 		option.minValue = 2;
 		option.maxValue = 10;
 		option.changeValue = 0.1;
-		option.onChange = onChangeSafeFrames;
+		option.onChange = function():Void {
+			Conductor.safeZoneOffset = (OptionData.safeFrames / 60) * 1000;
+		};
 		addOption(option);
 
 		addOption(new Option('Visuals and UI', false));
@@ -277,8 +315,6 @@ class PreferencesSubState extends MusicBeatSubState
 			'camShakes',
 			'bool',
 			true);
-		option.luaAllowed = true;
-		option.luaVarAltShit = 'cameraZoomOnBeat';
 		addOption(option);
 
 		var option:Option = new Option('Icon Zooms',
@@ -287,7 +323,6 @@ class PreferencesSubState extends MusicBeatSubState
 			'iconZooms',
 			'bool',
 			true);
-		option.luaAllowed = true;
 		addOption(option);
 
 		var option:Option = new Option('Consume Notes\'s Sustains:',
@@ -297,16 +332,20 @@ class PreferencesSubState extends MusicBeatSubState
 			'string',
 			'New',
 			['New', 'Old']);
-		option.isPause = isPause;
+		option.blockedOnPause = isPause;
 		addOption(option);
 
-		var option:Option = new Option('Note Splashes',
+		var option:Option = new Option('Note Splash Opacity:',
 			true,
-			"If unchecked, hitting \"Sick!\" notes won't show particles.",
-			'noteSplashes',
-			'bool',
-			true);
-		option.luaAllowed = true;
+			"Set the alpha for the Note Splashes, shown when hitting \"Sick!\" notes.",
+			'splashOpacity',
+			'percent',
+			1);
+		option.scrollSpeed = 1.6;
+		option.minValue = 0.0;
+		option.maxValue = 1;
+		option.changeValue = 0.1;
+		option.decimals = 1;
 		addOption(option);
 
 		var option:Option = new Option('Time Bar:',
@@ -316,8 +355,46 @@ class PreferencesSubState extends MusicBeatSubState
 			'string',
 			'Time Left and Elapsed',
 			['Time Left and Elapsed', 'Time Left', 'Time Elapsed', 'Song Name', 'Disabled']);
-		option.onChange = onChangeSongPosition;
-		option.luaAllowed = true;
+		option.onChange = function():Void
+		{
+			if (isPause)
+			{
+				var showTime:Bool = OptionData.songPositionType != 'Disabled';
+	
+				PlayState.instance.songPosBG.visible = showTime;
+				PlayState.instance.songPosBar.visible = showTime;
+				PlayState.instance.songPosName.visible = showTime;
+	
+				var curTime:Float = Conductor.songPosition - OptionData.noteOffset;
+				if (curTime < 0) curTime = 0;
+	
+				PlayState.instance.songPositionBar = (curTime / PlayState.instance.songLength);
+	
+				var songCalc:Float = (PlayState.instance.songLength - curTime);
+				if (OptionData.songPositionType == 'Time Elapsed') songCalc = curTime;
+	
+				var secondsTotal:Int = Math.floor(songCalc / 1000);
+				if (secondsTotal < 0) secondsTotal = 0;
+	
+				var secondsTotalBlyad:Int = Math.floor(curTime / 1000);
+				if (secondsTotalBlyad < 0) secondsTotalBlyad = 0;
+	
+				PlayState.instance.songPosName.text = PlayState.SONG.songName + " - " + CoolUtil.getDifficultyName(PlayState.lastDifficulty, PlayState.difficulties);
+	
+				if (OptionData.songPositionType != 'Song Name')
+				{
+					switch (OptionData.songPositionType)
+					{
+						case 'Time Left and Elapsed':
+							PlayState.instance.songPosName.text += ' (' + FlxStringUtil.formatTime(secondsTotalBlyad, false) + ' / ' + FlxStringUtil.formatTime(secondsTotal, false) + ')';
+						case 'Time Elapsed':
+							PlayState.instance.songPosName.text += ' (' + FlxStringUtil.formatTime(secondsTotalBlyad, false) + ')';
+						default:
+							PlayState.instance.songPosName.text += ' (' + FlxStringUtil.formatTime(secondsTotal, false) + ')';
+					}
+				}
+			}
+		};
 		addOption(option);
 
 		var option:Option = new Option('Score Text',
@@ -326,8 +403,12 @@ class PreferencesSubState extends MusicBeatSubState
 			'scoreText',
 			'bool',
 			true);
-		option.onChange = onChangeScoreText;
-		option.luaAllowed = true;
+		option.onChange = function():Void
+		{
+			if (isPause) {
+				PlayState.instance.scoreTxt.visible = OptionData.scoreText;
+			}
+		};
 		addOption(option);
 
 		var option:Option = new Option('Cutscenes in:',
@@ -353,7 +434,6 @@ class PreferencesSubState extends MusicBeatSubState
 			'naughtyness',
 			'bool',
 			true);
-		option.luaAllowed = true;
 		addOption(option);
 
 		var option:Option = new Option('Combo Stacking',
@@ -370,7 +450,15 @@ class PreferencesSubState extends MusicBeatSubState
 			'showRatings',
 			'bool',
 			true);
-		option.onChange = onChangeRating;
+		option.onChange = function():Void
+		{
+			if (isPause)
+			{
+				for (rating in PlayState.instance.grpRatings) {
+					rating.goToVisible();
+				}
+			}
+		};
 		addOption(option);
 
 		var option:Option = new Option('Show Numbers',
@@ -379,7 +467,15 @@ class PreferencesSubState extends MusicBeatSubState
 			'showNumbers',
 			'bool',
 			true);
-		option.onChange = onChangeNumbers;
+		option.onChange = function():Void
+		{
+			if (isPause)
+			{
+				for (number in PlayState.instance.grpNumbers) {
+					number.goToVisible();
+				}
+			}
+		};
 		addOption(option);
 
 		var option:Option = new Option('Health Bar Transparency',
@@ -393,8 +489,16 @@ class PreferencesSubState extends MusicBeatSubState
 		option.maxValue = 1;
 		option.changeValue = 0.1;
 		option.decimals = 1;
-		option.onChange = onChangeHealthBarColor;
-		option.luaAllowed = true;
+		option.onChange = function():Void
+		{
+			if (isPause)
+			{
+				PlayState.instance.healthBarBG.alpha = OptionData.healthBarAlpha;
+				PlayState.instance.healthBar.alpha = OptionData.healthBarAlpha;
+				PlayState.instance.iconP1.alpha = OptionData.healthBarAlpha;
+				PlayState.instance.iconP2.alpha = OptionData.healthBarAlpha;
+			}
+		};
 		addOption(option);
 
 		var option:Option = new Option('Pause Screen Song:',
@@ -404,9 +508,35 @@ class PreferencesSubState extends MusicBeatSubState
 			'string',
 			'Tea Time',
 			['None', 'Breakfast', 'Tea Time']);
-		option.onChange = onChangePauseMusic;
+		option.onChange = function():Void
+		{
+			FreeplayMenuState.destroyFreeplayVocals();
+
+			if (isPause)
+			{
+				if (OptionData.pauseMusic == 'None') {
+					PauseSubState.pauseMusic.volume = 0;
+				}
+				else
+				{
+					PauseSubState.pauseMusic.loadEmbedded(Paths.getMusic(Paths.formatToSongPath(OptionData.pauseMusic)), true, true);
+					PauseSubState.pauseMusic.volume = 0.5;
+					PauseSubState.pauseMusic.play();
+				}
+			}
+			else
+			{
+				if (OptionData.pauseMusic == 'None') {
+					FlxG.sound.music.volume = 0;
+				}
+				else {
+					FlxG.sound.playMusic(Paths.getMusic(Paths.formatToSongPath(OptionData.pauseMusic)));
+				}
+			}
+	
+			changedMusic = true;
+		};
 		option.isIgnoriteFunctionOnReset = true;
-		option.isPause = isPause;
 		addOption(option);
 
 		#if !mobile
@@ -417,7 +547,12 @@ class PreferencesSubState extends MusicBeatSubState
 			'bool',
 			false);
 		addOption(option);
-		option.onChange = onChangeFPSCounter;
+		option.onChange = function():Void
+		{
+			if (Main.fpsCounter != null) {
+				Main.fpsCounter.visible = OptionData.fpsCounter;
+			}
+		};
 
 		var option:Option = new Option('Rainbow FPS Counter',
 			true,
@@ -434,7 +569,12 @@ class PreferencesSubState extends MusicBeatSubState
 			'bool',
 			false);
 		addOption(option);
-		option.onChange = onChangeMemoryCounter;
+		option.onChange = function():Void
+		{
+			if (Main.memoryCounter != null) {
+				Main.memoryCounter.visible = OptionData.memoryCounter;
+			}
+		};
 
 		var option:Option = new Option('Rainbow Memory Counter',
 			true,
@@ -445,6 +585,7 @@ class PreferencesSubState extends MusicBeatSubState
 		addOption(option);
 		#end
 
+		#if CHECK_FOR_UPDATES
 		var option:Option = new Option('Check for Updates',
 			true,
 			'On Release builds, turn this on to check for updates when you start the game.',
@@ -452,15 +593,18 @@ class PreferencesSubState extends MusicBeatSubState
 			'bool',
 			true);
 		addOption(option);
+		#end
 
 		var option:Option = new Option('Auto Pause',
 			true,
-			'Uncheck this if you want to play without lags when you are in any other application.',
+			'If checked, the game will automatically freeze itself when not in focus.',
 			'autoPause',
 			'bool',
 			false);
 		addOption(option);
-		option.onChange = onChangeAutoPause;
+		option.onChange = function():Void {
+			FlxG.autoPause = OptionData.autoPause;
+		};
 
 		var option:Option = new Option('Watermarks',
 			true,
@@ -487,8 +631,6 @@ class PreferencesSubState extends MusicBeatSubState
 			'bool',
 			true);
 		addOption(option);
-		option.luaAllowed = true;
-		option.luaVarAltShit = 'flashing';
 
 		addOption(defaultValue);
 	}
@@ -530,8 +672,7 @@ class PreferencesSubState extends MusicBeatSubState
 
 		getOptions();
 
-		if (!isPause)
-		{
+		if (!isPause) {
 			Conductor.changeBPM(102);
 		}
 
@@ -545,7 +686,12 @@ class PreferencesSubState extends MusicBeatSubState
 		}
 		else
 		{
-			bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+			if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
+				bg.loadGraphic(Paths.getImage('menuDesat'));
+			}
+			else {
+				bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+			}
 			bg.color = 0xFFea71fd;
 			bg.updateHitbox();
 			bg.screenCenter();
@@ -613,22 +759,12 @@ class PreferencesSubState extends MusicBeatSubState
 
 			var isCentered:Bool = unselectableCheck(i, true);
 
-			var optionText:Alphabet = new Alphabet(300, 70 * i, leOption.name, isCentered);
+			var optionText:Alphabet = new Alphabet(isCentered ? FlxG.width / 2 : (leOption.type != 'bool' ? 180 : 300), 270, leOption.name, isCentered);
 			optionText.isMenuItem = true;
 			optionText.changeX = false;
-
-			if (isCentered)
-			{
-				optionText.screenCenter(X);
-				optionText.startPosition.y = -20;
-			}
-			else {
-				optionText.startPosition.y = -70;
-			}
-
-			optionText.shit = 1;
+			optionText.lerpMult /= 2;
+			optionText.targetY = i - curSelected;
 			optionText.distancePerItem.y = 100;
-			optionText.targetY = i;
 			grpOptions.add(optionText);
 
 			if (!isCentered)
@@ -655,18 +791,18 @@ class PreferencesSubState extends MusicBeatSubState
 					}
 				}
 
-				if (leOption.type != 'bool')
-				{
-					optionText.x = 180;
-					optionText.distancePerItem.x = 180;
-				}
-
 				updateTextFrom(leOption);
-
 				if (curSelected < 0) curSelected = i;
 			}
+			else
+			{
+				optionText.startPosition.y = 315;
+				optionText.alignment = CENTERED;
+			}
 
-			if (optionsArray[i].showBoyfriend && boyfriend == null && !optionsArray[i].isPause) {
+			optionText.snapToPosition();
+
+			if (leOption.showBoyfriend && boyfriend == null && !leOption.blockedOnPause) {
 				reloadBoyfriend();
 			}
 		}
@@ -683,6 +819,7 @@ class PreferencesSubState extends MusicBeatSubState
 		add(descText);
 
 		changeSelection();
+		reloadCheckboxes();
 
 		if (isPause) cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 	}
@@ -699,6 +836,12 @@ class PreferencesSubState extends MusicBeatSubState
 	public override function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
+
+		var pauseMusic:FlxSound = PauseSubState.pauseMusic;
+
+		if (isPause && pauseMusic != null && pauseMusic.volume < 0.5) {
+			pauseMusic.volume += 0.01 * elapsed;
+		}
 
 		if (FlxG.sound.music != null && !isPause) {
 			Conductor.songPosition = FlxG.sound.music.time;
@@ -780,7 +923,7 @@ class PreferencesSubState extends MusicBeatSubState
 				}
 				else if (!unselectableCheck(curSelected))
 				{
-					if (curOption.type == 'bool' && !curOption.isPause)
+					if (curOption.type == 'bool' && !curOption.blockedOnPause)
 					{
 						if (OptionData.flashingLights)
 						{
@@ -829,7 +972,7 @@ class PreferencesSubState extends MusicBeatSubState
 				reloadCheckboxes();
 			}
 
-			if (curOption.type != 'bool' && curOption.type != 'menu' && curOption != defaultValue && !curOption.isPause)
+			if (curOption.type != 'bool' && curOption.type != 'menu' && curOption != defaultValue && !curOption.blockedOnPause)
 			{
 				if (controls.UI_LEFT || controls.UI_RIGHT)
 				{
@@ -1052,181 +1195,28 @@ class PreferencesSubState extends MusicBeatSubState
 		option.text = text.replace('%v', val).replace('%d', def);
 	}
 
-	function onChangeFullScreen():Void
-	{
-		FlxG.fullscreen = OptionData.fullScreen;
-	}
-
-	function onChangeAntiAliasing():Void
-	{
-		for (sprite in members)
-		{
-			var sprite:Dynamic = sprite; // Make it check for FlxSprite instead of FlxBasic
-			var sprite:FlxSprite = sprite; // Don't judge me ok
-
-			if (sprite != null && (sprite is FlxSprite) && !(sprite is FlxText)) {
-				sprite.antialiasing = OptionData.globalAntialiasing;
-			}
-		}
-	}
-
-	#if !html5
-	function onChangeFramerate():Void
-	{
-		if (OptionData.framerate > FlxG.drawFramerate)
-		{
-			FlxG.updateFramerate = OptionData.framerate;
-			FlxG.drawFramerate = OptionData.framerate;
-		}
-		else
-		{
-			FlxG.drawFramerate = OptionData.framerate;
-			FlxG.updateFramerate = OptionData.framerate;
-		}
-	}
-	#end
-
 	function onChangeHitsoundVolume():Void
 	{
 		#if !web
 		if (OptionData.hitsoundType != 'None')
 		{
 			if (OptionData.hitsoundType == 'Kade') {
-				FlxG.sound.play(Paths.getSound('SNAP', 'shared'), OptionData.hitsoundVolume);
+				FlxG.sound.play(Paths.getSound('SNAP'), OptionData.hitsoundVolume);
 			}
 			else if (OptionData.hitsoundType == 'Psych') {
-				FlxG.sound.play(Paths.getSound('hitsound', 'shared'), OptionData.hitsoundVolume);
+				FlxG.sound.play(Paths.getSound('hitsound'), OptionData.hitsoundVolume);
 			}
 		}
 		#end
 	}
 
-	function onChangeSafeFrames():Void
-	{
-		Conductor.safeZoneOffset = (OptionData.safeFrames / 60) * 1000;
-	}
-
-	function onChangeScoreText():Void
-	{
-		if (isPause) {
-			PlayState.instance.scoreTxt.visible = OptionData.scoreText;
-		}
-	}
-
-	function onChangeSongPosition():Void
-	{
-		if (isPause)
-		{
-			var showTime:Bool = OptionData.songPositionType != 'Disabled';
-
-			PlayState.instance.songPosBG.visible = showTime;
-			PlayState.instance.songPosBar.visible = showTime;
-			PlayState.instance.songPosName.visible = showTime;
-
-			var curTime:Float = Conductor.songPosition - OptionData.noteOffset;
-			if (curTime < 0) curTime = 0;
-
-			PlayState.instance.songPositionBar = (curTime / PlayState.instance.songLength);
-
-			var songCalc:Float = (PlayState.instance.songLength - curTime);
-			if (OptionData.songPositionType == 'Time Elapsed') songCalc = curTime;
-
-			var secondsTotal:Int = Math.floor(songCalc / 1000);
-			if (secondsTotal < 0) secondsTotal = 0;
-
-			var secondsTotalBlyad:Int = Math.floor(curTime / 1000);
-			if (secondsTotalBlyad < 0) secondsTotalBlyad = 0;
-
-			PlayState.instance.songPosName.text = PlayState.SONG.songName + " - " + CoolUtil.getDifficultyName(PlayState.lastDifficulty, PlayState.difficulties);
-
-			if (OptionData.songPositionType != 'Song Name')
-			{
-				switch (OptionData.songPositionType)
-				{
-					case 'Time Left and Elapsed':
-						PlayState.instance.songPosName.text += ' (' + FlxStringUtil.formatTime(secondsTotalBlyad, false) + ' / ' + FlxStringUtil.formatTime(secondsTotal, false) + ')';
-					case 'Time Elapsed':
-						PlayState.instance.songPosName.text += ' (' + FlxStringUtil.formatTime(secondsTotalBlyad, false) + ')';
-					default:
-						PlayState.instance.songPosName.text += ' (' + FlxStringUtil.formatTime(secondsTotal, false) + ')';
-				}
-			}
-		}
-	}
-
-	function onChangeHealthBarColor():Void
-	{
-		if (isPause)
-		{
-			PlayState.instance.healthBarBG.alpha = OptionData.healthBarAlpha;
-			PlayState.instance.healthBar.alpha = OptionData.healthBarAlpha;
-			PlayState.instance.iconP1.alpha = OptionData.healthBarAlpha;
-			PlayState.instance.iconP2.alpha = OptionData.healthBarAlpha;
-		}
-	}
-
-	function onChangeRating():Void
-	{
-		if (isPause)
-		{
-			for (rating in PlayState.instance.grpRatings) {
-				rating.goToVisible();
-			}
-		}
-	}
-
-	function onChangeNumbers():Void
-	{
-		if (isPause)
-		{
-			for (number in PlayState.instance.grpNumbers) {
-				number.goToVisible();
-			}
-		}
-	}
-
-	function onChangeAutoPause():Void
-	{
-		FlxG.autoPause = OptionData.autoPause;
-	}
-
 	var changedMusic:Bool = false;
-
-	function onChangePauseMusic():Void
-	{
-		FreeplayMenuState.destroyFreeplayVocals();
-
-		if (OptionData.pauseMusic == 'None') {
-			FlxG.sound.music.volume = 0;
-		}
-		else {
-			FlxG.sound.playMusic(Paths.getMusic(Paths.formatToSongPath(OptionData.pauseMusic), 'shared'));
-		}
-
-		changedMusic = true;
-	}
-
-	#if !mobile
-	function onChangeFPSCounter():Void
-	{
-		if (Main.fpsCounter != null) {
-			Main.fpsCounter.visible = OptionData.fpsCounter;
-		}
-	}
-
-	function onChangeMemoryCounter():Void
-	{
-		if (Main.memoryCounter != null) {
-			Main.memoryCounter.visible = OptionData.memoryCounter;
-		}
-	}
-	#end
 
 	public override function destroy():Void
 	{
 		super.destroy();
 
-		if (changedMusic) FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
+		if (!isPause && changedMusic) FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 	}
 
 	public override function beatHit():Void
@@ -1294,7 +1284,7 @@ class PreferencesSubState extends MusicBeatSubState
 		descBox.visible = curOption.description != '';
 
 		if (boyfriend != null) {
-			boyfriend.visible = curOption.showBoyfriend && !curOption.isPause;
+			boyfriend.visible = curOption.showBoyfriend && !curOption.blockedOnPause;
 		}
 
 		FlxG.sound.play(Paths.getSound('scrollMenu'));

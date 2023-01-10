@@ -14,6 +14,7 @@ import flixel.text.FlxText;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
+import flixel.system.FlxSound;
 import flixel.effects.FlxFlicker;
 
 using StringTools;
@@ -61,7 +62,12 @@ class NotesSubState extends MusicBeatSubState
 		}
 		else
 		{
-			bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+			if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
+				bg.loadGraphic(Paths.getImage('menuDesat'));
+			}
+			else {
+				bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+			}
 			bg.color = 0xFFea71fd;
 			bg.updateHitbox();
 			bg.screenCenter();
@@ -113,7 +119,8 @@ class NotesSubState extends MusicBeatSubState
 			add(practiceText);
 		}
 		
-		blackBG = new FlxSprite(posX - 25).makeGraphic(870, 200, FlxColor.BLACK);
+		blackBG = new FlxSprite(posX - 25);
+		blackBG.makeGraphic(870, 200, FlxColor.BLACK);
 		blackBG.alpha = 0.4;
 		add(blackBG);
 
@@ -173,6 +180,12 @@ class NotesSubState extends MusicBeatSubState
 	public override function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
+
+		var pauseMusic:FlxSound = PauseSubState.pauseMusic;
+
+		if (isPause && pauseMusic != null && pauseMusic.volume < 0.5) {
+			pauseMusic.volume += 0.01 * elapsed;
+		}
 
 		if (!flickering)
 		{
@@ -318,8 +331,7 @@ class NotesSubState extends MusicBeatSubState
 
 						FlxFlicker.flicker(grpNotes.members[curSelected], 1, 0.06, true);
 
-						FlxFlicker.flicker(grpNumbers.members[(curSelected * 3) + typeSelected], 1, 0.06, true, false, function(flick:FlxFlicker):Void
-						{
+						FlxFlicker.flicker(grpNumbers.members[(curSelected * 3) + typeSelected], 1, 0.06, true, false, function(flick:FlxFlicker):Void {
 							selectType();
 						});
 
@@ -368,8 +380,7 @@ class NotesSubState extends MusicBeatSubState
 			var item = grpNumbers.members[i];
 			item.alpha = 0;
 
-			if ((curSelected * 3) + typeSelected == i)
-			{
+			if ((curSelected * 3) + typeSelected == i) {
 				item.alpha = 1;
 			}
 		}
@@ -397,8 +408,7 @@ class NotesSubState extends MusicBeatSubState
 			var item = grpNumbers.members[i];
 			item.alpha = 0.6;
 
-			if ((curSelected * 3) + typeSelected == i)
-			{
+			if ((curSelected * 3) + typeSelected == i) {
 				item.alpha = 1;
 			}
 		}
@@ -466,6 +476,8 @@ class NotesSubState extends MusicBeatSubState
 		for (letter in item.letters) {
 			letter.offset.x += add;
 		}
+
+		reloadAllShitOnGame();
 	}
 
 	function updateValue(change:Float = 0):Void
@@ -507,6 +519,84 @@ class NotesSubState extends MusicBeatSubState
 		{
 			letter.offset.x += add;
 			if (roundedValue < 0) letter.offset.x += 10;
+		}
+
+		reloadAllShitOnGame();
+	}
+
+	function reloadAllShitOnGame():Void
+	{
+		if (isPause && PlayState.instance != null)
+		{
+			PlayState.instance.notes.forEachAlive(function(note:Note):Void
+			{
+				@:privateAccess
+				var maxNote:Int = note.maxNote;
+				var noteData:Int = note.noteData;
+
+				if (noteData > -1 && noteData < OptionData.arrowHSV.length)
+				{
+					note.colorSwap.hue = OptionData.arrowHSV[noteData % maxNote][0] / 360;
+					note.colorSwap.saturation = OptionData.arrowHSV[noteData % maxNote][1] / 100;
+					note.colorSwap.brightness = OptionData.arrowHSV[noteData % maxNote][2] / 100;
+				}
+
+				note.noteSplashHue = note.colorSwap.hue;
+				note.noteSplashSat = note.colorSwap.saturation;
+				note.noteSplashBrt = note.colorSwap.brightness;
+			});
+
+			PlayState.instance.playerStrums.forEachAlive(function(note:StrumNote):Void
+			{
+				var noteData:Int = note.noteData;
+
+				if (note.animation.curAnim == null || note.animation.curAnim.name == 'static') 
+				{
+					note.colorSwap.hue = 0;
+					note.colorSwap.saturation = 0;
+					note.colorSwap.brightness = 0;
+				}
+				else
+				{
+					if (noteData > -1 && noteData < OptionData.arrowHSV.length)
+					{
+						note.colorSwap.hue = OptionData.arrowHSV[noteData][0] / 360;
+						note.colorSwap.saturation = OptionData.arrowHSV[noteData][1] / 100;
+						note.colorSwap.brightness = OptionData.arrowHSV[noteData][2] / 100;
+					}
+				}
+			});
+
+			PlayState.instance.opponentStrums.forEachAlive(function(note:StrumNote):Void
+			{
+				var noteData:Int = note.noteData;
+
+				if (note.animation.curAnim == null || note.animation.curAnim.name == 'static') 
+				{
+					note.colorSwap.hue = 0;
+					note.colorSwap.saturation = 0;
+					note.colorSwap.brightness = 0;
+				}
+				else
+				{
+					if (noteData > -1 && noteData < OptionData.arrowHSV.length)
+					{
+						note.colorSwap.hue = OptionData.arrowHSV[noteData][0] / 360;
+						note.colorSwap.saturation = OptionData.arrowHSV[noteData][1] / 100;
+						note.colorSwap.brightness = OptionData.arrowHSV[noteData][2] / 100;
+					}
+				}
+			});
+
+			PlayState.instance.grpNoteSplashes.forEachAlive(function(noteSpl:NoteSplash):Void
+			{
+				if (noteSpl.note > -1 && noteSpl.note < OptionData.arrowHSV.length)
+				{
+					noteSpl.colorSwap.hue = OptionData.arrowHSV[noteSpl.note][0] / 360;
+					noteSpl.colorSwap.saturation = OptionData.arrowHSV[noteSpl.note][1] / 100;
+					noteSpl.colorSwap.brightness = OptionData.arrowHSV[noteSpl.note][2] / 100;
+				}
+			});
 		}
 	}
 }

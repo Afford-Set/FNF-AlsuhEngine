@@ -6,6 +6,7 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxEase;
+import transition.Transition;
 import flixel.system.FlxSound;
 import flixel.tweens.FlxTween;
 import options.OptionsMenuState;
@@ -15,24 +16,22 @@ using StringTools;
 
 class PauseSubState extends BaseSubState
 {
-	static var playingPause:Bool = false;
+	public static var pauseMusic:FlxSound = null;
 	static var goToOptions:Bool = false;
 
 	var curSelected:Int = 0;
-
 	var menuItems:Array<String> = [];
 
 	var menuItemsOG:Array<String> = ['Resume', 'Restart Song', 'Change Difficulty', 'Options', 'Exit to menu'];
 	var difficultyChoices:Array<String> = [];
 
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
-	var pauseMusic:FlxSound;
-
-	var fromOptions:Bool = false;
 
 	var skipTimeText:FlxText;
 	var skipTimeTracker:Alphabet;
 	var curTime:Float = Math.max(0, Conductor.songPosition);
+
+	var fromOptions:Bool = false;
 
 	public function new(?fromOptions:Bool = false):Void
 	{
@@ -77,42 +76,17 @@ class PauseSubState extends BaseSubState
 
 		menuItems = menuItemsOG;
 
-		if (FlxG.sound.music.playing && FlxG.sound.music != null) {
-			FlxG.sound.music.pause();
-		}
-
-		for (i in FlxG.sound.list)
-		{
-			if (i.playing && i.ID != 9000) {
-				i.pause();
-			}
-		}
-
 		goToOptions = false;
 
-		if (!playingPause)
+		if (!fromOptions)
 		{
-			playingPause = true;
-	
 			pauseMusic = new FlxSound();
-
 			if (OptionData.pauseMusic != 'None') {
 				pauseMusic.loadEmbedded(Paths.getMusic(Paths.formatToSongPath(OptionData.pauseMusic)), true, true);
 			}
-
 			pauseMusic.volume = 0;
-			pauseMusic.ID = 9000;
 			pauseMusic.play(false, FlxG.random.int(0, Std.int(pauseMusic.length / 2)));
 			FlxG.sound.list.add(pauseMusic);
-		}
-		else
-		{
-			for (i in FlxG.sound.list)
-			{
-				if (i.ID == 9000) { // jankiest static variable
-					pauseMusic = i;
-				}
-			}
 		}
 
 		var bg:FlxSprite = new FlxSprite();
@@ -222,9 +196,10 @@ class PauseSubState extends BaseSubState
 
 		for (i in 0...menuItems.length)
 		{
-			var menuItem:Alphabet = new Alphabet(0, (70 * i) + 30, menuItems[i], true);
+			var menuItem:Alphabet = new Alphabet(90, 320, menuItems[i], true);
 			menuItem.isMenuItem = true;
-			menuItem.targetY = i;
+			menuItem.targetY = i - curSelected;
+			menuItem.setPosition(0, (70 * i) + 30);
 			grpMenuShit.add(menuItem);
 
 			if (menuItems[i] == 'Skip Time')
@@ -340,7 +315,9 @@ class PauseSubState extends BaseSubState
 			}
 		}
 
-		if (controls.BACK || FlxG.mouse.justPressedRight) {
+		if (controls.BACK || FlxG.mouse.justPressedRight)
+		{
+			PlayState.instance.callOnLuas('onResume', []);
 			close();
 		}
 
@@ -370,6 +347,7 @@ class PauseSubState extends BaseSubState
 			{
 				case 'Resume':
 				{
+					PlayState.instance.callOnLuas('onResume', []);
 					close();
 				}
 				case 'Restart Song':
@@ -396,6 +374,7 @@ class PauseSubState extends BaseSubState
 							PlayState.instance.setSongTime(curTime);
 						}
 
+						PlayState.instance.callOnLuas('onResume', []);
 						close();
 					}
 				}
@@ -452,27 +431,7 @@ class PauseSubState extends BaseSubState
 						}
 						case 'replay':
 						{
-							if (FlxG.save.data.botPlay != null) {
-								PlayStateChangeables.botPlay = FlxG.save.data.botPlay;
-							}
-							else {
-								PlayStateChangeables.botPlay = false;
-							}
-
-							if (FlxG.save.data.scrollSpeed != null) {
-								PlayStateChangeables.scrollSpeed = FlxG.save.data.scrollSpeed;
-							}
-							else {
-								PlayStateChangeables.scrollSpeed = 1.0;
-							}
-		
-							if (FlxG.save.data.downScroll != null) {
-								OptionData.downScroll = FlxG.save.data.downScroll;
-							}
-							else {
-								OptionData.downScroll = false;
-							}
-
+							Replay.resetVariables();
 							FlxG.switchState(new options.ReplaysMenuState());
 						}
 						default:
@@ -506,10 +465,8 @@ class PauseSubState extends BaseSubState
 	{
 		super.destroy();
 
-		if (!goToOptions)
-		{
+		if (!goToOptions) {
 			pauseMusic.destroy();
-			playingPause = false;
 		}
 	}
 

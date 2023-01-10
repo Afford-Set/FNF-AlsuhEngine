@@ -12,6 +12,7 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
 import flixel.group.FlxGroup;
+import flixel.system.FlxSound;
 import flixel.effects.FlxFlicker;
 import flixel.input.keyboard.FlxKey;
 
@@ -19,7 +20,7 @@ using StringTools;
 
 class ControlsSubState extends BaseSubState
 {
-	private static var curSelected:Int = -1;
+	private static var curSelected:Int = 1;
 	private static var curAlt:Bool = false;
 
 	private static var defaultKey:String = 'Reset to Default Keys';
@@ -86,7 +87,12 @@ class ControlsSubState extends BaseSubState
 		}
 		else
 		{
-			bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+			if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
+				bg.loadGraphic(Paths.getImage('menuDesat'));
+			}
+			else {
+				bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+			}
 			bg.color = 0xFFea71fd;
 			bg.updateHitbox();
 			bg.screenCenter();
@@ -154,25 +160,21 @@ class ControlsSubState extends BaseSubState
 		{
 			var isCentered:Bool = unselectableCheck(i, true);
 
-			var optionText:Alphabet = new Alphabet(0, 70, optionShit[i][0], true);
+			var optionText:Alphabet = new Alphabet(200, 300, optionShit[i][0], true);
 			optionText.isMenuItem = true;
-		
+			optionText.lerpMult /= 2;
+
 			if (isCentered)
 			{
 				optionText.screenCenter(X);
 				optionText.y -= 55;
 				optionText.startPosition.y -= 55;
 			}
-			else
-			{
-				optionText.x = 200;
-				optionText.startPosition.x = 200;
-			}
 
-			optionText.shit = 1;
 			optionText.changeX = false;
 			optionText.distancePerItem.y = 60;
-			optionText.targetY = i;
+			optionText.targetY = i - curSelected;
+			optionText.snapToPosition();
 			grpOptions.add(optionText);
 
 			if (!isCentered)
@@ -201,6 +203,12 @@ class ControlsSubState extends BaseSubState
 	public override function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
+
+		var pauseMusic:FlxSound = PauseSubState.pauseMusic;
+
+		if (isPause && pauseMusic != null && pauseMusic.volume < 0.5) {
+			pauseMusic.volume += 0.01 * elapsed;
+		}
 
 		if ((controls.BACK || FlxG.mouse.justPressedRight) && !rebindingKey)
 		{

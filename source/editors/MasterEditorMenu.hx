@@ -9,6 +9,8 @@ import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
+import transition.Transition;
+import transition.TransitionableState;
 
 using StringTools;
 
@@ -24,7 +26,6 @@ class MasterEditorMenu extends TransitionableState
 		'Dialogue Editor',
 		'Dialogue Portrait Editor',
 		'Character Editor',
-		// 'Stage Editor', Alan is here, we need your pull request with stage editor for StageSpriteData.hx.
 		'Chart Editor',
 	];
 	private var directories:Array<String> = [null];
@@ -34,6 +35,8 @@ class MasterEditorMenu extends TransitionableState
 
 	public override function create():Void
 	{
+		Transition.nextCamera = null;
+
 		super.create();
 
 		FlxG.camera.bgColor = FlxColor.BLACK;
@@ -49,7 +52,12 @@ class MasterEditorMenu extends TransitionableState
 		#end
 
 		var bg:FlxSprite = new FlxSprite();
-		bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
+			bg.loadGraphic(Paths.getImage('menuDesat'));
+		}
+		else {
+			bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+		}
 		bg.scrollFactor.set();
 		bg.color = 0xFF353535;
 		add(bg);
@@ -59,9 +67,10 @@ class MasterEditorMenu extends TransitionableState
 
 		for (i in 0...editorsArray.length)
 		{
-			var editorText:Alphabet = new Alphabet(0, (70 * i) + 30, editorsArray[i], true);
+			var editorText:Alphabet = new Alphabet(90, 320, editorsArray[i], true);
 			editorText.isMenuItem = true;
-			editorText.targetY = i;
+			editorText.targetY = i - curSelected;
+			editorText.setPosition(0, (70 * i) + 30);
 			grpEditors.add(editorText);
 		}
 
@@ -174,20 +183,10 @@ class MasterEditorMenu extends TransitionableState
 	{
 		switch (label)
 		{
-			case 'Week Editor':
-			{
-				if (!OptionData.loadingScreen) {
-					FreeplayMenuState.destroyFreeplayVocals();
-				}
-
+			case 'Week Editor': {
 				FlxG.switchState(new WeekEditorState());
 			}
-			case 'Menu Character Editor':
-			{
-				if (!OptionData.loadingScreen) {
-					FreeplayMenuState.destroyFreeplayVocals();
-				}
-
+			case 'Menu Character Editor': {
 				FlxG.switchState(new MenuCharacterEditorState());
 			}
 			case 'Character Editor':
@@ -205,11 +204,6 @@ class MasterEditorMenu extends TransitionableState
 				LoadingState.loadAndSwitchState(new DialogueCharacterEditorState(), true);
 				return;
 			}
-			case 'Stage Editor': // Alan is here, we need your pull request with stage editor for StageSpriteData.hx.
-			{
-				LoadingState.loadAndSwitchState(new StageEditorState(), true);
-				return;
-			}
 			case 'Chart Editor':
 			{
 				PlayState.SONG = Song.loadFromJson('test', 'test');
@@ -222,7 +216,6 @@ class MasterEditorMenu extends TransitionableState
 		if (!OptionData.loadingScreen)
 		{
 			FlxG.sound.music.volume = 0;
-
 			FreeplayMenuState.destroyFreeplayVocals();
 		}
 	}
@@ -260,8 +253,7 @@ class MasterEditorMenu extends TransitionableState
 	
 		WeekData.setDirectoryFromWeek();
 
-		if (directories[curDirectory] == null || directories[curDirectory].length < 1)
-		{
+		if (directories[curDirectory] == null || directories[curDirectory].length < 1) {
 			directoryTxt.text = '< No Mod Directory Loaded >';
 		}
 		else

@@ -11,14 +11,11 @@ using StringTools;
 
 class VideoSubState extends BaseSubState
 {
-	public var leSource:String = "";
+	var leSource:String = "";
 
-	public var txt:FlxText;
-
-	public var vidSound:FlxSound = null;
-
-	public var doShit:Bool = false;
-	public var pauseText:String = "Press P To Pause/Unpause";
+	var txt:FlxText;
+	var vidSound:FlxSound = null;
+	var pauseText:String = "Press P To Pause/Unpause";
 
 	var holdTimer:Int = 0;
 	var crashMoment:Int = 0;
@@ -67,23 +64,29 @@ class VideoSubState extends BaseSubState
 			}
 		}
 
-		GlobalVideo.get().source(Paths.getWebm(leSource));
-		GlobalVideo.get().clearPause();
+		var ourVideo:Dynamic = GlobalVideo.get();
+		ourVideo.source(Paths.getWebm(leSource));
 
-		if (GlobalVideo.isWebm) {
-			GlobalVideo.get().updatePlayer();
+		if (ourVideo == null)
+		{
+			end();
+			return;
 		}
 
-		GlobalVideo.get().show();
+		ourVideo.clearPause();
 
 		if (GlobalVideo.isWebm) {
-			GlobalVideo.get().restart();
+			ourVideo.updatePlayer();
+		}
+
+		ourVideo.show();
+
+		if (GlobalVideo.isWebm) {
+			ourVideo.restart();
 		}
 		else {
-			GlobalVideo.get().play();
+			ourVideo.play();
 		}
-
-		doShit = true;
 
 		add(skipTxt);
 
@@ -96,17 +99,23 @@ class VideoSubState extends BaseSubState
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
+		var ourVideo:Dynamic = GlobalVideo.get();
 
-		GlobalVideo.get().update(elapsed);
-		
-		if (GlobalVideo.get().ended || GlobalVideo.get().stopped)
+		if (ourVideo == null)
+		{
+			end();
+			return;
+		}
+
+		ourVideo.update(elapsed);
+
+		if (ourVideo.ended || ourVideo.stopped)
 		{
 			txt.visible = false;
 			skipTxt.visible = false;
 
-			GlobalVideo.get().hide();
-			GlobalVideo.get().stop();
+			ourVideo.hide();
+			ourVideo.stop();
 		}
 
 		if (crashMoment > 0) crashMoment--;
@@ -119,46 +128,53 @@ class VideoSubState extends BaseSubState
 			itsTooLate = true;
 	
 			FlxG.sound.music.volume = 0;
-
-			GlobalVideo.get().alpha();
+			ourVideo.alpha();
 	
 			txt.visible = false;
 	
 			if (holdTimer > 100)
 			{
 				skipTxt.visible = false;
-				GlobalVideo.get().stop();
+				ourVideo.stop();
 
 				end();
+				return;
 			}
 		}
-		else if (!GlobalVideo.get().paused)
+		else if (!ourVideo.paused)
 		{
-			GlobalVideo.get().unalpha();
+			ourVideo.unalpha();
 
 			holdTimer = 0;
 			itsTooLate = false;
 		}
 		
-		if (GlobalVideo.get().ended) {
+		if (ourVideo.ended)
+		{
 			end();
+			return;
 		}
 
-		if (GlobalVideo.get().played || GlobalVideo.get().restarted) {
-			GlobalVideo.get().show();
+		if (ourVideo.played || ourVideo.restarted) {
+			ourVideo.show();
 		}
 
-		GlobalVideo.get().restarted = false;
-		GlobalVideo.get().played = false;
+		ourVideo.restarted = false;
+		ourVideo.played = false;
 
-		GlobalVideo.get().stopped = false;
-		GlobalVideo.get().ended = false;
+		ourVideo.stopped = false;
+		ourVideo.ended = false;
+
+		super.update(elapsed);
 	}
 
 	public function end():Void
 	{
 		txt.text = pauseText;
-		vidSound.destroy();
+
+		if (vidSound != null) {
+			vidSound.destroy();
+		}
 
 		close();
 

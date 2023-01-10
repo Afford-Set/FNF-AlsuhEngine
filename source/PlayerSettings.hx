@@ -3,23 +3,24 @@ package;
 import Controls;
 import flixel.FlxG;
 import flixel.util.FlxSignal;
+import flixel.input.gamepad.FlxGamepad;
 
 using StringTools;
 
 class PlayerSettings
 {
-	public static var numPlayers(default, null) = 0;
-	public static var numAvatars(default, null) = 0;
+	public static var numPlayers(default, null):Int = 0;
+	public static var numAvatars(default, null):Int = 0;
 
 	public static var player1(default, null):PlayerSettings;
 	public static var player2(default, null):PlayerSettings;
 
 	#if (haxe >= "4.0.0")
-	public static final onAvatarAdd = new FlxTypedSignal<PlayerSettings->Void>();
-	public static final onAvatarRemove = new FlxTypedSignal<PlayerSettings->Void>();
+	public static final onAvatarAdd:FlxTypedSignal<PlayerSettings->Void> = new FlxTypedSignal<PlayerSettings->Void>();
+	public static final onAvatarRemove:FlxTypedSignal<PlayerSettings->Void> = new FlxTypedSignal<PlayerSettings->Void>();
 	#else
-	public static var onAvatarAdd = new FlxTypedSignal<PlayerSettings->Void>();
-	public static var onAvatarRemove = new FlxTypedSignal<PlayerSettings->Void>();
+	public static var onAvatarAdd:FlxTypedSignal<PlayerSettings->Void> = new FlxTypedSignal<PlayerSettings->Void>();
+	public static var onAvatarRemove:FlxTypedSignal<PlayerSettings->Void> = new FlxTypedSignal<PlayerSettings->Void>();
 	#end
 
 	public var id(default, null):Int;
@@ -30,7 +31,7 @@ class PlayerSettings
 	public var controls:Controls;
 	#end
 
-	function new(id, scheme):Void
+	function new(id:Int, scheme:KeyboardScheme):Void
 	{
 		this.id = id;
 		this.controls = new Controls('player$id', scheme);
@@ -53,7 +54,7 @@ class PlayerSettings
 
 		if (numGamepads > 0)
 		{
-			var gamepad = FlxG.gamepads.getByID(0);
+			var gamepad:FlxGamepad = FlxG.gamepads.getByID(0);
 	
 			if (gamepad == null) {
 				throw 'Unexpected null gamepad. id:0';
@@ -70,7 +71,7 @@ class PlayerSettings
 				++numPlayers;
 			}
 
-			var gamepad = FlxG.gamepads.getByID(1);
+			var gamepad:FlxGamepad = FlxG.gamepads.getByID(1);
 
 			if (gamepad == null) {
 				throw 'Unexpected null gamepad. id:0';

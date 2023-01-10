@@ -11,6 +11,7 @@ import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
+import transition.TransitionableState;
 
 using StringTools;
 
@@ -39,7 +40,12 @@ class AchievementsMenuState extends TransitionableState
 		#end
 
 		var menuBG:FlxSprite = new FlxSprite();
-		menuBG.loadGraphic(Paths.getImage('bg/menuBGBlue'));
+		if (Paths.fileExists('images/menuBGBlue.png', IMAGE)) {
+			menuBG.loadGraphic(Paths.getImage('menuBGBlue'));
+		}
+		else {
+			menuBG.loadGraphic(Paths.getImage('bg/menuBGBlue'));
+		}
 		menuBG.updateHitbox();
 		menuBG.screenCenter();
 		menuBG.antialiasing = OptionData.globalAntialiasing;
@@ -67,12 +73,10 @@ class AchievementsMenuState extends TransitionableState
 			var achieveName:String = Achievements.achievementsStuff[achievementIndex[i]][2];
 			var unlocked:String = Achievements.isAchievementUnlocked(achieveName) ? Achievements.achievementsStuff[achievementIndex[i]][0] : '?';
 
-			var leText:Alphabet = new Alphabet(0, (100 * i) + 210, unlocked, false);
+			var leText:Alphabet = new Alphabet(280, 270, unlocked, false);
 			leText.isMenuItem = true;
-			leText.x += 280;
-			leText.startPosition.x = 200;
-			leText.startPosition.y = -70;
-			leText.targetY = i;
+			leText.targetY = i - curSelected;
+			leText.snapToPosition();
 			grpTexts.add(leText);
 
 			var icon:AttachedAchievement = new AttachedAchievement(leText.x - 105, leText.y, achieveName);
@@ -116,14 +120,12 @@ class AchievementsMenuState extends TransitionableState
 			if (controls.UI_UP_P)
 			{
 				changeSelection(-shiftMult);
-
 				holdTime = 0;
 			}
 
 			if (controls.UI_DOWN_P)
 			{
 				changeSelection(shiftMult);
-
 				holdTime = 0;
 			}
 

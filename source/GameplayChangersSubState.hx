@@ -64,7 +64,6 @@ class GameplayChangersSubState extends BaseSubState
 			optionsArray.push(option);
 		}
 
-		#if !html5
 		var option:GameplayOption = new GameplayOption('Playback Rate', 'playbackRate', 'float', 1);
 		option.scrollSpeed = 1;
 		option.minValue = 0.5;
@@ -75,7 +74,6 @@ class GameplayChangersSubState extends BaseSubState
 		option.luaAllowed = true;
 		option.luaString = 'playbackRate';
 		optionsArray.push(option);
-		#end
 
 		var option:GameplayOption = new GameplayOption('Health Gain Multiplier', 'healthGain', 'float', 1);
 		option.scrollSpeed = 2.5;
@@ -208,9 +206,8 @@ class GameplayChangersSubState extends BaseSubState
 				leOption.onPause = true;
 			}
 
-			var optionText:Alphabet = new Alphabet(120, 70, leOption.name, true);
+			var optionText:Alphabet = new Alphabet(200, 360, leOption.name, true);
 			optionText.isMenuItem = true;
-			optionText.startPosition.x = 120;
 			optionText.scaleX = 0.8;
 			optionText.scaleY = 0.8;
 			optionText.targetY = i;
@@ -222,29 +219,35 @@ class GameplayChangersSubState extends BaseSubState
 				{
 					optionText.x += 110;
 					optionText.startPosition.x += 110;
+					optionText.snapToPosition();
 
 					var checkbox:CheckboxThingie = new CheckboxThingie(optionText.x - 105, optionText.y, leOption.getValue() == true);
 					checkbox.sprTracker = optionText;
 					checkbox.offsetX -= 32;
-					checkbox.offsetY = -70;
+					checkbox.offsetY = -120;
 					checkbox.ID = i;
 					checkbox.snapToUpdateVariables();
 					checkboxGroup.add(checkbox);
 				}
 				case 'int' | 'float' | 'percent' | 'string':
 				{
-					var valueText:AttachedText = new AttachedText(Std.string(optionsArray[i].getValue()), optionText.width + 15, -13.5, true, 0.8);
+					optionText.snapToPosition();
+
+					var valueText:AttachedText = new AttachedText(Std.string(leOption.getValue()), optionText.width, -72, true, 0.8);
 					valueText.sprTracker = optionText;
 					valueText.copyAlpha = true;
 					valueText.ID = i;
 					valueText.snapToUpdateVariables();
 					grpTexts.add(valueText);
 
-					optionsArray[i].setChild(valueText);
+					leOption.setChild(valueText);
+				}
+				default: {
+					optionText.snapToPosition();
 				}
 			}
 
-			updateTextFrom(optionsArray[i]);
+			updateTextFrom(leOption);
 		}
 
 		changeSelection();
@@ -344,7 +347,7 @@ class GameplayChangersSubState extends BaseSubState
 				}
 				else
 				{
-					if (curOption.type == 'bool' && !curOption.isPause)
+					if (curOption.type == 'bool' && !curOption.blockedOnPause)
 					{
 						if (OptionData.flashingLights)
 						{
@@ -382,7 +385,7 @@ class GameplayChangersSubState extends BaseSubState
 				}
 			}
 
-			if (curOption.type != 'bool' && curOption.type != 'menu' && curOption != defaultValue && !curOption.isPause)
+			if (curOption.type != 'bool' && curOption.type != 'menu' && curOption != defaultValue && !curOption.blockedOnPause)
 			{
 				if (controls.UI_LEFT || controls.UI_RIGHT)
 				{
@@ -713,7 +716,7 @@ class GameplayOption
 	public var text(get, set):String;
 	public var onChange:Void->Void = null; //Pressed enter (on Bool type options) or pressed/held left/right (on other types)
 
-	public var isPause:Bool = false;
+	public var blockedOnPause:Bool = false;
 	public var type(get, default):String = 'bool'; //bool, int (or integer), float (or fl), percent, string (or str)
 	// Bool will use checkboxes
 	// Everything else will use a text
@@ -811,7 +814,7 @@ class GameplayOption
 		Reflect.setProperty(PlayStateChangeables, variable, value);
 
 		#if LUA_ALLOWED
-		if (onPause && luaAllowed && luaString.length > 0) {
+		if (onPause && luaAllowed && luaString.length > 0 && !blockedOnPause) {
 			PlayState.instance.setOnLuas(luaString, value);
 		}
 		#end

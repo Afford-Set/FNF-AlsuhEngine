@@ -9,7 +9,10 @@ import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
+import transition.Transition;
+import flixel.system.FlxSound;
 import flixel.effects.FlxFlicker;
+import transition.TransitionableState;
 
 using StringTools;
 
@@ -73,10 +76,11 @@ class OptionsMenuState extends TransitionableState
 
 	public override function create():Void
 	{
+		Transition.nextCamera = null;
+
 		super.create();
 
-		if (FlxG.sound.music.playing == false || FlxG.sound.music.volume == 0)
-		{
+		if (FlxG.sound.music.playing == false || FlxG.sound.music.volume == 0) {
 			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 		}
 
@@ -87,7 +91,12 @@ class OptionsMenuState extends TransitionableState
 		#end
 
 		var bg:FlxSprite = new FlxSprite();
-		bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
+			bg.loadGraphic(Paths.getImage('menuDesat'));
+		}
+		else {
+			bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+		}
 		bg.color = 0xFFea71fd;
 		bg.updateHitbox();
 		bg.screenCenter();
@@ -149,14 +158,12 @@ class OptionsMenuState extends TransitionableState
 				if (controls.UI_UP_P)
 				{
 					changeSelection(-1);
-
 					holdTime = 0;
 				}
 
 				if (controls.UI_DOWN_P)
 				{
 					changeSelection(1);
-
 					holdTime = 0;
 				}
 
@@ -185,8 +192,7 @@ class OptionsMenuState extends TransitionableState
 					FlxFlicker.flicker(selectorLeft, 1, 0.04, true);
 					FlxFlicker.flicker(selectorRight, 1, 0.04, true);
 	
-					FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.04, true, false, function(flick:FlxFlicker):Void
-					{
+					FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.04, true, false, function(flick:FlxFlicker):Void {
 						openSelectedSubstate(options[curSelected]);
 					});
 	
@@ -371,6 +377,12 @@ class OptionsSubState extends BaseSubState
 	{
 		super.update(elapsed);
 
+		var pauseMusic:FlxSound = PauseSubState.pauseMusic;
+
+		if (pauseMusic != null && pauseMusic.volume < 0.5) {
+			pauseMusic.volume += 0.01 * elapsed;
+		}
+
 		if (controls.BACK || FlxG.mouse.justPressedRight)
 		{
 			OptionsMenuState.curSelected = curSelected;
@@ -394,14 +406,12 @@ class OptionsSubState extends BaseSubState
 				if (controls.UI_UP_P)
 				{
 					changeSelection(-1);
-
 					holdTime = 0;
 				}
 
 				if (controls.UI_DOWN_P)
 				{
 					changeSelection(1);
-
 					holdTime = 0;
 				}
 
@@ -430,8 +440,7 @@ class OptionsSubState extends BaseSubState
 					FlxFlicker.flicker(selectorLeft, 1, 0.04, true);
 					FlxFlicker.flicker(selectorRight, 1, 0.04, true);
 	
-					FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.04, true, false, function(flick:FlxFlicker):Void
-					{
+					FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.04, true, false, function(flick:FlxFlicker):Void {
 						openSelectedSubstate(options[curSelected]);
 					});
 	

@@ -16,7 +16,17 @@ class Number extends FlxSprite
 
 		this.number = number;
 
-		loadGraphic(Paths.getImage('numbers/num' + number + suffix));
+		var ourPath:String = 'num' + number + suffix;
+
+		if (Paths.fileExists('images/' + ourPath + '.png', IMAGE)) {
+			loadGraphic(Paths.getImage(ourPath));
+		}
+		else if (Paths.fileExists('pixelUI/' + ourPath + '.png', IMAGE)) {
+			loadGraphic(Paths.getImage('pixelUI/' + ourPath));
+		}
+		else {
+			loadGraphic(Paths.getImage('numbers/' + ourPath));
+		}
 
 		screenCenter();
 

@@ -17,7 +17,6 @@ class BGSprite extends FlxSprite
 			for (i in 0...animArray.length)
 			{
 				var anim:String = animArray[i];
-
 				animation.addByPrefix(anim, anim, 24, loop);
 
 				if (idleAnim == null)

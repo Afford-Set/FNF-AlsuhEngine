@@ -1,13 +1,15 @@
 package;
 
 import haxe.Json;
+import haxe.format.JsonParser;
+
 #if MODS_ALLOWED
 import sys.io.File;
 import sys.FileSystem;
 #end
+
 import flixel.FlxSprite;
 import openfl.utils.Assets;
-import haxe.format.JsonParser;
 
 using StringTools;
 
@@ -71,33 +73,33 @@ class MenuCharacter extends FlxSprite
 			}
 			default:
 			{
-				var characterPath:String = 'images/storymenu/menucharacters/' + character + '.json';
-				var rawJson = null;
+				var rawJson:String = null;
+				var path:String = Paths.getFile('menucharacters/$DEFAULT_CHARACTER.json', TEXT);
+
+				if (Paths.fileExists('images/menucharacters/$character.json', TEXT)) {
+					path = Paths.getFile('images/menucharacters/$character.json', TEXT);
+				}
+				else if (Paths.fileExists('images/storymenu/menucharacters/$character.json', TEXT)) {
+					path = Paths.getFile('images/storymenu/menucharacters/$character.json', TEXT);
+				}
+				else if (Paths.fileExists('menucharacters/$character.json', TEXT)) {
+					path = Paths.getFile('menucharacters/$character.json', TEXT);
+				}
 
 				#if MODS_ALLOWED
-				var path:String = Paths.modFolders(characterPath);
-
-				if (!FileSystem.exists(path)) {
-					path = Paths.getPreloadPath(characterPath);
-				}
-
-				if (!FileSystem.exists(path)) {
-					path = Paths.getPreloadPath('images/storymenu/menucharacters/' + DEFAULT_CHARACTER + '.json');
-				}
-
 				rawJson = File.getContent(path);
 				#else
-				var path:String = Paths.getPreloadPath(characterPath);
-
-				if (!Assets.exists(path)) {
-					path = Paths.getPreloadPath('images/storymenu/menucharacters/' + DEFAULT_CHARACTER + '.json');
-				}
-
 				rawJson = Assets.getText(path);
 				#end
 				
 				var charFile:MenuCharacterFile = cast Json.parse(rawJson);
-				frames = Paths.getSparrowAtlas('storymenu/menucharacters/' + charFile.image);
+
+				if (Paths.fileExists('images/menucharacters/' + charFile.image + '.png', IMAGE)) {
+					frames = Paths.getSparrowAtlas('menucharacters/' + charFile.image);
+				}
+				else {
+					frames = Paths.getSparrowAtlas('storymenu/menucharacters/' + charFile.image);
+				}
 
 				isDanced = charFile.isGF;
 
@@ -135,7 +137,6 @@ class MenuCharacter extends FlxSprite
 				}
 
 				offset.set(charFile.position[0], charFile.position[1]);
-
 				dance();
 			}
 		}

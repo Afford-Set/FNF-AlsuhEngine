@@ -1,6 +1,8 @@
 package;
 
+import Conductor;
 import flixel.FlxG;
+import transition.TransitionableState;
 
 using StringTools;
 
@@ -91,24 +93,11 @@ class MusicBeatState extends TransitionableState
 
 	private function updateCurStep():Void
 	{
-		var lastChange = Conductor.getBPMFromSeconds(Conductor.songPosition);
+		var lastChange:BPMChangeEvent = Conductor.getBPMFromSeconds(Conductor.songPosition);
 
 		var shit:Float = ((Conductor.songPosition - OptionData.noteOffset) - lastChange.songTime) / lastChange.stepCrochet;
 		curDecStep = lastChange.stepTime + shit;
 		curStep = lastChange.stepTime + Math.floor(shit);
-	}
-
-	public static function resetState():Void
-	{
-		FlxG.switchState(FlxG.state);
-	}
-
-	public static function getState():MusicBeatState
-	{
-		var curState:Dynamic = FlxG.state;
-		var leState:MusicBeatState = curState;
-
-		return leState;
 	}
 
 	public function stepHit():Void
@@ -131,7 +120,6 @@ class MusicBeatState extends TransitionableState
 	function getBeatsOnSection()
 	{
 		var val:Null<Float> = PlayState.SONG != null && PlayState.SONG.notes[curSection] != null ? PlayState.SONG.notes[curSection].sectionBeats : 4;
-
 		return val == null ? 4 : val;
 	}
 }

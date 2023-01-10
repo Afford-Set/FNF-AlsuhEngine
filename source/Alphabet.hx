@@ -24,6 +24,7 @@ class Alphabet extends FlxSpriteGroup
 
 	public var isMenuItem:Bool = false;
 	public var targetY:Int = 0;
+	public var lerpMult:Float = 0.16;
 	public var changeX:Bool = true;
 	public var changeY:Bool = true;
 
@@ -38,6 +39,9 @@ class Alphabet extends FlxSpriteGroup
 	public function new(x:Float, y:Float, text:String = "", ?bold:Bool = true):Void
 	{
 		super(x, y);
+
+		this.startPosition.x = x;
+		this.startPosition.y = y;
 
 		this.bold = bold;
 		this.text = text;
@@ -139,7 +143,6 @@ class Alphabet extends FlxSpriteGroup
 		}
 
 		scaleX = value;
-
 		return value;
 	}
 
@@ -162,24 +165,19 @@ class Alphabet extends FlxSpriteGroup
 		}
 
 		scaleY = value;
-
 		return value;
 	}
-
-	public var shit:Float = 2;
 
 	override function update(elapsed:Float):Void
 	{
 		if (isMenuItem)
 		{
-			var scaledY = FlxMath.remapToRange(targetY, 0, 1, 0, 1.3);
-
 			if (changeX) {
-				x = CoolUtil.coolLerp(x, (targetY * distancePerItem.x) + 90 + startPosition.x, 0.08 * shit);
+				x = CoolUtil.coolLerp(x, (targetY * distancePerItem.x) + startPosition.x, lerpMult);
 			}
 
 			if (changeY) {
-				y = CoolUtil.coolLerp(y, (scaledY * distancePerItem.y) + (FlxG.height * 0.48) + startPosition.y, 0.08 * shit);
+				y = CoolUtil.coolLerp(y, (targetY * 1.3 * distancePerItem.y) + startPosition.y, lerpMult);
 			}
 		}
 
@@ -339,7 +337,12 @@ class AlphaCharacter extends FlxSprite
 
 		this.parent = parent;
 
-		image = 'ui/alphabet';
+		if (Paths.fileExists('images/alphabet.png', IMAGE)) {
+			image = 'alphabet';
+		}
+		else {
+			image = 'ui/alphabet';
+		}
 
 		antialiasing = OptionData.globalAntialiasing;
 

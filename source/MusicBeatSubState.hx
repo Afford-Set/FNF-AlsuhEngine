@@ -1,5 +1,7 @@
 package;
 
+import Conductor;
+
 using StringTools;
 
 class MusicBeatSubState extends BaseSubState
@@ -39,7 +41,7 @@ class MusicBeatSubState extends BaseSubState
 
 	private function updateCurStep():Void
 	{
-		var lastChange = Conductor.getBPMFromSeconds(Conductor.songPosition);
+		var lastChange:BPMChangeEvent = Conductor.getBPMFromSeconds(Conductor.songPosition);
 
 		var shit:Float = ((Conductor.songPosition - OptionData.noteOffset) - lastChange.songTime) / lastChange.stepCrochet;
 		curDecStep = lastChange.stepTime + shit;
@@ -55,6 +57,6 @@ class MusicBeatSubState extends BaseSubState
 
 	public function beatHit():Void
 	{
-		//do literally nothing dumbass
+		// do literally nothing dumbass
 	}
 }

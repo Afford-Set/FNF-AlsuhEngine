@@ -10,6 +10,7 @@ import sys.FileSystem;
 #end
 
 import haxe.Json;
+import haxe.format.JsonParser;
 
 import flixel.FlxG;
 import openfl.Assets;
@@ -22,6 +23,7 @@ import flixel.util.FlxTimer;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxEase;
 import openfl.display.Bitmap;
+import transition.Transition;
 import openfl.display.BitmapData;
 import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepad;
@@ -40,6 +42,9 @@ typedef TitleData =
 
 	gfx:Float,
 	gfy:Float,
+	gfscalex:Null<Float>,
+	gfscaley:Null<Float>,
+	gfantialiasing:Null<Bool>,
 
 	backgroundSprite:String,
 
@@ -74,7 +79,6 @@ class TitleState extends MusicBeatState
 		#end
 
 		WeekData.loadTheFirstEnabledMod();
-
 		Transition.skipNextTransOut = true;
 
 		super.create();
@@ -98,14 +102,30 @@ class TitleState extends MusicBeatState
 
 		PlayStateChangeables.loadChangeables();
 
+		if (FlxG.save.data.weekCompleted != null) {
+			WeekData.weekCompleted = FlxG.save.data.weekCompleted;
+		}
+
 		#if sys
 		if (!FileSystem.exists(Sys.getCwd() + "\\assets\\replays")) {
 			FileSystem.createDirectory(Sys.getCwd() + "\\assets\\replays");
 		}
 		#end
 		
-		titleJSON = Json.parse(Paths.getTextFromFile('images/title/gfDanceTitle.json'));
+		if (Paths.fileExists('images/title/gfDanceTitle.json', TEXT)) {
+			titleJSON = Json.parse(Paths.getTextFromFile('images/title/gfDanceTitle.json'));
+		}
+		else if (Paths.fileExists('images/gfDanceTitle.json', TEXT)) {
+			titleJSON = Json.parse(Paths.getTextFromFile('images/gfDanceTitle.json'));
+		}
+		else if (Paths.fileExists('data/gfDanceTitle.json', TEXT)) {
+			titleJSON = Json.parse(Paths.getTextFromFile('data/gfDanceTitle.json'));
+		}
+		else {
+			titleJSON = Json.parse(Paths.getTextFromFile('title/gfDanceTitle.json'));
+		}
 
+		#if CHECK_FOR_UPDATES
 		if (OptionData.checkForUpdates && !initialized)
 		{
 			var http = new haxe.Http("https://raw.githubusercontent.com/AlanSurtaev2008/FNF-AlsuhEngine/main/version.downloadMe");
@@ -126,6 +146,7 @@ class TitleState extends MusicBeatState
 	
 			http.request();
 		}
+		#end
 
 		if (initialized)
 		{
@@ -133,13 +154,7 @@ class TitleState extends MusicBeatState
 				startIntro();
 			});
 		}
-		else
-		{
-			persistentUpdate = true;
-			persistentDraw = true;
-
-			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
-
+		else {
 			startIntro();
 		}
 
@@ -164,44 +179,70 @@ class TitleState extends MusicBeatState
 
 	function startIntro():Void
 	{
-		Conductor.changeBPM(titleJSON.bpm);
 		persistentUpdate = true;
+		persistentDraw = true;
+
+		if (titleJSON.gfantialiasing == null) titleJSON.gfantialiasing = true;
+		if (titleJSON.gfscalex == null) titleJSON.gfscalex = 1;
+		if (titleJSON.gfscaley == null) titleJSON.gfscaley = 1;
+
+		FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
+		Conductor.changeBPM(titleJSON.bpm);
 
 		var bg:FlxSprite = new FlxSprite();
-
-		if (titleJSON.backgroundSprite != null && titleJSON.backgroundSprite.length > 0 && titleJSON.backgroundSprite != 'none') {
-			bg.loadGraphic(Paths.getImage('title/' + titleJSON.backgroundSprite));
+		if (titleJSON.backgroundSprite != null && titleJSON.backgroundSprite.length > 0 && titleJSON.backgroundSprite != 'none')
+		{
+			if (Paths.fileExists('images/' + titleJSON.backgroundSprite + '.png', IMAGE)) {
+				bg.loadGraphic(Paths.getImage(titleJSON.backgroundSprite));
+			}
+			else {
+				bg.loadGraphic(Paths.getImage('title/' + titleJSON.backgroundSprite));
+			}
 		}
 		else {
 			bg.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		}
-
 		add(bg);
 
 		swagShader = new ColorSwap();
 
 		gfDance = new FlxSprite(titleJSON.gfx, titleJSON.gfy);
-		gfDance.frames = Paths.getSparrowAtlas('title/gfDanceTitle');
+		if (Paths.fileExists('images/gfDanceTitle.png', IMAGE)) {
+			gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
+		}
+		else {
+			gfDance.frames = Paths.getSparrowAtlas('title/gfDanceTitle');
+		}
 		gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
 		gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
-		gfDance.antialiasing = OptionData.globalAntialiasing;
+		gfDance.scale.set(titleJSON.gfscalex, titleJSON.gfscaley);
+		gfDance.antialiasing = titleJSON.gfantialiasing ? OptionData.globalAntialiasing : false;
 		gfDance.shader = swagShader.shader;
 		add(gfDance);
 
 		logoBl = new FlxSprite(titleJSON.titlex, titleJSON.titley);
-		logoBl.frames = Paths.getSparrowAtlas('title/logoBumpin');
+		if (Paths.fileExists('images/logoBumpin.png', IMAGE)) {
+			logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
+		}
+		else {
+			logoBl.frames = Paths.getSparrowAtlas('title/logoBumpin');
+		}
 		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
 		logoBl.antialiasing = OptionData.globalAntialiasing;
 		logoBl.shader = swagShader.shader;
 		add(logoBl);
 
 		titleText = new FlxSprite(titleJSON.startx, titleJSON.starty);
-		titleText.frames = Paths.getSparrowAtlas('title/titleEnter');
+		if (Paths.fileExists('images/titleEnter.png', IMAGE)) {
+			titleText.frames = Paths.getSparrowAtlas('titleEnter');
+		}
+		else {
+			titleText.frames = Paths.getSparrowAtlas('title/titleEnter');
+		}
 
 		var animFrames:Array<FlxFrame> = [];
 
-		@:privateAccess
-		{
+		@:privateAccess {
 			titleText.animation.findByPrefix(animFrames, "ENTER IDLE");
 			titleText.animation.findByPrefix(animFrames, "ENTER FREEZE");
 		}
@@ -209,14 +250,14 @@ class TitleState extends MusicBeatState
 		if (animFrames.length > 0)
 		{
 			newTitle = true;
-			
+
 			titleText.animation.addByPrefix('idle', "ENTER IDLE", 24);
 			titleText.animation.addByPrefix('press', OptionData.flashingLights ? "ENTER PRESSED" : "ENTER FREEZE", 24);
 		}
 		else
 		{
 			newTitle = false;
-			
+
 			titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
 			titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
 		}
@@ -234,7 +275,12 @@ class TitleState extends MusicBeatState
 		add(textGroup);
 
 		ngSpr = new FlxSprite(0, FlxG.height * 0.52);
-		ngSpr.loadGraphic(Paths.getImage('title/newgrounds_logo'));
+		if (Paths.fileExists('images/newgrounds_logo.png', IMAGE)) {
+			ngSpr.loadGraphic(Paths.getImage('newgrounds_logo'));
+		}
+		else {
+			ngSpr.loadGraphic(Paths.getImage('title/newgrounds_logo'));
+		}
 		ngSpr.setGraphicSize(Std.int(ngSpr.width * 0.8));
 		ngSpr.updateHitbox();
 		ngSpr.screenCenter(X);
@@ -335,11 +381,14 @@ class TitleState extends MusicBeatState
 					if (timer >= 1) {
 						timer = (-timer) + 2;
 					}
-					
+
 					timer = FlxEase.quadInOut(timer);
-					
-					titleText.color = FlxColor.interpolate(titleTextColors[0], titleTextColors[1], timer);
-					titleText.alpha = FlxMath.lerp(titleTextAlphas[0], titleTextAlphas[1], timer);
+
+					if (titleText != null)
+					{
+						titleText.color = FlxColor.interpolate(titleTextColors[0], titleTextColors[1], timer);
+						titleText.alpha = FlxMath.lerp(titleTextAlphas[0], titleTextAlphas[1], timer);
+					}
 				}
 				
 				if (pressedEnter)
@@ -359,6 +408,7 @@ class TitleState extends MusicBeatState
 
 					new FlxTimer().start(1, function(tmr:FlxTimer)
 					{
+						#if CHECK_FOR_UPDATES
 						if (OptionData.checkForUpdates && OutdatedState.newVersion.trim() != MainMenuState.engineVersion.trim() && !OutdatedState.leftState)
 						{
 							Debug.logInfo('There is a new version ' + OutdatedState.newVersion.trim() + '!');
@@ -366,9 +416,10 @@ class TitleState extends MusicBeatState
 						}
 						else
 						{
+						#end
 							Debug.logInfo('You now have the latest version');
 							FlxG.switchState(new MainMenuState());
-						}
+						#if CHECK_FOR_UPDATES } #end
 					});
 				}
 			}

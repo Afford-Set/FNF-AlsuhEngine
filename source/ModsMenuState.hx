@@ -21,6 +21,7 @@ import flixel.util.FlxColor;
 import openfl.geom.Rectangle;
 import flixel.tweens.FlxTween;
 import openfl.display.BitmapData;
+import transition.TransitionableState;
 
 using StringTools;
 
@@ -73,7 +74,12 @@ class ModsMenuState extends TransitionableState
 		#end
 
 		bg = new FlxSprite();
-		bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
+			bg.loadGraphic(Paths.getImage('menuDesat'));
+		}
+		else {
+			bg.loadGraphic(Paths.getImage('bg/menuDesat'));
+		}
 		bg.antialiasing = OptionData.globalAntialiasing;
 		bg.screenCenter();
 		add(bg);
@@ -688,7 +694,7 @@ class ModMetadata
 		this.color = ModsMenuState.defaultColor;
 		this.restart = false;
 
-		var path = Paths.mods(folder + '/pack.json'); // Try loading json
+		var path:String = Paths.mods(folder + '/pack.json'); // Try loading json
 
 		if (FileSystem.exists(path))
 		{

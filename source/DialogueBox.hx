@@ -15,11 +15,8 @@ class DialogueBox extends FlxSpriteGroup
 	var box:FlxSprite;
 
 	var curCharacter:String = '';
-
 	var dialogueList:Array<String> = [];
-
 	var swagDialogue:FlxTypeText;
-
 	var dropText:FlxText;
 
 	public var finishThing:Void->Void;

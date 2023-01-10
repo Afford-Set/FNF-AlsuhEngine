@@ -5,6 +5,7 @@ import Discord.DiscordClient;
 #end
 
 import haxe.Json;
+import haxe.format.JsonParser;
 
 #if sys
 import sys.io.File;
@@ -236,8 +237,7 @@ class MenuCharacterEditorState extends MusicBeatUIState
 			characterFile.flipX = flipXCheckbox.checked;
 		};
 
-		var reloadImageButton:FlxButton = new FlxButton(180, confirmInputText.y + 95, "Reload Char", function():Void
-		{
+		var reloadImageButton:FlxButton = new FlxButton(180, confirmInputText.y + 95, "Reload Char", function():Void {
 			reloadSelectedCharacter();
 		});
 		

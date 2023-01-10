@@ -11,6 +11,7 @@ import sys.FileSystem;
 #end
 import flixel.FlxSprite;
 import flixel.group.FlxGroup;
+import transition.TransitionableState;
 
 using StringTools;
 
@@ -38,7 +39,12 @@ class ReplaysMenuState extends TransitionableState
 		}
 
 		var bg:FlxSprite = new FlxSprite();
-		bg.loadGraphic(Paths.getImage('bg/menuBGBlue'));
+		if (Paths.fileExists('images/menuBGBlue.png', IMAGE)) {
+			bg.loadGraphic(Paths.getImage('menuBGBlue'));
+		}
+		else {
+			bg.loadGraphic(Paths.getImage('bg/menuBGBlue'));
+		}
 		bg.updateHitbox();
 		bg.screenCenter();
 		bg.antialiasing = OptionData.globalAntialiasing;
@@ -49,7 +55,7 @@ class ReplaysMenuState extends TransitionableState
 		#end
 		replaysArray.sort(Reflect.compare);
 
-		if (replaysArray.length >= 1)
+		if (replaysArray.length > 0)
 		{
 			for (i in 0...replaysArray.length)
 			{
@@ -69,11 +75,11 @@ class ReplaysMenuState extends TransitionableState
 
 		for (i in 0...replaysArray.length)
 		{
-			var replayText:Alphabet = new Alphabet(0, (100 * i) + 210, replaysArray[i], false);
-			replayText.isMenuItem = true;
-			replayText.targetY = i;
-			replayText.startPosition.y = -70;
-			grpReplays.add(replayText);
+			var leText:Alphabet = new Alphabet(100, 270, replaysArray[i], false);
+			leText.isMenuItem = true;
+			leText.targetY = i - curSelected;
+			leText.snapToPosition();
+			grpReplays.add(leText);
 		}
 
 		changeSelection();

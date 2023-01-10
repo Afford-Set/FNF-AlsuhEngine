@@ -1,14 +1,16 @@
 package;
 
-import Song;
 import haxe.Json;
+import haxe.format.JsonParser;
+
+import Song;
+
 #if MODS_ALLOWED
 import sys.io.File;
 import sys.FileSystem;
 #else
 import openfl.utils.Assets;
 #end
-import haxe.format.JsonParser;
 
 using StringTools;
 
@@ -29,57 +31,7 @@ typedef StageFile =
 	var camera_girlfriend:Array<Float>;
 
 	var camera_speed:Null<Float>;
-
-	// @:optional var spritesData:Array<StageSpriteData>;
 }
-
-/*
-	Alan is here, we need your pull request with stage editor for StageSpriteData.hx.
-
-typedef StageSpriteData =
-{
-	var name:String;
-	var path:String;
-	var index:Dynamic;
-
-	var x:Float;
-	var y:Float;
-
-	var alpha:Float;
-	var visible:Bool;
-
-	var antialiasing:Bool;
-
-	var active:Bool;
-	var exists:Bool;
-
-	var camera:String;
-
-	var flipX:Bool;
-	var flipY:Bool;
-
-	var angle:Float;
-
-	var scrollX:Float;
-	var scrollY:Float;
-
-	var scaleX:Float;
-	var scaleY:Float;
-
-	var animated:Bool;
-	var animations:Array<StageAnimArray>;
-}
-
-typedef StageAnimArray =
-{
-	var anim:String;
-	var name:String;
-	var fps:Int;
-	var loop:Bool;
-	var indices:Array<Int>;
-	var offsets:Array<Int>;
-}
-*/
 
 class StageData
 {

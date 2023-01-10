@@ -16,7 +16,15 @@ class Rating extends FlxSprite
 
 		this.rating = rating;
 
-		loadGraphic(Paths.getImage('ratings/' + rating + suffix));
+		if (Paths.fileExists('images/' + rating + suffix + '.png', IMAGE)) {
+			loadGraphic(Paths.getImage(rating + suffix));
+		}
+		else if (Paths.fileExists('pixelUI/' + rating + suffix + '.png', IMAGE)) {
+			loadGraphic(Paths.getImage('pixelUI/' + rating + suffix));
+		}
+		else {
+			loadGraphic(Paths.getImage('ratings/' + rating + suffix));
+		}
 
 		screenCenter();
 

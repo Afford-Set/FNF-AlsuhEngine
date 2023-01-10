@@ -19,8 +19,7 @@ class WebmHandler
 	
 	public function source(?vPath:String):Void
 	{
-		if (vPath != null && vPath.length > 0)
-		{
+		if (vPath != null && vPath.length > 0) {
 			vidPath = vPath;
 		}
 	}
@@ -30,16 +29,16 @@ class WebmHandler
 		io = new WebmIoFile(vidPath);
 		webm = new WebmPlayer();
 		webm.fuck(io, false);
-		webm.addEventListener(WebmEvent.PLAY, function(e) {
+		webm.addEventListener(WebmEvent.PLAY, function(e):Void {
 			onPlay();
 		});
-		webm.addEventListener(WebmEvent.COMPLETE, function(e) {
+		webm.addEventListener(WebmEvent.COMPLETE, function(e):Void {
 			onEnd();
 		});
-		webm.addEventListener(WebmEvent.STOP, function(e) {
+		webm.addEventListener(WebmEvent.STOP, function(e):Void {
 			onStop();
 		});
-		webm.addEventListener(WebmEvent.RESTART, function(e) {
+		webm.addEventListener(WebmEvent.RESTART, function(e):Void {
 			onRestart();
 		});
 		webm.visible = false;
@@ -54,24 +53,21 @@ class WebmHandler
 	
 	public function play():Void
 	{
-		if (initialized)
-		{
+		if (initialized) {
 			webm.play();
 		}
 	}
 	
 	public function stop():Void
 	{
-		if (initialized)
-		{
+		if (initialized) {
 			webm.stop();
 		}
 	}
 	
 	public function restart():Void
 	{
-		if (initialized)
-		{
+		if (initialized) {
 			webm.restart();
 		}
 	}
@@ -80,6 +76,7 @@ class WebmHandler
 	{
 		webm.x = GlobalVideo.calc(0);
 		webm.y = GlobalVideo.calc(1);
+
 		webm.width = GlobalVideo.calc(2);
 		webm.height = GlobalVideo.calc(3);
 	}

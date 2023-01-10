@@ -26,15 +26,11 @@ class RatingData
 
 	public function get_hitWindow():Null<Int>
 	{
-		if (Reflect.hasField(OptionData, name + 'Window')) {
-			return Reflect.field(OptionData, name + 'Window');
-		}
-
-		return null;
+		return Reflect.getProperty(OptionData, name + 'Window');
 	}
 
 	public function increase(blah:Int = 1):Void
 	{
-		Reflect.setField(PlayState.instance, counter, Reflect.field(PlayState.instance, counter) + blah);
+		Reflect.setProperty(PlayState.instance, counter, Reflect.field(PlayState.instance, counter) + blah);
 	}
 }

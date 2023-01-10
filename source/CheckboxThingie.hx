@@ -13,11 +13,16 @@ class CheckboxThingie extends FlxSprite
 	public var offsetX:Float = 0;
 	public var offsetY:Float = 0;
 
-	public function new(x:Float = 0, y:Float = 0, ?checked = false):Void
+	public function new(x:Float = 0, y:Float = 0, ?checked:Bool = false):Void
 	{
 		super(x, y);
 
-		frames = Paths.getSparrowAtlas('ui/checkboxanim');
+		if (Paths.fileExists('images/checkboxanim.png', IMAGE)) {
+			frames = Paths.getSparrowAtlas('checkboxanim');
+		}
+		else {
+			frames = Paths.getSparrowAtlas('ui/checkboxanim');
+		}
 
 		animation.addByPrefix("unchecked", "checkbox0", 24, false);
 		animation.addByPrefix("unchecking", "checkbox anim reverse", 24, false);
@@ -70,7 +75,7 @@ class CheckboxThingie extends FlxSprite
 		}
 		else if (animation.curAnim.name != 'unchecked' && animation.curAnim.name != 'unchecking')
 		{
-			animation.play("unchecking", true);
+			animation.play('unchecking', true);
 			offset.set(25, 28);
 		}
 

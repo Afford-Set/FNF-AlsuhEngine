@@ -2,6 +2,7 @@ package;
 
 import flixel.FlxG;
 import flixel.math.FlxMath;
+import flixel.util.FlxSave;
 import flixel.util.FlxColor;
 import flixel.input.keyboard.FlxKey;
 
@@ -16,7 +17,7 @@ using StringTools;
 
 class CoolUtil
 {
-	public static function getDifficultyName(diff:String, isSuffix:Bool = false, ?difficulties:Array<Array<String>> = null):String
+	public static function getDifficultyName(diff:String, ?isSuffix:Null<Bool> = false, ?difficulties:Array<Dynamic> = null):String
 	{
 		if (difficulties == null) {
 			difficulties = PlayState.difficulties;
@@ -25,7 +26,7 @@ class CoolUtil
 		return difficulties[0][difficulties[isSuffix ? 2 : 1].indexOf(diff)];
 	}
 
-	public static function getDifficultyID(diff:String, ?isSuffix:Bool = false, ?difficulties:Array<Array<String>> = null):String
+	public static function getDifficultyID(diff:String, ?isSuffix:Null<Bool> = false, ?difficulties:Array<Dynamic> = null):String
 	{
 		if (difficulties == null) {
 			difficulties = PlayState.difficulties;
@@ -34,7 +35,7 @@ class CoolUtil
 		return difficulties[1][difficulties[isSuffix ? 2 : 0].indexOf(diff)];
 	}
 
-	public static function getDifficultySuffix(diff:String, ?isName:Bool = false, ?difficulties:Array<Array<String>> = null):String
+	public static function getDifficultySuffix(diff:String, ?isName:Null<Bool> = false, ?difficulties:Array<Dynamic> = null):String
 	{
 		if (difficulties == null) {
 			difficulties = PlayState.difficulties;
@@ -74,15 +75,17 @@ class CoolUtil
 
 	public static function formatSong(song:String, diff:String):String
 	{
-		return (song + '-' + diff).toLowerCase();
+		return Paths.formatToSongPath(song + '-' + diff);
 	}
 
 	public static function formatToName(name:String):String
 	{
 		var splitter:Array<String> = name.trim().split('-');
-			
-		for (i in 0...splitter.length) {
-			splitter[i] = '' + splitter[i].charAt(0).toUpperCase().trim() + splitter[i].substr(1).toLowerCase().trim();
+
+		for (i in 0...splitter.length)
+		{
+			var str:String = splitter[i];
+			str = '' + str.charAt(0).toUpperCase().trim() + str.substr(1).toLowerCase().trim();
 		}
 
 		return splitter.join(' ');
@@ -138,7 +141,7 @@ class CoolUtil
 				if (label.toLowerCase() == 'null') {
 					return '---';
 				}
-		
+
 				return '' + label.charAt(0).toUpperCase() + label.substr(1).toLowerCase();
 			} 
 		}
@@ -247,6 +250,19 @@ class CoolUtil
 		#end
 	}
 
+	/** Quick Function to Fix Save Files for Flixel 5
+		if you are making a mod, you are gonna wanna change "Afford-Set" to something else
+		so Base Alsuh saves won't conflict with yours
+		@BeastlyGabi
+	**/
+	public static function getSavePath(folder:String = 'Afford-Set'):String
+	{
+		@:privateAccess
+		return #if (flixel < "5.0.0") folder #else FlxG.stage.application.meta.get('company')
+			+ '/'
+			+ FlxSave.validate(FlxG.stage.application.meta.get('file')) #end;
+	}
+
 	public static function precacheImage(image:String, ?library:String = null):Void
 	{
 		Paths.getImage(image, library);
@@ -261,4 +277,53 @@ class CoolUtil
 	{
 		Paths.getMusic(sound, library);
 	}
+
+	#if !mobile
+	private static var colorArray:Array<FlxColor> =
+	[
+		FlxColor.fromRGB(148, 0, 211),
+		FlxColor.fromRGB(75, 0, 130),
+		FlxColor.fromRGB(0, 0, 255),
+		FlxColor.fromRGB(0, 255, 0),
+		FlxColor.fromRGB(255, 255, 0),
+		FlxColor.fromRGB(255, 127, 0),
+		FlxColor.fromRGB(255, 0 , 0)
+	];
+
+	private static var currentColor:Int = 0;
+	private static var currentColor2:Int = 0;
+
+	public static function recolorCounters(skippedFrames:Int = 0, skippedFrames2:Int = 0):Void
+	{
+		if (OptionData.rainFPS && skippedFrames >= 6)
+		{
+			if (currentColor >= colorArray.length) {
+				currentColor = 0;
+			}
+
+			Main.fpsCounter.textColor = colorArray[currentColor];
+
+			currentColor++;
+			skippedFrames = 0;
+		}
+		else {
+			skippedFrames++;
+		}
+
+		if (OptionData.rainMemory && skippedFrames >= 6)
+		{
+			if (currentColor2 >= colorArray.length) {
+				currentColor2 = 0;
+			}
+
+			Main.memoryCounter.textColor = colorArray[currentColor2];
+
+			currentColor2++;
+			skippedFrames2 = 0;
+		}
+		else {
+			skippedFrames2++;
+		}
+	}
+	#end
 }

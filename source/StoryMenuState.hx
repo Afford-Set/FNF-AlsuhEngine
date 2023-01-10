@@ -473,7 +473,7 @@ class StoryMenuState extends MusicBeatState
 
 		var newDifficulty:String = curWeek.difficulties[1][curDifficulty];
 
-		if (Paths.fileExists('images/' + newDifficulty + '.png', IMAGE)) {
+		if (Paths.fileExists('images/menudifficulties/' + newDifficulty + '.png', IMAGE)) {
 			sprDifficulty.loadGraphic(Paths.getImage('menudifficulties/' + newDifficulty));
 		}
 		else {

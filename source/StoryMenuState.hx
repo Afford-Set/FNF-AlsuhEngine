@@ -482,11 +482,11 @@ class StoryMenuState extends MusicBeatState
 
 		sprDifficulty.x = leftArrow.x + 60;
 		sprDifficulty.x += (308 - sprDifficulty.width) / 2;
-		sprDifficulty.y = leftArrow.y + 15;
 
 		if (curDifficultyString != newDifficulty)
 		{
 			sprDifficulty.alpha = 0;
+			sprDifficulty.y = leftArrow.y - 15;
 
 			if (tweenDifficulty != null) tweenDifficulty.cancel();
 
@@ -496,6 +496,9 @@ class StoryMenuState extends MusicBeatState
 					tweenDifficulty = null;
 				}
 			});
+		}
+		else {
+			sprDifficulty.y = leftArrow.y + 15;
 		}
 
 		curDifficultyString = newDifficulty;

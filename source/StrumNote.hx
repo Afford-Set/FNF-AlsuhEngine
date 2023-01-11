@@ -20,17 +20,24 @@ class StrumNote extends FlxSprite
 
 	public var player:Int;
 
+	private var maxNote:Int = 4;
+	private var colors:Array<String> = ['purple', 'blue', 'green', 'red'];
+	private var colArray:Array<String> = ['LEFT', 'DOWN', 'UP', 'RIGHT'];
+	private var colArray2:Array<String> = [];
+	private var pixelInt:Array<Int> = [0, 1, 2, 3];
+	private var colArrayButVanilInt:Array<Int> = [1, 2, 4, 3];
+
 	public function new(x:Float, y:Float, leData:Int, player:Int):Void
 	{
 		colorSwap = new ColorSwap();
 		shader = colorSwap.shader;
 
-		noteData = leData;
-
 		this.player = player;
 		this.noteData = leData;
 
 		super(x, y);
+
+		colArray2 = colArray.copy();
 
 		var skin:String = 'NOTE_assets';
 
@@ -49,7 +56,7 @@ class StrumNote extends FlxSprite
 
 		if (PlayState.isPixelStage)
 		{
-			var ourGraphic:FlxGraphic = null;
+			var ourGraphic:FlxGraphic = Paths.getImage('notes/' + skin);
 
 			if (Paths.fileExists('images/' + skin + '.png', IMAGE)) {
 				ourGraphic = Paths.getImage(skin);
@@ -60,9 +67,6 @@ class StrumNote extends FlxSprite
 			else if (Paths.fileExists('images/notes/pixel/' + skin + '.png', IMAGE)) {
 				ourGraphic = Paths.getImage('notes/pixel/' + skin);
 			}
-			else {
-				ourGraphic = Paths.getImage('notes/' + skin);
-			}
 
 			loadGraphic(ourGraphic);
 
@@ -70,43 +74,10 @@ class StrumNote extends FlxSprite
 			height = height / 5;
 
 			loadGraphic(ourGraphic, true, Math.floor(width), Math.floor(height));
-		
-			animation.add('green', [6]);
-			animation.add('red', [7]);
-			animation.add('blue', [5]);
-			animation.add('purple', [4]);
+			loadPixelNoteAnims();
 
 			antialiasing = false;
-
 			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
-
-			switch (Math.abs(leData))
-			{
-				case 0:
-				{
-					animation.add('static', [0]);
-					animation.add('pressed', [4, 8], 12, false);
-					animation.add('confirm', [12, 16], 24, false);
-				}
-				case 1:
-				{
-					animation.add('static', [1]);
-					animation.add('pressed', [5, 9], 12, false);
-					animation.add('confirm', [13, 17], 24, false);
-				}
-				case 2:
-				{
-					animation.add('static', [2]);
-					animation.add('pressed', [6, 10], 12, false);
-					animation.add('confirm', [14, 18], 12, false);
-				}
-				case 3:
-				{
-					animation.add('static', [3]);
-					animation.add('pressed', [7, 11], 12, false);
-					animation.add('confirm', [15, 19], 24, false);
-				}
-			}
 		}
 		else
 		{
@@ -117,46 +88,42 @@ class StrumNote extends FlxSprite
 				frames = Paths.getSparrowAtlas('notes/' + skin);
 			}
 
-			animation.addByPrefix('green', 'arrowUP');
-			animation.addByPrefix('blue', 'arrowDOWN');
-			animation.addByPrefix('purple', 'arrowLEFT');
-			animation.addByPrefix('red', 'arrowRIGHT');
+			loadNoteAnims();
 
 			antialiasing = OptionData.globalAntialiasing;
-
 			setGraphicSize(Std.int(width * 0.7));
-
-			switch (Math.abs(leData))
-			{
-				case 0:
-				{
-					animation.addByPrefix('static', 'arrowLEFT');
-					animation.addByPrefix('pressed', 'left press', 24, false);
-					animation.addByPrefix('confirm', 'left confirm', 24, false);
-				}
-				case 1:
-				{
-					animation.addByPrefix('static', 'arrowDOWN');
-					animation.addByPrefix('pressed', 'down press', 24, false);
-					animation.addByPrefix('confirm', 'down confirm', 24, false);
-				}
-				case 2:
-				{
-					animation.addByPrefix('static', 'arrowUP');
-					animation.addByPrefix('pressed', 'up press', 24, false);
-					animation.addByPrefix('confirm', 'up confirm', 24, false);
-				}
-				case 3:
-				{
-					animation.addByPrefix('static', 'arrowRIGHT');
-					animation.addByPrefix('pressed', 'right press', 24, false);
-					animation.addByPrefix('confirm', 'right confirm', 24, false);
-				}
-			}
 		}
 
 		updateHitbox();
 		scrollFactor.set();
+	}
+
+	function loadNoteAnims():Void
+	{
+		var vanillaShit:String = ' static instance ' + colArrayButVanilInt[noteData];
+		var shitMyPants:String = 'arrow' + vanillaShit + '0000';
+		var vanillaAllowed:Bool = frames.getByName(shitMyPants) != null;
+
+		if (vanillaAllowed) {
+			colArray[noteData] = vanillaShit;
+		}
+
+		animation.addByPrefix(colors[noteData], 'arrow' + colArray[noteData]);
+		animation.addByPrefix('static', 'arrow' + colArray[noteData]);
+
+		var lowCol:String = colArray2[noteData].toLowerCase();
+		animation.addByPrefix('pressed', lowCol + ' press', 24, false);
+		animation.addByPrefix('confirm', lowCol + ' confirm', 24, false);
+	}
+
+	function loadPixelNoteAnims():Void
+	{
+		var pixelInt:Int = pixelInt[noteData];
+		animation.add(colors[noteData], [pixelInt + maxNote]);
+
+		animation.add('static', [pixelInt]);
+		animation.add('pressed', [pixelInt + maxNote, pixelInt + (maxNote * 2)], 12, false);
+		animation.add('confirm', [pixelInt + (maxNote * 3), pixelInt + (maxNote * 4)], 24, false);
 	}
 
 	public function postAddedToGroup():Void

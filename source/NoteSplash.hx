@@ -3,6 +3,9 @@ package;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import shaders.ColorSwap;
+import flixel.graphics.frames.FlxFrame;
+
+using StringTools;
 
 class NoteSplash extends FlxSprite
 {
@@ -30,6 +33,15 @@ class NoteSplash extends FlxSprite
 
 		antialiasing = OptionData.globalAntialiasing;
 	}
+
+	private var isPsychArray:Array<Array<Bool>> =
+	[
+		[false, false],
+		[false, false],
+		[false, false],
+		[false, false]
+	];
+	private var colors:Array<String> = ['purple', 'blue', 'green', 'red'];
 
 	public function setupNoteSplash(x:Float, y:Float, note:Int = 0, texture:String = null, mustPress:Bool = true, hueColor:Float = 0, satColor:Float = 0, brtColor:Float = 0):Void
 	{
@@ -64,11 +76,22 @@ class NoteSplash extends FlxSprite
 		colorSwap.saturation = satColor;
 		colorSwap.brightness = brtColor;
 
-		offset.set(-10, -10);
-
 		var animNum:Int = FlxG.random.int(1, 2);
-		animation.play('note' + note + '-' + animNum, true);
-		animation.curAnim.frameRate = 24 + FlxG.random.int(-2, 2);
+		offset.x = -10;
+
+		if (isPsychArray[note][animNum]) {
+			offset.y = 0;
+		}
+		else {
+			offset.y = offset.x;
+		}
+
+		var ourPrefix:String = 'note$note-$animNum';
+		animation.play(ourPrefix, true);
+
+		if (animation.curAnim != null) {
+			animation.curAnim.frameRate = 24 + FlxG.random.int(-2, 2);
+		}
 	}
 
 	function loadAnims(skin:String):Void
@@ -83,12 +106,34 @@ class NoteSplash extends FlxSprite
 			frames = Paths.getSparrowAtlas('notes/' + skin);
 		}
 
-		for (i in 1...3)
+		for (i in 0...colors.length)
 		{
-			animation.addByPrefix("note0-" + i, "note impact " + i + " purple", 24, false);
-			animation.addByPrefix("note1-" + i, "note impact " + i + " blue", 24, false);
-			animation.addByPrefix("note2-" + i, "note impact " + i + " green", 24, false);
-			animation.addByPrefix("note3-" + i, "note impact " + i + " red", 24, false);
+			for (j in 1...3)
+			{
+				var color:String = colors[i];
+				var ourPrefix:String = 'note' + i + '-' + j;
+
+				var tempPsych:String = 'note splash ' + color + ' ' + j;
+				var animName:String = tempPsych + '0000';
+				var value:Bool = frames.getByName(animName) != null;
+				isPsychArray[i][j] = value;
+
+				if (isPsychArray[i][j]) {
+					animation.addByPrefix(ourPrefix, tempPsych, 24, false);
+				}
+				else
+				{
+					var shit:String = 'note impact ' + j + ' ' + color;
+					var fuck:String = 'note impact ' + j + '  ' + color;
+
+					if (frames.getByName(fuck) != null)
+						animation.addByPrefix(ourPrefix, fuck, 24, false);
+					else
+						animation.addByPrefix(ourPrefix, shit, 24, false);
+				}
+
+				animation.play(ourPrefix, true); // does precaches
+			}
 		}
 	}
 

@@ -322,7 +322,7 @@ class Note extends FlxSprite
 		{
 			if (isSustainNote)
 			{
-				var ourGraphic:FlxGraphic = null;
+				var ourGraphic:FlxGraphic = Paths.getImage('notes/' + blahblah + 'ENDS');
 
 				if (Paths.fileExists('images/' + blahblah + 'ENDS' + '.png', IMAGE)) {
 					ourGraphic = Paths.getImage(blahblah + 'ENDS');
@@ -332,9 +332,6 @@ class Note extends FlxSprite
 				}
 				else if (Paths.fileExists('images/notes/pixel/' + blahblah + 'ENDS' + '.png', IMAGE)) {
 					ourGraphic = Paths.getImage('notes/pixel/' + blahblah + 'ENDS');
-				}
-				else {
-					ourGraphic = Paths.getImage('notes/' + blahblah + 'ENDS');
 				}
 
 				loadGraphic(ourGraphic);
@@ -348,7 +345,7 @@ class Note extends FlxSprite
 			}
 			else
 			{
-				var ourGraphic:FlxGraphic = null;
+				var ourGraphic:FlxGraphic = Paths.getImage('notes/' + blahblah);
 
 				if (Paths.fileExists('images/' + blahblah + '.png', IMAGE)) {
 					ourGraphic = Paths.getImage(blahblah);
@@ -358,9 +355,6 @@ class Note extends FlxSprite
 				}
 				else if (Paths.fileExists('images/notes/pixel/' + blahblah + '.png', IMAGE)) {
 					ourGraphic = Paths.getImage('notes/pixel/' + blahblah);
-				}
-				else {
-					ourGraphic = Paths.getImage('notes/' + blahblah);
 				}
 
 				loadGraphic(ourGraphic);
@@ -407,14 +401,20 @@ class Note extends FlxSprite
 
 	function loadNoteAnims():Void
 	{
-		animation.addByPrefix(colArray[noteData] + 'Scroll', colArray[noteData] + '0');
+		var ourCol:String = colArray[noteData];
+		var blyad:String = ourCol + ' instance';
+		var fuck:String = blyad + ' 10000';
+
+		if (frames.getByName(fuck) == null) blyad = ourCol + '0';
+
+		animation.addByPrefix(ourCol + 'Scroll', blyad);
 
 		if (isSustainNote)
 		{
 			animation.addByPrefix('purpleholdend', 'pruple end hold'); // plz not delete this
 
-			animation.addByPrefix(colArray[noteData] + 'holdend', colArray[noteData] + ' hold end');
-			animation.addByPrefix(colArray[noteData] + 'hold', colArray[noteData] + ' hold piece');
+			animation.addByPrefix(ourCol + 'holdend', ourCol + ' hold end');
+			animation.addByPrefix(ourCol + 'hold', ourCol + ' hold piece');
 		}
 
 		setGraphicSize(Std.int(width * 0.7));
@@ -423,13 +423,15 @@ class Note extends FlxSprite
 
 	function loadPixelNoteAnims():Void
 	{
+		var ourCol:String = colArray[noteData];
+
 		if (isSustainNote)
 		{
-			animation.add(colArray[noteData] + 'holdend', [pixelInt[noteData] + maxNote]);
-			animation.add(colArray[noteData] + 'hold', [pixelInt[noteData]]);
+			animation.add(ourCol + 'holdend', [pixelInt[noteData] + maxNote]);
+			animation.add(ourCol + 'hold', [pixelInt[noteData]]);
 		}
 		else {
-			animation.add(colArray[noteData] + 'Scroll', [pixelInt[noteData] + maxNote]);
+			animation.add(ourCol + 'Scroll', [pixelInt[noteData] + maxNote]);
 		}
 	}
 

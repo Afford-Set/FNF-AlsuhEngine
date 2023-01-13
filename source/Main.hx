@@ -1,6 +1,6 @@
 package;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -128,6 +128,17 @@ class Main extends Sprite
 		#end
 
 		Debug.onGameStart();
+
+		#if DISCORD_ALLOWED
+		if (!DiscordClient.isInitialized)
+		{
+			DiscordClient.initialize();
+
+			Application.current.window.onClose.add(function():Void {
+				DiscordClient.shutdown();
+			});
+		}
+		#end
 		
 		#if CRASH_HANDLER
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);

@@ -1,9 +1,5 @@
 package;
 
-#if desktop
-import Discord.DiscordClient;
-#end
-
 #if sys
 import sys.io.File;
 import sys.FileSystem;
@@ -159,14 +155,6 @@ class TitleState extends MusicBeatState
 			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 			startIntro();
 		}
-
-		#if desktop
-		DiscordClient.initialize();
-
-		Application.current.onExit.add(function(exitCode:Int):Void {
-			DiscordClient.shutdown();
-		});
-		#end
 	}
 
 	var swagShader:ColorSwap = null;
@@ -407,7 +395,7 @@ class TitleState extends MusicBeatState
 
 					transitioning = true;
 
-					new FlxTimer().start(1, function(tmr:FlxTimer)
+					new FlxTimer().start(1, function(tmr:FlxTimer):Void
 					{
 						#if CHECK_FOR_UPDATES
 						if (OptionData.checkForUpdates && OutdatedState.newVersion.trim() != MainMenuState.engineVersion.trim() && !OutdatedState.leftState)

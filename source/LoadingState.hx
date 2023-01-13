@@ -84,7 +84,7 @@ class LoadingState extends TransitionableState
 					checkLibrary(directory);
 				}
 	
-				new FlxTimer().start(1.5, function(_) introComplete());
+				new FlxTimer().start(1.5, function(_:FlxTimer):Void introComplete());
 			});
 		});
 	}
@@ -309,8 +309,7 @@ class LoadingState extends TransitionableState
 				library.onChange.add(LimeAssets.onChange.dispatch);
 				promise.completeWith(Future.withValue(library));
 			}
-		}).onError(function(error:Dynamic):Void
-		{
+		}).onError(function(error:Dynamic):Void {
 			promise.error("There is no asset library with an ID of \"" + id + "\"");
 		});
 

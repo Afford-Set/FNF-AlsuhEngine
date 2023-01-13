@@ -3,7 +3,7 @@ package;
 import haxe.Json;
 import haxe.format.JsonParser;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -881,7 +881,7 @@ class PlayState extends MusicBeatState
 
 	public var songLength:Float = 0;
 
-	#if desktop
+	#if DISCORD_ALLOWED
 	var storyDifficultyText:String = "";
 	var iconRPC:String = "";
 	var detailsText:String = "";
@@ -1407,7 +1407,7 @@ class PlayState extends MusicBeatState
 		}
 		#end
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		storyDifficultyText = CoolUtil.getDifficultyName(lastDifficulty, difficulties) + (lastDifficulty != storyDifficulty ? ' (' + CoolUtil.getDifficultyName(storyDifficulty, difficulties) + ')' : '');
 		iconRPC = dad.char_name;
 
@@ -1697,11 +1697,12 @@ class PlayState extends MusicBeatState
 			{
 				#if WEBM_ALLOWED
 				var filepath:String = Paths.getWebm(name);
+				var filepathFindLimeOpenFlShit:String = Paths.getWebm(name, null, true);
 		
 				#if sys
 				if (!FileSystem.exists(filepath))
 				#else
-				if (!OpenFlAssets.exists(filepath))
+				if (!OpenFlAssets.exists(filepathFindLimeOpenFlShit))
 				#end
 				{
 					Debug.logWarn('Couldnt find video file: ' + name);
@@ -1720,11 +1721,12 @@ class PlayState extends MusicBeatState
 			{
 				#if MP4_ALLOWED
 				var filepath:String = Paths.getVideo(name);
+				var filepathFindLimeOpenFlShit:String = Paths.getVideo(name, null, true);
 		
 				#if sys
 				if (!FileSystem.exists(filepath))
 				#else
-				if (!OpenFlAssets.exists(filepath))
+				if (!OpenFlAssets.exists(filepathFindLimeOpenFlShit))
 				#end
 				{
 					Debug.logWarn('Couldnt find video file: ' + name);
@@ -1746,10 +1748,17 @@ class PlayState extends MusicBeatState
 
 	public function startAndEnd():Void
 	{
-		if (endingSong)
+		if (endingSong) {
 			endSong();
+		}
 		else
-			startCountdown();
+		{
+			var ret:Dynamic = callOnLuas('onStartPost', []);
+
+			if (ret != FunkinLua.Function_Stop) {
+				startCountdown();
+			}
+		}
 	}
 
 	public var strumLine:FlxSprite;
@@ -1949,7 +1958,7 @@ class PlayState extends MusicBeatState
 
 	public function updateScore():Void
 	{
-		scoreTxt.text = Highscore.scoreText(deathCounter, songAccuracy, ratingString, comboRank, health, songMisses, songScore);
+		scoreTxt.text = Highscore.getScoreText(deathCounter, songAccuracy, ratingString, comboRank, health, songMisses, songScore);
 	}
 
 	public function snapCamFollowToPos(x:Float, y:Float):Void
@@ -1981,7 +1990,7 @@ class PlayState extends MusicBeatState
 			{
 				doof.finishThing = function():Void
 				{
-					var ret:Dynamic = callOnLuas('onStart', []);
+					var ret:Dynamic = callOnLuas('onStartPost', []);
 
 					if (ret != FunkinLua.Function_Stop) {
 						startCountdown();
@@ -2849,7 +2858,7 @@ class PlayState extends MusicBeatState
 
 		songLength = FlxG.sound.music.length; // Song duration in a float, useful for the time left feature
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence(detailsText, SONG.songName + " - " + storyDifficultyText, iconRPC, true, songLength); // Updating Discord Rich Presence (with Time Left)
 		#end
 
@@ -3541,7 +3550,7 @@ class PlayState extends MusicBeatState
 
 			paused = false;
 
-			#if desktop
+			#if DISCORD_ALLOWED
 			if (startTimer.finished) {
 				DiscordClient.changePresence(detailsText, SONG.songName + " - " + storyDifficultyText, iconRPC, true, songLength - Conductor.songPosition - OptionData.noteOffset);
 			}
@@ -3556,7 +3565,7 @@ class PlayState extends MusicBeatState
 	{
 		super.onFocus();
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		if (health > 0 && !paused)
 		{
 			if (Conductor.songPosition > 0.0) {
@@ -3571,7 +3580,7 @@ class PlayState extends MusicBeatState
 	
 	public override function onFocusLost():Void
 	{
-		#if desktop
+		#if DISCORD_ALLOWED
 		if (health > 0 && !paused) {
 			DiscordClient.changePresence(detailsPausedText, SONG.songName + " - " + storyDifficultyText, iconRPC);
 		}
@@ -4289,7 +4298,7 @@ class PlayState extends MusicBeatState
 
 		openSubState(new PauseSubState(false));
 	
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence(detailsPausedText, SONG.songName + " - " + storyDifficultyText, iconRPC);
 		#end
 	}
@@ -4335,7 +4344,7 @@ class PlayState extends MusicBeatState
 
 				openSubState(new GameOverSubState(boyfriend.getScreenPosition().x - boyfriend.positionArray[0], boyfriend.getScreenPosition().y - boyfriend.positionArray[1]));
 				
-				#if desktop
+				#if DISCORD_ALLOWED
 				DiscordClient.changePresence("Game Over - " + detailsText, SONG.songName + " - " + storyDifficultyText, iconRPC);
 				#end
 
@@ -4357,7 +4366,7 @@ class PlayState extends MusicBeatState
 
 		FlxG.switchState(new editors.ChartingState());
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("Chart Editor", null, null, true);
 		#end
 	}
@@ -6144,10 +6153,8 @@ class PlayState extends MusicBeatState
 
 	public function sortHitNotes(a:Note, b:Note):Int
 	{
-		if (a.lowPriority && !b.lowPriority)
-			return 1;
-		else if (!a.lowPriority && b.lowPriority)
-			return -1;
+		if (a.lowPriority && !b.lowPriority) return 1;
+		else if (!a.lowPriority && b.lowPriority) return -1;
 
 		return FlxSort.byValues(FlxSort.ASCENDING, a.strumTime, b.strumTime);
 	}

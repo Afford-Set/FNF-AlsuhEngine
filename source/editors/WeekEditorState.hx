@@ -1,6 +1,6 @@
 package editors;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -483,7 +483,7 @@ class WeekEditorState extends MusicBeatUIState
 
 		recalculateStuffPosition();
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("Week Editor", "Editting: " + weekFile.weekName); // Updating Discord Rich Presence
 		#end
 	}

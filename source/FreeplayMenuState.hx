@@ -1,6 +1,6 @@
 package;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -45,7 +45,7 @@ class FreeplayMenuState extends TransitionableState
 	{
 		super.create();
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Freeplay Menu", null); // Updating Discord Rich Presence
 		#end
 

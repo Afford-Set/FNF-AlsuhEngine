@@ -2,6 +2,7 @@ package;
 
 #if sys
 import sys.io.File;
+import haxe.io.Path;
 import sys.FileSystem;
 #end
 
@@ -401,7 +402,7 @@ class Paths
 		return getImage(key, library);
 	}
 
-	public static function getVideo(key:String, ?library:String):String
+	public static function getVideo(key:String, ?library:String, ?blyad:Bool = false):String
 	{
 		#if MODS_ALLOWED
 		var file:String = modsVideo(key);
@@ -411,8 +412,12 @@ class Paths
 		}
 		#end
 
-		var shit:String = getPath('videos/$key.$VIDEO_EXT', BINARY, library).replace(currentLevel + ':', '').replace(library + ':', '');
-		return shit;
+		var shit:String = getPath('videos/$key.$VIDEO_EXT', BINARY, library);
+		if (blyad) return shit;
+
+		var replacedPath:String = shit.replace(currentLevel + ':', '');
+		replacedPath = replacedPath.replace(library + ':', '');
+		return replacedPath;
 	}
 
 	@:deprecated("`Paths.video()` is deprecated, use 'Paths.getVideo()' instead")
@@ -421,6 +426,32 @@ class Paths
 		Debug.logWarn("`Paths.video()` is deprecated! use 'Paths.getVideo()' instead");
 
 		return getVideo(key, library);
+	}
+
+	public static function getWebm(key:String, ?library:String, ?blyad:Bool = false):String
+	{
+		#if MODS_ALLOWED
+		var file:String = modsWebm(key);
+
+		if (FileSystem.exists(file)) {
+			return file;
+		}
+		#end
+
+		var shit:String = getPath('videos/$key.webm', BINARY, library);
+		if (blyad) return shit;
+
+		var replacedPath:String = shit.replace(currentLevel + ':', '');
+		replacedPath = replacedPath.replace(library + ':', '');
+		return replacedPath;
+	}
+
+	@:deprecated("`Paths.webm()` is deprecated, use 'Paths.getWebm()' instead")
+	public static function webm(key:String, ?library:String):String
+	{
+		Debug.logWarn("`Paths.webm()` is deprecated! use 'Paths.getWebm()' instead");
+
+		return getWebm(key, library);
 	}
 
 	public static function getWebmSound(key:String, ?library:String):Sound
@@ -434,28 +465,6 @@ class Paths
 		Debug.logWarn("`Paths.webmSound()` is deprecated! use 'Paths.getWebmSound()' instead");
 
 		return getWebmSound('videos', library);
-	}
-
-	public static function getWebm(key:String, ?library:String):String
-	{
-		#if MODS_ALLOWED
-		var file:String = modsWebm(key);
-
-		if (FileSystem.exists(file)) {
-			return file;
-		}
-		#end
-
-		var shit:String = getPath('videos/$key.webm', BINARY, library).replace(currentLevel + ':', '').replace(library + ':', '');
-		return shit;
-	}
-
-	@:deprecated("`Paths.webm()` is deprecated, use 'Paths.getWebm()' instead")
-	public static function webm(key:String, ?library:String):String
-	{
-		Debug.logWarn("`Paths.webm()` is deprecated! use 'Paths.getWebm()' instead");
-
-		return getWebm(key, library);
 	}
 
 	public static function getTextFromFile(key:String, ?ignoreMods:Bool = false):String
@@ -782,7 +791,7 @@ class Paths
 		{
 			for (folder in FileSystem.readDirectory(modsFolder))
 			{
-				var path:String = haxe.io.Path.join([modsFolder, folder]);
+				var path:String = Path.join([modsFolder, folder]);
 
 				if (sys.FileSystem.isDirectory(path) && !ignoreModFolders.contains(folder) && !list.contains(folder)) {
 					list.push(folder);

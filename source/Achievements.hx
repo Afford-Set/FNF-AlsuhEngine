@@ -138,7 +138,7 @@ class Achievements
 		var oldPath:Array<String> = Paths.globalMods.copy();
 		Paths.globalMods = [];
 
-		var paths:Array<String> = [Paths.modFolders('achievements/'),Paths.getPreloadPath('achievements/'),];
+		var paths:Array<String> = [Paths.modFolders('achievements/'), Paths.getPreloadPath('achievements/')];
 		Paths.globalMods = oldPath;
 
 		for (i in paths.copy())
@@ -177,7 +177,7 @@ class Achievements
 										achievementsStuff.push(achievement.copy());
 									}
 									else {
-										achievementsStuff.insert(index,achievement);
+										achievementsStuff.insert(index, achievement);
 									}
 								}
 							}
@@ -196,7 +196,7 @@ class Achievements
 		var oldPath:Array<String> = Paths.globalMods.copy();
 		Paths.globalMods = [];
 
-		var paths:Array<String> = [Paths.modFolders('achievements/'),Paths.getPreloadPath('achievements/')];
+		var paths:Array<String> = [Paths.modFolders('achievements/'), Paths.getPreloadPath('achievements/')];
 		Paths.globalMods = oldPath;
 
 		var luas:Array<String> = [];
@@ -314,10 +314,13 @@ class AchievementObject extends FlxSpriteGroup
 		OptionData.savePrefs();
 
 		var id:Int = Achievements.getAchievementIndex(name);
-		var achievementBG:FlxSprite = new FlxSprite(60, 50).makeGraphic(420, 120, FlxColor.BLACK);
+
+		var achievementBG:FlxSprite = new FlxSprite(60, 50);
+		achievementBG.makeGraphic(420, 120, FlxColor.BLACK);
 		achievementBG.scrollFactor.set();
 
-		var achievementIcon:FlxSprite = new FlxSprite(achievementBG.x + 10, achievementBG.y + 10).loadGraphic(Paths.getImage('achievements/' + name));
+		var achievementIcon:FlxSprite = new FlxSprite(achievementBG.x + 10, achievementBG.y + 10);
+		achievementIcon.loadGraphic(Paths.getImage('achievements/' + name));
 		achievementIcon.scrollFactor.set();
 		achievementIcon.setGraphicSize(Std.int(achievementIcon.width * (2 / 3)));
 		achievementIcon.updateHitbox();

@@ -1,6 +1,6 @@
 package;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -55,7 +55,7 @@ class StoryMenuState extends MusicBeatState
 		WeekData.reloadWeekFiles(true);
 		if (curSelected >= WeekData.weeksList.length) curSelected = 0;
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Story Menu", null); // Updating Discord Rich Presence
 		#end
 

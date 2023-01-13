@@ -160,17 +160,11 @@ class Character extends FlxSprite
 				switch (spriteType)
 				{
 					case 'packer':
-					{
 						frames = Paths.getPackerAtlas(json.image);
-					}
 					case 'sparrow':
-					{
 						frames = Paths.getSparrowAtlas(json.image);
-					}
 					case 'texture':
-					{
 						frames = AtlasFrameMaker.construct(json.image);
-					}
 				}
 
 				imageFile = json.image;
@@ -211,7 +205,6 @@ class Character extends FlxSprite
 				}
 
 				antialiasing = noAntialiasing ? false : OptionData.globalAntialiasing;
-
 				animationsArray = json.animations;
 
 				if (animationsArray != null && animationsArray.length > 0)

@@ -1,6 +1,6 @@
 package;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -69,7 +69,7 @@ class ModsMenuState extends TransitionableState
 
 		super.create();
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Menus", null); // Updating Discord Rich Presence
 		#end
 
@@ -112,7 +112,7 @@ class ModsMenuState extends TransitionableState
 			}
 		}
 
-		var boolshit = true;
+		var boolshit:Bool = true;
 
 		if (FileSystem.exists("modsList.txt"))
 		{
@@ -148,7 +148,6 @@ class ModsMenuState extends TransitionableState
 			modsList[curSelected][1] = !modsList[curSelected][1];
 
 			updateButtonToggle();
-
 			FlxG.sound.play(Paths.getSound('scrollMenu'), 0.6);
 		});
 

@@ -14,7 +14,7 @@ import haxe.io.Path;
 import sys.FileSystem;
 #end
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -256,7 +256,7 @@ class ChartingState extends MusicBeatUIState
 		vortex = FlxG.save.data.chart_vortex;
 		ignoreWarnings = FlxG.save.data.ignoreWarnings;
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("Chart Editor", _song.songName); // Updating Discord Rich Presence
 		#end
 

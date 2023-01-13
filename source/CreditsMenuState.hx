@@ -1,6 +1,6 @@
 package;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -44,7 +44,7 @@ class CreditsMenuState extends TransitionableState
 	{
 		super.create();
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Credits Menu", null); // Updating Discord Rich Presence
 		#end
 

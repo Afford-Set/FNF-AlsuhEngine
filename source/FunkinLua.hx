@@ -1,6 +1,6 @@
 package;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -2839,6 +2839,7 @@ class FunkinLua
 
 					luaTrace('startVideo: Video file not found: ' + videoFile, false, false, FlxColor.RED);
 					#else
+					luaTrace('startVideo: Platform not supported!', false, false, FlxColor.RED);
 					PlayState.instance.startAndEnd();
 					#end
 				}
@@ -2853,6 +2854,7 @@ class FunkinLua
 
 					luaTrace('startVideo: Video file not found: ' + videoFile, false, false, FlxColor.RED);
 					#else
+					luaTrace('startVideo: Platform not supported!', false, false, FlxColor.RED);
 					PlayState.instance.startAndEnd();
 					#end
 				}
@@ -3033,13 +3035,6 @@ class FunkinLua
 		{
 			closed = true;
 			return closed;
-		});
-
-		Lua_helper.add_callback(lua, "changePresence", function(details:String, state:Null<String>, ?smallImageKey:String, ?hasStartTimestamp:Bool, ?endTimestamp:Float):Void
-		{
-			#if desktop
-			DiscordClient.changePresence(details, state, smallImageKey, hasStartTimestamp, endTimestamp);
-			#end
 		});
 
 		Lua_helper.add_callback(lua, "makeLuaText", function(tag:String, text:String, width:Int, x:Float, y:Float):Void // LUA TEXTS
@@ -3653,6 +3648,10 @@ class FunkinLua
 
 			return list;
 		});
+
+		#if DISCORD_ALLOWED
+		DiscordClient.addLuaCallbacks(lua);
+		#end
 
 		call('onCreate', []);
 		#end

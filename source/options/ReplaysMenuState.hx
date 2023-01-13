@@ -1,6 +1,6 @@
 package options;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -30,7 +30,7 @@ class ReplaysMenuState extends TransitionableState
 
 		persistentUpdate = true;
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Replays Menu", null); // Updating Discord Rich Presence
 		#end
 

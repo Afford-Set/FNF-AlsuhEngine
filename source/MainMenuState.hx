@@ -1,6 +1,6 @@
 package;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -49,7 +49,7 @@ class MainMenuState extends TransitionableState
 	var camFollowPos:FlxObject;
 	var camFollow:FlxPoint;
 
-	public static var engineVersion:String = '1.6.6';
+	public static var engineVersion:String = '1.6.7';
 	public static var psychEngineVersion:String = '0.6.4';
 
 	public static var gameVersion:String = '0.2.8';
@@ -66,7 +66,7 @@ class MainMenuState extends TransitionableState
 
 		WeekData.loadTheFirstEnabledMod();
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Menus", null); // Updating Discord Rich Presence
 		#end
 

@@ -1,6 +1,6 @@
 package editors;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -64,7 +64,7 @@ class MenuCharacterEditorState extends MusicBeatUIState
 			flipX: false
 		};
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("Menu Character Editor", "Editting: " + characterFile.image); // Updating Discord Rich Presence
 		#end
 
@@ -345,7 +345,7 @@ class MenuCharacterEditorState extends MusicBeatUIState
 
 		updateOffset();
 		
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("Menu Character Editor", "Editting: " + characterFile.image); // Updating Discord Rich Presence
 		#end
 	}

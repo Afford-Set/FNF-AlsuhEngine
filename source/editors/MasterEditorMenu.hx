@@ -1,6 +1,6 @@
 package editors;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -47,7 +47,7 @@ class MasterEditorMenu extends TransitionableState
 
 		FlxG.mouse.visible = false;
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Editors Menu", null); // Updating Discord Rich Presence
 		#end
 
@@ -85,8 +85,7 @@ class MasterEditorMenu extends TransitionableState
 		directoryTxt.scrollFactor.set();
 		add(directoryTxt);
 		
-		for (folder in Paths.getModDirectories())
-		{
+		for (folder in Paths.getModDirectories()) {
 			directories.push(folder);
 		}
 
@@ -118,14 +117,12 @@ class MasterEditorMenu extends TransitionableState
 			if (controls.UI_LEFT_P)
 			{
 				changeDirectory(-1);
-
 				holdTimeMod = 0;
 			}
 
 			if (controls.UI_RIGHT_P)
 			{
 				changeDirectory(1);
-
 				holdTimeMod = 0;
 			}
 
@@ -138,6 +135,10 @@ class MasterEditorMenu extends TransitionableState
 				if (holdTimeMod > 0.5 && checkNewHold - checkLastHold > 0) {
 					changeDirectory((checkNewHold - checkLastHold) * (controls.UI_UP ? -1 : 1));
 				}
+			}
+
+			if (FlxG.mouse.wheel != 0 && FlxG.keys.pressed.ALT) {
+				changeDirectory(-1 * FlxG.mouse.wheel);
 			}
 		}
 		#end
@@ -169,7 +170,7 @@ class MasterEditorMenu extends TransitionableState
 				}
 			}
 
-			if (FlxG.mouse.wheel != 0) {
+			if (FlxG.mouse.wheel != 0 && !FlxG.keys.pressed.ALT) {
 				changeSelection(-1 * FlxG.mouse.wheel);
 			}
 		}

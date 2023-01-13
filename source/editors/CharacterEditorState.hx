@@ -2,7 +2,7 @@ package editors;
 
 import haxe.Json;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -1239,7 +1239,7 @@ class CharacterEditorState extends MusicBeatUIState
 
 	function updatePresence():Void
 	{
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("Character Editor", "Character: " + daAnim, leHealthIcon.getCharacter()); // Updating Discord Rich Presence
 		#end
 	}

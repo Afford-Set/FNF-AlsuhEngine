@@ -37,8 +37,8 @@ class OutdatedState extends TransitionableState
 
 		txt = new FlxText(0, 0, FlxG.width, "Your used version " + MainMenuState.engineVersion.trim() + "\nof Alsuh Engine is outdated."
 			+ "\nUse the latest version " + newVersion.trim()
-			+ "." + (curChanges != '- dik' ? "\n\nWhat new?\n\n" + curChanges : '') + "\n\nPress ENTER to download latest version\nor ESCAPE to ignorite this message.", 24);
-		txt.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+			+ "." + (curChanges != '- dik' ? "\n\nWhat new?\n\n" + curChanges : '') + "\n\nPress ENTER to download latest version\nor ESCAPE to ignorite this message.", 32);
+		txt.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		txt.scrollFactor.set();
 		txt.screenCenter();
 		txt.borderSize = 2.4;

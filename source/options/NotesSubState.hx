@@ -1,12 +1,11 @@
 package options;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
-import options.OptionsMenuState;
-
 import shaders.ColorSwap;
+import options.OptionsMenuState;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -48,7 +47,7 @@ class NotesSubState extends MusicBeatSubState
 	{
 		super.create();
 		
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Options Menu - Notes", null);
 		#end
 

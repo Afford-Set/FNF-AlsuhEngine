@@ -1,6 +1,6 @@
 package options;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -86,7 +86,7 @@ class OptionsMenuState extends TransitionableState
 
 		OptionData.savePrefs();
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Options Menu", null);
 		#end
 
@@ -128,7 +128,7 @@ class OptionsMenuState extends TransitionableState
 	{
 		super.closeSubState();
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Options Menu", null);
 		#end
 
@@ -295,7 +295,7 @@ class OptionsSubState extends BaseSubState
 
 		OptionData.savePrefs();
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Options Menu", null);
 		#end
 

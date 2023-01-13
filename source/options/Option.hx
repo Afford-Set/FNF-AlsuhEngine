@@ -112,7 +112,7 @@ class Option
 		Reflect.setProperty(OptionData, variable, value);
 
 		#if LUA_ALLOWED
-		if (onPause && !blockedOnPause) // for lua shit
+		if (onPause && PlayState.instance != null && !blockedOnPause) // for lua shit
 		{
 			var existsShit:Bool = OptionData.luaPrefsMap.exists(variable);
 			var ourName:String = existsShit ? OptionData.luaPrefsMap.get(variable)[0] : null;

@@ -59,14 +59,12 @@ class Highscore
 			if (songScores.get(daSong) < score)
 			{
 				setScore(daSong, score);
-
 				if (accuracy >= 0) setAccuracy(daSong, accuracy);
 			}
 		}
 		else
 		{
 			setScore(daSong, score);
-
 			if (accuracy >= 0) setAccuracy(daSong, accuracy);
 		}
 	}
@@ -129,7 +127,7 @@ class Highscore
 		}
 	}
 
-	public static function scoreText(deaths:Int, accuracy:Float, rating:String, comboRank:String, health:Float, misses:Int, score:Int):String
+	public static function getScoreText(deaths:Int, accuracy:Float, rating:String, comboRank:String, health:Float, misses:Int, score:Int):String
 	{
 		return 'Deaths: ' + deaths + ' | Accuracy: ' + CoolUtil.floorDecimal(accuracy, 2) + '% | Rating: ' + rating +
 			(rating != 'N/A' ? ' (' + comboRank + ')' : '') + ' | Health: ' + Math.floor(health * 50) + '% | Combo Breaks: ' + misses + ' | Score: ' + score;

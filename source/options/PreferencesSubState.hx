@@ -1,6 +1,6 @@
 package options;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -44,6 +44,7 @@ class PreferencesSubState extends MusicBeatSubState
 		};
 		addOption(option);
 
+		#if !web
 		var option:Option = new Option('Screen Resolution',
 			true,
 			'Choose your preferred screen resolution.',
@@ -63,6 +64,7 @@ class PreferencesSubState extends MusicBeatSubState
 				FlxG.fullscreen = OptionData.fullScreen;
 			}
 		};
+		#end
 
 		//I'd suggest using "Low Quality" as an example for making your own option since it is the simplest here
 		var option:Option = new Option('Low Quality',
@@ -346,6 +348,18 @@ class PreferencesSubState extends MusicBeatSubState
 		option.maxValue = 1;
 		option.changeValue = 0.1;
 		option.decimals = 1;
+		option.onChange = function():Void
+		{
+			if (PlayState.instance != null && isPause)
+			{
+				PlayState.instance.grpNoteSplashes.forEachAlive(function(noteSpl:NoteSplash):Void
+				{
+					if (noteSpl != null) {
+						noteSpl.alpha = OptionData.splashOpacity;
+					}
+				});
+			}
+		}
 		addOption(option);
 
 		var option:Option = new Option('Time Bar:',
@@ -666,7 +680,7 @@ class PreferencesSubState extends MusicBeatSubState
 	{
 		super.create();
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Options Menu - Preferences", null);
 		#end
 
@@ -776,6 +790,13 @@ class PreferencesSubState extends MusicBeatSubState
 						var checkbox:CheckboxThingie = new CheckboxThingie(optionText.x - 105, optionText.y, leOption.getValue() == true);
 						checkbox.sprTracker = optionText;
 						checkbox.ID = i;
+
+						if (checkbox.isVanilla)
+						{
+							checkbox.offsetX -= 35;
+							checkbox.offsetY = 15;
+						}
+
 						checkbox.snapToUpdateVariables();
 						checkboxGroup.add(checkbox);
 					}
@@ -929,8 +950,7 @@ class PreferencesSubState extends MusicBeatSubState
 						{
 							flickering = true;
 	
-							FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flick:FlxFlicker):Void
-							{
+							FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flick:FlxFlicker):Void {
 								changeBool(curOption);
 							});
 	

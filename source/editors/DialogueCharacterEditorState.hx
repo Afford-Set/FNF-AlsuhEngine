@@ -3,7 +3,7 @@ package editors;
 import haxe.Json;
 import haxe.format.JsonParser;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -535,7 +535,7 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 		curAnim = 0;
 		animText.text = 'Animation: ' + character.jsonFile.animations[curAnim].anim + ' (' + (curAnim + 1) +' / ' + character.jsonFile.animations.length + ') - Press W or S to scroll';
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("Dialogue Character Editor", "Editting: " + character.jsonFile.image); // Updating Discord Rich Presence
 		#end
 	}

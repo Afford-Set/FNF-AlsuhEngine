@@ -10,6 +10,8 @@ class CheckboxThingie extends FlxSprite
 	public var copyAlpha:Bool = true;
 	public var copyVisible:Bool = true;
 
+	public var isVanilla:Bool = false;
+
 	public var offsetX:Float = 0;
 	public var offsetY:Float = 0;
 
@@ -20,23 +22,44 @@ class CheckboxThingie extends FlxSprite
 		if (Paths.fileExists('images/checkboxanim.png', IMAGE)) {
 			frames = Paths.getSparrowAtlas('checkboxanim');
 		}
-		else {
+		else if (Paths.fileExists('images/checkboxThingie.png', IMAGE)) {
+			frames = Paths.getSparrowAtlas('checkboxThingie');
+		}
+		else if (Paths.fileExists('images/ui/checkboxanim.png', IMAGE)) {
 			frames = Paths.getSparrowAtlas('ui/checkboxanim');
 		}
+		else {
+			frames = Paths.getSparrowAtlas('ui/checkboxThingie');
+		}
 
-		animation.addByPrefix('unchecked', 'checkbox0', 24, false);
-		animation.addByPrefix('unchecking', 'checkbox anim reverse', 24, false);
-		animation.addByPrefix('checking', 'checkbox anim0', 24, false);
-		animation.addByPrefix('checked', 'checkbox finish', 24, false);
+		isVanilla = frames.getByName('Check Box unselected0000') != null && frames.getByName('Check Box selecting animation0000') != null;
+
+		if (isVanilla)
+		{
+			animation.addByPrefix('static', 'Check Box unselected', 24, false);
+			animation.addByPrefix('checked', 'Check Box selecting animation', 24, false);
+		}
+		else
+		{
+			animation.addByPrefix('unchecked', 'checkbox0', 24, false);
+			animation.addByPrefix('unchecking', 'checkbox anim reverse', 24, false);
+			animation.addByPrefix('checking', 'checkbox anim0', 24, false);
+			animation.addByPrefix('checked', 'checkbox finish', 24, false);
+		}
 
 		antialiasing = OptionData.globalAntialiasing;
 
-		setGraphicSize(Std.int(0.9 * width));
+		var sizeShit:Float = isVanilla ? 0.8 : 0.9;
+
+		setGraphicSize(Std.int(sizeShit * width));
 		updateHitbox();
 
-		animationFinished(checked ? 'checking' : 'unchecking');
+		if (!isVanilla)
+		{
+			animationFinished(checked ? 'checking' : 'unchecking');
+			animation.finishCallback = animationFinished;
+		}
 
-		animation.finishCallback = animationFinished;
 		daValue = checked;
 	}
 
@@ -51,7 +74,12 @@ class CheckboxThingie extends FlxSprite
 	{
 		if (sprTracker != null)
 		{
-			setPosition(sprTracker.x - 130 + offsetX, sprTracker.y + 30 + offsetY);
+			if (isVanilla) {
+				setPosition(sprTracker.x - 100 + offsetX, sprTracker.y + 5 + offsetY);
+			}
+			else {
+				setPosition(sprTracker.x - 130 + offsetX, sprTracker.y + 30 + offsetY);
+			}
 
 			if (copyAlpha) {
 				alpha = sprTracker.alpha;
@@ -67,7 +95,23 @@ class CheckboxThingie extends FlxSprite
 	{
 		daValue = check;
 
-		if (animation != null)
+		if (isVanilla)
+		{
+			if (daValue)
+			{
+				if (animation.curAnim != null && animation.curAnim.name != 'checked')
+				{
+					animation.play('checked', true);
+					offset.set(17, 70);
+				}
+			}
+			else
+			{
+				animation.play('static');
+				offset.set();
+			}
+		}
+		else
 		{
 			if (daValue)
 			{
@@ -89,99 +133,21 @@ class CheckboxThingie extends FlxSprite
 
 	private function animationFinished(name:String):Void
 	{
-		switch (name)
+		if (!isVanilla)
 		{
-			case 'checking':
+			switch (name)
 			{
-				animation.play('checked', true);
-				offset.set(3, 12);
-			}
-			case 'unchecking':
-			{
-				animation.play('unchecked', true);
-				offset.set(0, 2);
-			}
-		}
-	}
-}
-
-class VanillaCheckboxThingie extends FlxSprite
-{
-	public var sprTracker:FlxSprite;
-	public var daValue(default, set):Bool;
-
-	public var copyAlpha:Bool = true;
-	public var copyVisible:Bool = true;
-
-	public var offsetX:Float = 0;
-	public var offsetY:Float = 0;
-
-	public function new(x:Float = 0, y:Float = 0, ?checked:Bool = false):Void
-	{
-		super(x, y);
-
-		if (Paths.fileExists('images/checkboxThingie.png', IMAGE)) {
-			frames = Paths.getSparrowAtlas('checkboxThingie');
-		}
-		else {
-			frames = Paths.getSparrowAtlas('ui/checkboxThingie');
-		}
-
-		animation.addByPrefix('static', "Check Box unselected", 24, false);
-		animation.addByPrefix('checked', "Check Box selecting animation", 24, false);
-
-		antialiasing = OptionData.globalAntialiasing;
-
-		setGraphicSize(Std.int(0.6 * width));
-		updateHitbox();
-
-		daValue = checked;
-	}
-
-	override function update(elapsed:Float):Void
-	{
-		super.update(elapsed);
-
-		snapToUpdateVariables();
-	}
-
-	public function snapToUpdateVariables():Void
-	{
-		if (sprTracker != null)
-		{
-			setPosition(sprTracker.x - 100 + offsetX, sprTracker.y + 5 + offsetY);
-
-			if (copyAlpha) {
-				alpha = sprTracker.alpha;
-			}
-
-			if (copyVisible) {
-				visible = sprTracker.visible;
-			}
-		}
-	}
-
-	private function set_daValue(value:Bool):Bool
-	{
-		daValue = value;
-
-		if (animation != null)
-		{
-			if (daValue)
-			{
-				if (animation.curAnim != null && animation.curAnim.name != 'checked')
+				case 'checking':
 				{
 					animation.play('checked', true);
-					offset.set(17, 70);
+					offset.set(3, 12);
+				}
+				case 'unchecking':
+				{
+					animation.play('unchecked', true);
+					offset.set(0, 2);
 				}
 			}
-			else
-			{
-				animation.play('static');
-				offset.set(0, 0);
-			}
 		}
-
-		return value;
 	}
 }

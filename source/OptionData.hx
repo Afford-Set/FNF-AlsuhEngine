@@ -11,11 +11,15 @@ using StringTools;
 class OptionData
 {
 	public static var fullScreen:Bool = false;
+	#if !web
 	public static var screenRes:String = '1280x720';
+	#end
 	public static var lowQuality:Bool = false;
 	public static var globalAntialiasing:Bool = true;
 	public static var shaders:Bool = true;
+	#if !html5
 	public static var framerate:Int = 60;
+	#end
 
 	public static var ghostTapping:Bool = true;
 	public static var controllerMode:Bool = false;
@@ -53,10 +57,12 @@ class OptionData
 
 	public static var healthBarAlpha:Float = 1;
 	public static var pauseMusic:String = 'Tea Time';
+	#if !mobile
 	public static var fpsCounter:Bool = false;
 	public static var rainFPS:Bool = false;
 	public static var memoryCounter:Bool = false;
 	public static var rainMemory:Bool = false;
+	#end
 	#if CHECK_FOR_UPDATES
 	public static var checkForUpdates:Bool = true;
 	#end
@@ -129,6 +135,7 @@ class OptionData
 						{
 							FlxG.fullscreen = fullScreen;
 						}
+						#if !web
 						case 'screenRes':
 						{
 							var res:Array<String> = OptionData.screenRes.split('x');
@@ -140,6 +147,8 @@ class OptionData
 								FlxG.fullscreen = OptionData.fullScreen;
 							}
 						}
+						#end
+						#if !html5
 						case 'framerate':
 						{
 							if (framerate > FlxG.drawFramerate)
@@ -153,6 +162,7 @@ class OptionData
 								FlxG.updateFramerate = framerate;
 							}
 						}
+						#end
 						case 'opponentStrumsType':
 						{
 							if (FlxG.save.data.cpuStrumsType != null)
@@ -204,6 +214,7 @@ class OptionData
 								FlxG.save.flush();
 							}
 						}
+						#if !mobile
 						case 'fpsCounter':
 						{
 							if (Main.fpsCounter != null) {
@@ -216,6 +227,7 @@ class OptionData
 								Main.memoryCounter.visible = memoryCounter;
 							}
 						}
+						#end
 						case 'autoPause':
 						{
 							FlxG.autoPause = autoPause;
@@ -241,7 +253,9 @@ class OptionData
 		luaPrefsMap.set('danceOffset', ['danceOffset', OptionData.danceOffset]);
 		luaPrefsMap.set('pauseMusic', ['pauseMusic', OptionData.pauseMusic]);
 		luaPrefsMap.set('middleScroll', ['middlescroll', OptionData.middleScroll]);
+		#if !html5
 		luaPrefsMap.set('framerate', ['framerate', OptionData.framerate]);
+		#end
 		luaPrefsMap.set('ghostTapping', ['ghostTapping', OptionData.ghostTapping]);
 		luaPrefsMap.set('scoreText', ['scoreText', OptionData.scoreText]);
 		luaPrefsMap.set('showRatings', ['showRatings', OptionData.showRatings]);

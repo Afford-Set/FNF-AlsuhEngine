@@ -223,8 +223,18 @@ class GameplayChangersSubState extends BaseSubState
 
 					var checkbox:CheckboxThingie = new CheckboxThingie(optionText.x - 105, optionText.y, leOption.getValue() == true);
 					checkbox.sprTracker = optionText;
-					checkbox.offsetX -= 32;
-					checkbox.offsetY = -120;
+
+					if (checkbox.isVanilla)
+					{
+						checkbox.offsetX -= 64;
+						checkbox.offsetY -= 110;
+					}
+					else
+					{
+						checkbox.offsetX -= 32;
+						checkbox.offsetY = -120;
+					}
+
 					checkbox.ID = i;
 					checkbox.snapToUpdateVariables();
 					checkboxGroup.add(checkbox);
@@ -353,8 +363,7 @@ class GameplayChangersSubState extends BaseSubState
 						{
 							flickering = true;
 
-							FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flick:FlxFlicker):Void
-							{
+							FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flick:FlxFlicker):Void {
 								changeBool(curOption);
 							});
 

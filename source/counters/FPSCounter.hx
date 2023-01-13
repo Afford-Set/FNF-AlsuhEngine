@@ -61,8 +61,7 @@ class FPSCounter extends TextField
 		currentTime += deltaTime;
 		times.push(currentTime);
 
-		while (times[0] < currentTime - 1000)
-		{
+		while (times[0] < currentTime - 1000) {
 			times.shift();
 		}
 
@@ -72,11 +71,14 @@ class FPSCounter extends TextField
 		if (currentCount != cacheCount)
 		{
 			text = "FPS: " + currentFPS;
-
 			textColor = 0xFFFFFFFF;
 
-			if (currentFPS <= OptionData.framerate / 2)
-			{
+			var fpsShit:Int = 60;
+			#if !html5
+			fpsShit = OptionData.framerate;
+			#end
+
+			if (currentFPS <= fpsShit / 2) {
 				textColor = 0xFFFF0000;
 			}
 		}

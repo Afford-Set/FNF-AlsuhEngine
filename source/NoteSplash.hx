@@ -3,7 +3,6 @@ package;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import shaders.ColorSwap;
-import flixel.graphics.frames.FlxFrame;
 
 using StringTools;
 
@@ -126,7 +125,7 @@ class NoteSplash extends FlxSprite
 					var shit:String = 'note impact ' + j + ' ' + color;
 					var fuck:String = 'note impact ' + j + '  ' + color;
 
-					if (frames.getByName(fuck) != null)
+					if (frames.getByName(fuck + '0000') != null) // plz not delete this
 						animation.addByPrefix(ourPrefix, fuck, 24, false);
 					else
 						animation.addByPrefix(ourPrefix, shit, 24, false);

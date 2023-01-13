@@ -1,6 +1,6 @@
 package editors;
 
-#if desktop
+#if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
 
@@ -296,7 +296,7 @@ class DialogueEditorState extends MusicBeatUIState
 
 		daText.y = DialogueBoxPsych.DEFAULT_TEXT_Y;
 
-		#if desktop
+		#if DISCORD_ALLOWED
 		var rpcText:String = lineInputText.text;
 		if (rpcText == null || rpcText.length < 1) rpcText = '(Empty)';
 		if (rpcText.length < 3) rpcText += '   '; // Fixes a bug on RPC that triggers an error when the text is too short

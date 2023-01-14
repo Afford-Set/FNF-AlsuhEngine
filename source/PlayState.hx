@@ -2776,7 +2776,7 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		FlxG.sound.playMusic(Paths.getInst(SONG.songID, CoolUtil.getDifficultySuffix(lastDifficulty)), 1, #if NO_PRELOAD_ALL true #else false #end);
+		FlxG.sound.playMusic(Paths.getInst(SONG.songID, CoolUtil.getDifficultySuffix(lastDifficulty), #if NO_PRELOAD_ALL true #else false #end), 1);
 		FlxG.sound.music.pitch = PlayStateChangeables.playbackRate;
 		FlxG.sound.music.onComplete = finishSong.bind();
 		vocals.play();

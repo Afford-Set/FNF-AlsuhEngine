@@ -1100,12 +1100,7 @@ class PlayState extends MusicBeatState
 					dialogue = CoolUtil.coolTextFile(Paths.getTxt(SONG.songID + '/' + SONG.songID + 'Dialogue'));
 			}
 		}
-		catch (e:Dynamic)
-		{
-			add(gfGroup);
-			add(dadGroup);
-			add(boyfriendGroup);
-
+		catch (e:Dynamic) {
 			Debug.logError('Dialogue file cannot loaded: ' + e);
 		}
 

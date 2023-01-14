@@ -4871,6 +4871,17 @@ class PlayState extends MusicBeatState
 					FunkinLua.setVarInArray(instance, value1, value2);
 				}
 			}
+			case 'Play Sound':
+			{
+				var soundPath:String = value1.trim();
+
+				var volume:Float = Std.parseFloat(value2);
+				if (Math.isNaN(volume)) volume = 1;
+
+				if (soundPath != null || soundPath.length > 0) {
+					FlxG.sound.play(Paths.getSound(soundPath), volume);
+				}
+			}
 			case 'Fade Event':
 			{
 				var strColor:String = value2.startsWith('0x') ? value2 : ('0x' + value2);
@@ -4938,17 +4949,6 @@ class PlayState extends MusicBeatState
 				}
 				else {
 					isCameraOnForcedPos = false;
-				}
-			}
-			case 'Play Sound':
-			{
-				var soundPath:String = value1.trim();
-
-				var volume:Float = Std.parseFloat(value2);
-				if (Math.isNaN(volume)) volume = 1;
-
-				if (soundPath != null || soundPath.length > 0) {
-					FlxG.sound.play(Paths.getSound(soundPath), volume);
 				}
 			}
 			case 'Camera Tween Zoom':

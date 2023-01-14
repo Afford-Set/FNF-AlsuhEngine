@@ -60,6 +60,8 @@ class CheckboxThingie extends FlxSprite
 			animation.finishCallback = animationFinished;
 		}
 
+		animation.play('static');
+
 		daValue = checked;
 	}
 

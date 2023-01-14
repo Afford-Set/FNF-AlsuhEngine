@@ -1141,8 +1141,7 @@ class PlayState extends MusicBeatState
 		try {
 			loadStage(SONG.stage);
 		}
-		catch (e:Dynamic)
-		{
+		catch (e:Dynamic) {
 			Debug.logError('Stage cannot loaded: ' + e);
 		}
 
@@ -1185,26 +1184,7 @@ class PlayState extends MusicBeatState
 		#end
 
 		#if (MODS_ALLOWED && LUA_ALLOWED)
-		var doPush:Bool = false;
-		var luaFile:String = 'stages/' + SONG.stage + '.lua';
-
-		if (FileSystem.exists(Paths.modFolders(luaFile)))
-		{
-			luaFile = Paths.modFolders(luaFile);
-			doPush = true;
-		}
-		else
-		{
-			luaFile = Paths.getPreloadPath(luaFile);
-
-			if (FileSystem.exists(luaFile)) {
-				doPush = true;
-			}
-		}
-		
-		if (doPush) {
-			luaArray.push(new FunkinLua(luaFile));
-		}
+		startLuasOnFolder('stages/' + curStage + '.lua');
 		#end
 
 		#if (MODS_ALLOWED && LUA_ALLOWED && ACHIEVEMENTS_ALLOWED)
@@ -1318,54 +1298,12 @@ class PlayState extends MusicBeatState
 		updateTime = true;
 
 		#if LUA_ALLOWED
-		for (notetype in noteTypeMap.keys())
-		{
-			#if MODS_ALLOWED
-			var luaToLoad:String = Paths.modFolders('custom_notetypes/' + notetype + '.lua');
-
-			if (FileSystem.exists(luaToLoad)) {
-				luaArray.push(new FunkinLua(luaToLoad));
-			}
-			else
-			{
-				luaToLoad = Paths.getPreloadPath('custom_notetypes/' + notetype + '.lua');
-
-				if (FileSystem.exists(luaToLoad)) {
-					luaArray.push(new FunkinLua(luaToLoad));
-				}
-			}
-			#elseif sys
-			var luaToLoad:String = Paths.getPreloadPath('custom_notetypes/' + notetype + '.lua');
-
-			if (OpenFlAssets.exists(luaToLoad)) {
-				luaArray.push(new FunkinLua(luaToLoad));
-			}
-			#end
+		for (notetype in noteTypeMap.keys()) {
+			startLuasOnFolder('custom_notetypes/' + notetype + '.lua');
 		}
 
-		for (event in eventPushedMap.keys())
-		{
-			#if MODS_ALLOWED
-			var luaToLoad:String = Paths.modFolders('custom_events/' + event + '.lua');
-
-			if (FileSystem.exists(luaToLoad)) {
-				luaArray.push(new FunkinLua(luaToLoad));
-			}
-			else
-			{
-				luaToLoad = Paths.getPreloadPath('custom_events/' + event + '.lua');
-
-				if (FileSystem.exists(luaToLoad)) {
-					luaArray.push(new FunkinLua(luaToLoad));
-				}
-			}
-			#elseif sys
-			var luaToLoad:String = Paths.getPreloadPath('custom_events/' + event + '.lua');
-
-			if (OpenFlAssets.exists(luaToLoad)) {
-				luaArray.push(new FunkinLua(luaToLoad));
-			}
-			#end
+		for (event in eventPushedMap.keys()) {
+			startLuasOnFolder('custom_events/' + event + '.lua');
 		}
 		#end
 
@@ -1374,6 +1312,12 @@ class PlayState extends MusicBeatState
 
 		eventPushedMap.clear();
 		eventPushedMap = null;
+
+		if (eventNotes.length > 1)
+		{
+			for (event in eventNotes) event.strumTime -= eventNoteEarlyTrigger(event);
+			eventNotes.sort(sortByTime);
+		}
 
 		#if LUA_ALLOWED
 		var filesPushed:Array<String> = [];
@@ -1504,7 +1448,9 @@ class PlayState extends MusicBeatState
 		}
 
 		Paths.clearUnusedMemory();
+
 		Transition.nextCamera = camOther;
+		if (eventNotes.length < 1) checkEventNote();
 	}
 
 	public function triggerCutscenes():Void
@@ -2995,9 +2941,7 @@ class PlayState extends MusicBeatState
 						value1: newEventNote[2],
 						value2: newEventNote[3]
 					};
-
 					subEvent.strumTime -= eventNoteEarlyTrigger(subEvent);
-
 					eventNotes.push(subEvent);
 					eventPushed(subEvent);
 				}
@@ -3098,19 +3042,13 @@ class PlayState extends MusicBeatState
 					value1: newEventNote[2],
 					value2: newEventNote[3]
 				};
-
 				subEvent.strumTime -= eventNoteEarlyTrigger(subEvent);
-
 				eventNotes.push(subEvent);
 				eventPushed(subEvent);
 			}
 		}
 
-		unspawnNotes.sort(sortByShit);
-
-		if (eventNotes.length > 1) { // No need to sort if there's a single one or none at all
-			eventNotes.sort(sortByTime);
-		}
+		unspawnNotes.sort(sortByTime);
 
 		var blyad:Int = unspawnNotes.length;
 
@@ -3132,8 +3070,6 @@ class PlayState extends MusicBeatState
 
 		Debug.logInfo(SONG.songName + ": Generated " + (notesBlyad + susNotesBlyad) + " notes. (" + susNotesBlyad + " sustainables and " + notesBlyad + " unsustainables)");
 		Debug.logInfo(SONG.songName + ": Generated " + eventNotes.length + " events.");
-
-		checkEventNote();
 
 		generatedMusic = true;
 	}
@@ -3245,9 +3181,9 @@ class PlayState extends MusicBeatState
 
 	public function eventNoteEarlyTrigger(event:EventNote):Float
 	{
-		var returnedValue:Float = callOnLuas('eventEarlyTrigger', [event.event]);
+		var returnedValue:Null<Float> = callOnLuas('eventEarlyTrigger', [event.event, event.value1, event.value2, event.strumTime], [], [0]);
 
-		if (returnedValue != 0) {
+		if (returnedValue != null && returnedValue != 0 && returnedValue != FunkinLua.Function_Continue) {
 			return returnedValue;
 		}
 
@@ -3260,14 +3196,9 @@ class PlayState extends MusicBeatState
 		return 0;
 	}
 
-	public function sortByShit(Obj1:Note, Obj2:Note):Int
+	function sortByTime(obj1:Dynamic, obj2:Dynamic):Int
 	{
-		return FlxSort.byValues(FlxSort.ASCENDING, Obj1.strumTime, Obj2.strumTime);
-	}
-
-	public function sortByTime(Obj1:EventNote, Obj2:EventNote):Int
-	{
-		return FlxSort.byValues(FlxSort.ASCENDING, Obj1.strumTime, Obj2.strumTime);
+		return FlxSort.byValues(FlxSort.ASCENDING, obj1.strumTime, obj2.strumTime);
 	}
 
 	public var skipArrowStartTween:Bool = false; // for lua
@@ -4411,7 +4342,7 @@ class PlayState extends MusicBeatState
 			var leStrumTime:Float = eventNotes[0].strumTime;
 
 			if (Conductor.songPosition < leStrumTime) {
-				break;
+				return;
 			}
 
 			var value1:String = '';
@@ -7174,37 +7105,68 @@ class PlayState extends MusicBeatState
 		return null;
 	}
 
-	public function callOnLuas(event:String, args:Array<Dynamic>, ignoreStops:Bool = true, exclusions:Array<String> = null):Dynamic
+	public function callOnLuas(event:String, args:Array<Dynamic>, ignoreStops:Bool = true, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic
 	{
 		var returnVal:Dynamic = FunkinLua.Function_Continue;
 
 		#if LUA_ALLOWED
 		if (exclusions == null) exclusions = [];
+		if (excludeValues == null) excludeValues = [];
 
 		for (script in luaArray)
 		{
-			if (exclusions.contains(script.scriptName)) {
-				continue;
-			}
+			if (exclusions.contains(script.scriptName)) continue;
 
-			var ret:Dynamic = script.call(event, args);
-
-			if (ret == FunkinLua.Function_StopLua && !ignoreStops) {
-				break;
-			}
-
-			var bool:Bool = ret == FunkinLua.Function_Continue;
-
-			if (!bool && ret != 0) {
-				returnVal = cast ret;
+			var myValue:Dynamic = script.call(event, args);
+			if (myValue == FunkinLua.Function_StopLua && !ignoreStops) break;
+			
+			if (myValue != null && myValue != FunkinLua.Function_Continue) {
+				returnVal = myValue;
 			}
 		}
-
-		for (i in achievementsArray) i.call(event, args);
 		#end
 
 		return returnVal;
 	}
+
+	#if LUA_ALLOWED
+	public function startLuasOnFolder(luaFile:String):Bool
+	{
+		for (script in luaArray) {
+			if (script.scriptName == luaFile) return false;
+		}
+
+		#if MODS_ALLOWED
+		var luaToLoad:String = Paths.modFolders(luaFile);
+
+		if (FileSystem.exists(luaToLoad))
+		{
+			luaArray.push(new FunkinLua(luaToLoad));
+			return true;
+		}
+		else
+		{
+			luaToLoad = Paths.getPreloadPath(luaFile);
+
+			if (FileSystem.exists(luaToLoad))
+			{
+				luaArray.push(new FunkinLua(luaToLoad));
+				return true;
+			}
+		}
+		#elseif sys
+		var luaToLoad:String = Paths.getPreloadPath(luaFile);
+
+		if (OpenFlAssets.exists(luaToLoad))
+		{
+			luaArray.push(new FunkinLua(luaToLoad));
+			return true;
+		}
+		#end
+
+		return false;
+	}
+	#end
 
 	public function setOnLuas(variable:String, arg:Dynamic):Void
 	{

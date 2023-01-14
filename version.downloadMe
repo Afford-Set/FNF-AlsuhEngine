@@ -1,7 +1,9 @@
-1.6.7;
+1.6.8;
 - Added Vanilla's Notes Support
 - Added Vannila's Check Box support
 - Removed Resolutions on HTML5
+- Removed "Lua.pushnil" from some lua callbacks
+- Fixed Note Delay
 - Fixed lua cutscene callback
 - Fixed Start Music on Title Menu
 - Fixed Vanilla Note Splashes

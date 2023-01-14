@@ -427,7 +427,7 @@ class TitleState extends MusicBeatState
 		}
 	}
 
-	function createCoolText(textArray:Array<String>):Void
+	function createCoolText(textArray:Array<String>, ?offset:Null<Float> = 0):Void
 	{
 		if (textGroup != null)
 		{
@@ -435,19 +435,19 @@ class TitleState extends MusicBeatState
 			{
 				var money:Alphabet = new Alphabet(0, 0, textArray[i], true);
 				money.screenCenter(X);
-				money.y += (i * 60) + 200;
+				money.y += (i * 60) + 200 + offset;
 				textGroup.add(money);
 			}
 		}
 	}
 
-	function addMoreText(text:String):Void
+	function addMoreText(text:String, ?offset:Null<Float> = 0):Void
 	{
 		if (textGroup != null)
 		{
 			var coolText:Alphabet = new Alphabet(0, 0, text, true);
 			coolText.screenCenter(X);
-			coolText.y += (textGroup.length * 60) + 200;
+			coolText.y += (textGroup.length * 60) + 200 + offset;
 			textGroup.add(coolText);
 		}
 	}
@@ -496,22 +496,22 @@ class TitleState extends MusicBeatState
 			case 5:
 			{
 				if (OptionData.watermarks)
-					createCoolText(['Original by']);
+					createCoolText(['Original by'], -20);
 				else
-					createCoolText(['In association', 'with']);
+					createCoolText(['In association', 'with'], -40);
 			}
 			case 7:
 			{
 				if (OptionData.watermarks)
 				{
-					addMoreText('ninjamuffin99');
-					addMoreText('phantomArcade');
-					addMoreText('kawaisprite');
-					addMoreText('evilsk8er');
+					addMoreText('ninjamuffin99', 20);
+					addMoreText('phantomArcade', 20);
+					addMoreText('kawaisprite', 20);
+					addMoreText('evilsk8er', 20);
 				}
 				else
 				{
-					addMoreText('newgrounds');
+					addMoreText('newgrounds', -40);
 
 					if (ngSpr != null) {
 						ngSpr.visible = true;

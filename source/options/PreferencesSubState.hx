@@ -620,6 +620,7 @@ class PreferencesSubState extends MusicBeatSubState
 			FlxG.autoPause = OptionData.autoPause;
 		};
 
+		#if ALSUH_WATERMARKS
 		var option:Option = new Option('Watermarks',
 			true,
 			'If unchecked, hides all watermarks on the engine.',
@@ -627,6 +628,7 @@ class PreferencesSubState extends MusicBeatSubState
 			'bool',
 			true);
 		addOption(option);
+		#end
 
 		#if PRELOAD_ALL
 		var option:Option = new Option('Loading Screen',

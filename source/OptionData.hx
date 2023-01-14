@@ -67,7 +67,7 @@ class OptionData
 	public static var checkForUpdates:Bool = true;
 	#end
 	public static var autoPause:Bool = false;
-	public static var watermarks:Bool = true;
+	public static var watermarks:Bool = #if ALSUH_WATERMARKS true #else false #end;
 	public static var loadingScreen:Bool = #if NO_PRELOAD_ALL true #else false #end;
 	public static var flashingLights:Bool = true;
 
@@ -131,8 +131,7 @@ class OptionData
 
 					switch (field)
 					{
-						case 'fullScreen':
-						{
+						case 'fullScreen': {
 							FlxG.fullscreen = fullScreen;
 						}
 						#if !web
@@ -228,8 +227,12 @@ class OptionData
 							}
 						}
 						#end
-						case 'autoPause':
-						{
+						#if !ALSUH_WATERMARKS
+						case 'watermarks': {
+							watermarks = false;
+						}
+						#end
+						case 'autoPause': {
 							FlxG.autoPause = autoPause;
 						}
 					}
@@ -261,11 +264,9 @@ class OptionData
 		luaPrefsMap.set('showRatings', ['showRatings', OptionData.showRatings]);
 		luaPrefsMap.set('showNumbers', ['showNumbers', OptionData.showNumbers]);
 		luaPrefsMap.set('songPositionType', ['songPositionType', OptionData.songPositionType]);
-		luaPrefsMap.set('camZooms', ['camZooms', OptionData.camZooms]);
 		luaPrefsMap.set('camZooms', ['cameraZoomOnBeat', OptionData.camZooms]);
 		luaPrefsMap.set('camShakes', ['cameraShakes', OptionData.camShakes]);
 		luaPrefsMap.set('iconZooms', ['iconZooms', OptionData.iconZooms]);
-		luaPrefsMap.set('flashingLights', ['flashingLights', OptionData.flashingLights]);
 		luaPrefsMap.set('flashingLights', ['flashing', OptionData.flashingLights]);
 		luaPrefsMap.set('noteOffset', ['noteOffset', OptionData.noteOffset]);
 		luaPrefsMap.set('healthBarAlpha', ['healthBarAlpha', OptionData.healthBarAlpha]);

@@ -4909,7 +4909,7 @@ class PlayState extends MusicBeatState
 
 					if (camFollow != null && camFollowPos != null)
 					{
-						modchartTweens.set('CameraEventX', FlxTween.tween(camFollowPos, {zoom: newX}, duration,
+						modchartTweens.set('CameraEventX', FlxTween.tween(camFollowPos, {x: newX}, duration,
 						{
 							ease: FunkinLua.getFlxEaseByString(value2),
 							onComplete: function(twn:FlxTween):Void
@@ -4921,7 +4921,7 @@ class PlayState extends MusicBeatState
 							}
 						}));
 
-						modchartTweens.set('CameraEventY', FlxTween.tween(camFollowPos, {zoom: newY}, duration,
+						modchartTweens.set('CameraEventY', FlxTween.tween(camFollowPos, {y: newY}, duration,
 						{
 							ease: FunkinLua.getFlxEaseByString(value2),
 							onComplete: function(twn:FlxTween):Void

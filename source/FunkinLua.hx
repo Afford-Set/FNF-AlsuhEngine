@@ -2440,7 +2440,7 @@ class FunkinLua
 
 			if (sprite != null)
 			{
-				addBehindGF(sprite);
+				PlayState.instance.addBehindGF(sprite);
 				return;
 			}
 
@@ -2453,7 +2453,7 @@ class FunkinLua
 
 			if (sprite != null)
 			{
-				addBehindDad(sprite);
+				PlayState.instance.addBehindDad(sprite);
 				return;
 			}
 
@@ -2466,7 +2466,7 @@ class FunkinLua
 
 			if (sprite != null)
 			{
-				addBehindBF(sprite);
+				PlayState.instance.addBehindBF(sprite);
 				return;
 			}
 

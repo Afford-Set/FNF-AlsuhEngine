@@ -40,7 +40,6 @@ class GameplayChangersSubState extends BaseSubState
 		if (!isPause)
 		{
 			var goption:GameplayOption = new GameplayOption('Scroll Type', 'scrollType', 'string', 'multiplicative', ["multiplicative", "constant"]);
-			goption.onChange = onChangeScrollSpeed;
 			optionsArray.push(goption);
 	
 			var option:GameplayOption = new GameplayOption('Scroll Speed', 'scrollSpeed', 'float', 1);
@@ -60,7 +59,6 @@ class GameplayChangersSubState extends BaseSubState
 				option.maxValue = 6;
 			}
 	
-			option.onChange = onChangeScrollSpeed;
 			optionsArray.push(option);
 		}
 
@@ -104,13 +102,41 @@ class GameplayChangersSubState extends BaseSubState
 		}
 
 		var option:GameplayOption = new GameplayOption('Botplay', 'botPlay', 'bool', false);
-		option.onChange = onChangeBotplay;
+		option.onChange = function():Void
+		{
+			if (isPause && PlayState.instance != null)
+			{
+				PlayState.instance.cpuControlled = PlayStateChangeables.botPlay;
+				PlayState.instance.botplayTxt.alpha = 1;
+				PlayState.instance.botplaySine = 0;
+			}
+	
+			PlayState.usedPractice = PlayStateChangeables.botPlay;
+		};
+
 		option.luaAllowed = true;
 		option.luaString = 'botPlay';
 		optionsArray.push(option);
 
 		var option:GameplayOption = new GameplayOption('Practice Mode', 'practiceMode', 'bool', false);
-		option.onChange = onChangePractice;
+		option.onChange = function():Void
+		{
+			if (isPause)
+			{
+				if (PlayState.instance != null) {
+					PlayState.instance.practiceMode = PlayStateChangeables.practiceMode;
+				}
+	
+				if (PlayState.instance.practiceMode) {
+					FlxTween.tween(practiceText, {alpha: 1, y: practiceText.y + 5}, 0.4, {ease: FlxEase.quartInOut});
+				}
+				else {
+					FlxTween.tween(practiceText, {alpha: 0, y: practiceText.y - 5}, 0.4, {ease: FlxEase.quartInOut});
+				}
+			}
+	
+			PlayState.usedPractice = PlayStateChangeables.practiceMode;
+		};
 		option.luaAllowed = true;
 		option.luaString = 'practiceMode';
 		optionsArray.push(option);
@@ -556,49 +582,6 @@ class GameplayChangersSubState extends BaseSubState
 
 		if (nextAccept > 0) {
 			nextAccept -= 1;
-		}
-	}
-
-	function onChangeScrollSpeed():Void
-	{
-		if (isPause)
-		{
-			PlayState.instance.songSpeedType = PlayStateChangeables.scrollType;
-
-			switch (PlayState.instance.songSpeedType)
-			{
-				case "multiplicative":
-					PlayState.instance.songSpeed = PlayState.SONG.speed * PlayStateChangeables.scrollSpeed;
-				case "constant":
-					PlayState.instance.songSpeed = PlayStateChangeables.scrollSpeed;
-			}
-		}
-	}
-
-	function onChangeBotplay():Void
-	{
-		if (isPause)
-		{
-			PlayState.instance.botplayTxt.visible = PlayStateChangeables.botPlay;
-			PlayState.instance.botplayTxt.alpha = 1;
-			PlayState.instance.botplaySine = 0;
-		}
-
-		PlayState.usedPractice = PlayStateChangeables.botPlay;
-	}
-
-	function onChangePractice():Void
-	{
-		PlayState.usedPractice = PlayStateChangeables.practiceMode;
-
-		if (isPause)
-		{
-			if (PlayStateChangeables.practiceMode) {
-				FlxTween.tween(practiceText, {alpha: 1, y: practiceText.y + 5}, 0.4, {ease: FlxEase.quartInOut});
-			}
-			else {
-				FlxTween.tween(practiceText, {alpha: 0, y: practiceText.y - 5}, 0.4, {ease: FlxEase.quartInOut});
-			}
 		}
 	}
 

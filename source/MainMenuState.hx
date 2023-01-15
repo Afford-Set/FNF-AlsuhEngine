@@ -49,7 +49,7 @@ class MainMenuState extends TransitionableState
 	var camFollowPos:FlxObject;
 	var camFollow:FlxPoint;
 
-	public static var engineVersion:String = '1.6.8';
+	public static var engineVersion:String = '1.6.9';
 	public static var psychEngineVersion:String = '0.6.4';
 
 	public static var gameVersion:String = '0.2.8';
@@ -268,11 +268,11 @@ class MainMenuState extends TransitionableState
 
 					selectedSomethin = true;
 
-					grpMenuItems.forEach(function(spr:FlxSprite)
+					grpMenuItems.forEach(function(spr:FlxSprite):Void
 					{
 						if (curSelected != spr.ID)
 						{
-							new FlxTimer().start(1, function(tmr:FlxTimer)
+							new FlxTimer().start(1, function(tmr:FlxTimer):Void
 							{
 								FlxTween.tween(spr, {alpha: 0}, 0.4,
 								{
@@ -289,14 +289,14 @@ class MainMenuState extends TransitionableState
 							{
 								FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
 								{
-									new FlxTimer().start(0.4, function(tmr:FlxTimer) {
+									new FlxTimer().start(0.4, function(tmr:FlxTimer):Void {
 										goToState(menuItems[curSelected]);
 									});
 								});
 							}
 							else
 							{
-								new FlxTimer().start(1.4, function(tmr:FlxTimer) {
+								new FlxTimer().start(1.4, function(tmr:FlxTimer):Void {
 									goToState(menuItems[curSelected]);
 								});
 							}
@@ -316,8 +316,7 @@ class MainMenuState extends TransitionableState
 			#end
 		}
 
-		grpMenuItems.forEach(function(spr:FlxSprite)
-		{
+		grpMenuItems.forEach(function(spr:FlxSprite):Void {
 			spr.screenCenter(X);
 		});
 	}
@@ -347,7 +346,7 @@ class MainMenuState extends TransitionableState
 	{
 		curSelected = CoolUtil.boundSelection(curSelected + change, menuItems.length);
 
-		grpMenuItems.forEach(function(spr:FlxSprite)
+		grpMenuItems.forEach(function(spr:FlxSprite):Void
 		{
 			spr.animation.play('idle');
 			spr.updateHitbox();

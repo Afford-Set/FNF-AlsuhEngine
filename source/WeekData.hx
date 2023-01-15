@@ -54,8 +54,8 @@ class WeekData
 {
 	public static var weeksList:Array<String> = [];
 
-	public static var weeksLoaded:Map<String, WeekData> = #if (haxe >= "4.0.0") new Map() #else new Map<String, WeekData>() #end;
-	public static var weekCompleted:Map<String, Bool> = #if (haxe >= "4.0.0") new Map() #else new Map<String, Bool>() #end;
+	public static var weeksLoaded:Map<String, WeekData> = new Map<String, WeekData>();
+	public static var weekCompleted:Map<String, Bool> = new Map<String, Bool>();
 
 	public var folder:String = '';
 

@@ -9,29 +9,7 @@ class PlayStateChangeables
 {
 	public static var scrollType:String = 'multiplicative';
 	public static var scrollSpeed:Float = 1.0;
-	public static var playbackRate(default, set):Float = 1.0;
-
-	static function set_playbackRate(value:Float):Float
-	{
-		playbackRate = value;
-
-		if (PlayState.instance != null)
-		{
-			if (PlayState.instance.generatedMusic)
-			{
-				if (PlayState.instance.vocals != null) PlayState.instance.vocals.pitch = value;
-				FlxG.sound.music.pitch = value;
-			}
-
-			FlxAnimationController.globalSpeed = value;
-
-			Conductor.safeZoneOffset = (OptionData.safeFrames / 60) * 1000 * value;
-			PlayState.instance.setOnLuas('playbackRate', playbackRate);
-		}
-
-		return value;
-	}
-
+	public static var playbackRate:Float = 1.0;
 	public static var healthGain:Float = 1.0;
 	public static var healthLoss:Float = 1.0;
 	public static var instaKill:Bool = false;

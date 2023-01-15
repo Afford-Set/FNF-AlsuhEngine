@@ -49,8 +49,8 @@
 	<define name="ALSUH_WATERMARKS"/>
 	<define name="LUA_ALLOWED" if="windows" />
 	<define name="hscriptPos" />
-	<define name="MP4_ALLOWED" if="desktop || android" unless="32bits"/>
-	<define name="WEBM_ALLOWED" if="windows" unless="32bits"/>
+	<define name="MP4_ALLOWED" if="desktop || android" unless="32bits"/> 
+	<define name="WEBM_ALLOWED" unless="web || 32bits || neko"/>
 	<define name="CRASH_HANDLER" if="desktop release" />
 
 	<!-- DONT ENABLE THIS -->
@@ -85,6 +85,7 @@
 		<library name="week7"    preload="false" />
 	</section>
 
+	<assets path="assets/lua/scripts"            rename="assets/scripts"            if="LUA_ALLOWED"/>
 	<assets path="assets/lua/custom_events"      rename="assets/custom_events"      if="LUA_ALLOWED"/>
 	<assets path="assets/lua/custom_notetypes"   rename="assets/custom_notetypes"   if="LUA_ALLOWED"/>
 
@@ -108,7 +109,7 @@
 	<assets path="assets/week6"    library="week6"    exclude="*.mp3" unless="web"/>
 	<assets path="assets/week7"    library="week7"    exclude="*.ogg" if="web"/>
 	<assets path="assets/week7"    library="week7"    exclude="*.mp3" unless="web"/>
-	
+
 	<section if="MODS_ALLOWED">
 		<assets path='example_mods' rename='mods' embed='false'/>
 	</section>
@@ -138,7 +139,7 @@
 	<haxelib name="faxe" if='switch'/>
 	<haxelib name="hxCodec" if="MP4_ALLOWED"/>
 	<haxelib name="actuate" if="desktop"/>
-	<haxelib name="extension-webm" if="WEBM_ALLOWED"/>
+	<haxelib name="extension-webm" if="WEBM_ALLOWED"/> <!-- Make sure to use https://github.com/AlanSurtaev2008/extension-webm -->
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
 	<haxelib name="discord_rpc" if="desktop"/>
 	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->

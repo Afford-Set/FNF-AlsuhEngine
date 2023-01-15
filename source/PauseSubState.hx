@@ -317,7 +317,7 @@ class PauseSubState extends BaseSubState
 
 		if (controls.BACK || FlxG.mouse.justPressedRight)
 		{
-			PlayState.instance.callOnLuas('onResume', []);
+			PlayState.instance.resume();
 			close();
 		}
 
@@ -347,7 +347,7 @@ class PauseSubState extends BaseSubState
 			{
 				case 'Resume':
 				{
-					PlayState.instance.callOnLuas('onResume', []);
+					PlayState.instance.resume();
 					close();
 				}
 				case 'Restart Song':
@@ -374,7 +374,7 @@ class PauseSubState extends BaseSubState
 							PlayState.instance.setSongTime(curTime);
 						}
 
-						PlayState.instance.callOnLuas('onResume', []);
+						PlayState.instance.resume();
 						close();
 					}
 				}

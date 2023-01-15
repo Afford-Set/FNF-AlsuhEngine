@@ -1,12 +1,48 @@
 -- Lua stuff
 
-function onStart()
+function onStart(playingCutscene)
 	-- this function is very simple, it is more similar to onStartCountdown
 	-- with this you can enable cut-scenes
+
+	-- Example:
+
+	-- for dialogue cutscenes:
+	--[[
+			if playingCutscene then
+				runTimer('startDialogue', 0.8);
+				setProperty('inCutscene', true);
+				return Function_Stop;
+			end
+			return Function_Continue;
+	-- ]]
+
+	-- for mp4 cutscenes:
+	--[[
+			if playingCutscene then
+				startVideo('your-video', 'mp4');
+				setProperty('inCutscene', true);
+				return Function_Stop;
+			end
+			return Function_Continue;
+	-- ]]
+
+	-- for webm cutscenes:
+	--[[
+			if playingCutscene then
+				startVideo('your-video', 'webm');
+				setProperty('inCutscene', true);
+				return Function_Stop;
+			end
+			return Function_Continue;
+	-- ]]
 end
 
-function onStartPost()
-	-- this function, like "onStart", only triggers on after death, or restart song or other mode
+function onLoadStage()
+	-- triggered after loading stage's settings
+end
+
+function onLoadStagePost()
+	-- end of "onLoadStage"
 end
 
 function onCreate()
@@ -47,7 +83,7 @@ function onUpdatePost(elapsed)
 end
 
 function onStartCountdown()
-	-- this function is deprecated, use onStart or onStartPost instead
+	-- this function is deprecated, use "onStart" instead
 
 	-- countdown started, duh
 	-- return Function_Stop if you want to stop the countdown from happening (Can be used to trigger dialogues and stuff! You can trigger the countdown with startCountdown())
@@ -66,25 +102,19 @@ function onSongStart()
 	-- Inst and Vocals start playing, songPosition = 0
 end
 
-function onEndSong()
-	-- this function is deprecated, use onEnd or onEndPost instead
+function onEndSong(playingCutscene)
 	-- song ended/starting transition (Will be delayed if you're unlocking an achievement)
 	-- return Function_Stop to stop the song from ending for playing a cutscene or something.
 	return Function_Continue;
 end
 
-function onEndSongPost()
-	-- this function is deprecated, use onEnd or onEndPost instead
+function onEndSongPost(playingCutscene)
 	-- end of "onEndSong"
 end
 
-function onEnd()
+function onEnd(playingCutscene)
 	-- this is a simple function like "onStart" and it is more similar to onEndSong and onEndSongPost
 	-- with this you can enable cut-scenes
-end
-
-function onEndPost()
-	-- this function, like "onEnd", only triggers on after mode
 end
 
 -- Substate interactions
@@ -198,4 +228,10 @@ function onTimerCompleted(tag, loops, loopsLeft)
 	-- A loop from a timer you called has been completed, value "tag" is it's tag
 	-- loops = how many loops it will have done when it ends completely
 	-- loopsLeft = how many are remaining
+
+	-- Example:
+	-- for dialogues:
+	-- 		if tag == 'startDialogue' then -- Timer completed, play dialogue
+	--			startDialogue('dialogue', '');
+	--		end
 end

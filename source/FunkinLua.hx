@@ -1715,6 +1715,11 @@ class FunkinLua
 			PlayState.instance.cameraMovement(target);
 		});
 
+		Lua_helper.add_callback(lua, "moveCameraToGF", function(justMove:Bool = false):Void
+		{
+			PlayState.instance.moveCameraToGF(justMove);
+		});
+
 		Lua_helper.add_callback(lua, "cameraShake", function(camera:String, intensity:Float, duration:Float):Void
 		{
 			if (OptionData.camShakes) {
@@ -4111,13 +4116,11 @@ class FunkinLua
 	{
 		#if LUA_ALLOWED
 		if (closed) return Function_Continue;
-
 		lastCalledFunction = func;
 
 		try
 		{
 			if (lua == null) return Function_Continue;
-
 			Lua.getglobal(lua, func);
 
 			var type:Int = Lua.type(lua, -1);
@@ -4148,7 +4151,6 @@ class FunkinLua
 			if (result == null) result = Function_Continue;
 
 			Lua.pop(lua, 1);
-
 			return result;
 		}
 		catch (e:Dynamic) {

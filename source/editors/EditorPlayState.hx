@@ -207,7 +207,7 @@ class EditorPlayState extends MusicBeatState
 		noteTypeMap.clear();
 		noteTypeMap = null;
 
-		scoreTxt = new FlxText(0, FlxG.height - 50, FlxG.width, "Hits: 0 | Misses: 0", 20);
+		scoreTxt = new FlxText(0, FlxG.height - 50, FlxG.width, "Hits: 0 | Combo Breaks: 0", 20);
 		scoreTxt.setFormat(Paths.getFont("vcr.ttf"), 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 1.25;

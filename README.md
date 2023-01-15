@@ -48,6 +48,7 @@ It's the same as in the Psych Engine, only there are changes and additions shown
 - bbpanzu - Ex-Programmer
 - shubs - New Input System
 - SqirraRNG - Crash Handler and Base code for Chart Editor's Waveform
+- EliteMasterEric - Runtime Shaders support
 - KadeDev - Fixed some cool stuff on Chart Editor and other PRs
 - iFlicky - Composer of Psync and Tea Time, also made the Dialogue Sounds
 - PolybiusProxy - .MP4 Video Loader Library (hxCodec)

@@ -2434,6 +2434,45 @@ class FunkinLua
 			luaTrace("addLuaSprite: Couldnt find object: " + tag, false, false, FlxColor.RED);
 		});
 
+		Lua_helper.add_callback(lua, "addBehindGF", function(tag:String):Void
+		{
+			var sprite:ModchartSprite = PlayState.instance.modchartSprites.get(tag);
+
+			if (sprite != null)
+			{
+				addBehindGF(sprite);
+				return
+			}
+
+			luaTrace("addBehindGF: Couldnt find object: " + tag, false, false, FlxColor.RED);
+		});
+
+		Lua_helper.add_callback(lua, "addBehindDad", function(tag:Stringthis.scriptCode):Void
+		{
+			var sprite:ModchartSprite = PlayState.instance.modchartSprites.get(tag);
+
+			if (sprite != null)
+			{
+				addBehindDad(sprite);
+				return
+			}
+
+			luaTrace("addBehindDad: Couldnt find object: " + tag, false, false, FlxColor.RED);
+		});
+
+		Lua_helper.add_callback(lua, "addBehindBF", function(tag:String):Void
+		{
+			var sprite:ModchartSprite = PlayState.instance.modchartSprites.get(tag);
+
+			if (sprite != null)
+			{
+				addBehindBF(sprite);
+				return
+			}
+
+			luaTrace("addBehindBF: Couldnt find object: " + tag, false, false, FlxColor.RED);
+		});
+
 		Lua_helper.add_callback(lua, "setGraphicSize", function(obj:String, x:Int, y:Int = 0, updateHitbox:Bool = true):Void
 		{
 			if (PlayState.instance.getLuaObject(obj) != null)

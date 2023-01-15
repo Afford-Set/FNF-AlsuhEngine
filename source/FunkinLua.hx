@@ -2447,7 +2447,7 @@ class FunkinLua
 			luaTrace("addBehindGF: Couldnt find object: " + tag, false, false, FlxColor.RED);
 		});
 
-		Lua_helper.add_callback(lua, "addBehindDad", function(tag:Stringthis.scriptCode):Void
+		Lua_helper.add_callback(lua, "addBehindDad", function(tag:String):Void
 		{
 			var sprite:ModchartSprite = PlayState.instance.modchartSprites.get(tag);
 

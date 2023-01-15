@@ -2441,7 +2441,7 @@ class FunkinLua
 			if (sprite != null)
 			{
 				addBehindGF(sprite);
-				return
+				return;
 			}
 
 			luaTrace("addBehindGF: Couldnt find object: " + tag, false, false, FlxColor.RED);
@@ -2454,7 +2454,7 @@ class FunkinLua
 			if (sprite != null)
 			{
 				addBehindDad(sprite);
-				return
+				return;
 			}
 
 			luaTrace("addBehindDad: Couldnt find object: " + tag, false, false, FlxColor.RED);
@@ -2467,7 +2467,7 @@ class FunkinLua
 			if (sprite != null)
 			{
 				addBehindBF(sprite);
-				return
+				return;
 			}
 
 			luaTrace("addBehindBF: Couldnt find object: " + tag, false, false, FlxColor.RED);

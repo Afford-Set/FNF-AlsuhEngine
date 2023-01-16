@@ -1210,6 +1210,10 @@ class PlayState extends MusicBeatState
 		startLuasOnFolder('weeks/' + storyWeek + '.lua');
 		#end
 
+		#if (MODS_ALLOWED && LUA_ALLOWED)
+		startLuasOnFolder('stages/' + curStage + '.lua');
+		#end
+
 		#if (MODS_ALLOWED && LUA_ALLOWED && ACHIEVEMENTS_ALLOWED)
 		function addAbilityToUnlockAchievements(funkinLua:FunkinLua):Void
 		{

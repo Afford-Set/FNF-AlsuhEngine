@@ -49,7 +49,7 @@
 	<define name="ALSUH_WATERMARKS"/>
 	<define name="LUA_ALLOWED" if="windows" />
 	<define name="hscriptPos" />
-	<define name="MP4_ALLOWED" if="desktop || android" unless="32bits"/> 
+	<define name="MP4_ALLOWED" if="desktop || android" unless="32bits"/>
 	<define name="WEBM_ALLOWED" unless="web || 32bits || neko"/>
 	<define name="CRASH_HANDLER" if="desktop release" />
 

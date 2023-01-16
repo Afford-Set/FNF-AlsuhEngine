@@ -8,7 +8,7 @@ environment:
 
 install:
   - haxelib install hmm
-  - haxelib run lime rebuild extension-webm mac
+  - haxelib run lime rebuild extension-webm macos
   - haxelib list
 
 test_script:

@@ -1,0 +1,25 @@
+version: "{build}"
+image: Ubuntu2004
+
+environment:
+  global:
+    HAXELIB_ROOT: /home/appveyor/haxelib
+    HAXE_INSTALLDIR: /home/appveyor/haxe
+
+install:
+  - haxelib install hmm
+  - haxelib run lime rebuild extension-webm linux
+  - haxelib list
+
+test_script:
+  - haxelib run lime test linux
+
+build_script:
+  - haxelib run lime build linux
+
+after_build:
+  - tar -cvf AlsuhEngine-Linux.tar -C /home/appveyor/projects/fnf-alsuhengine-linux/export/release/linux/bin .\
+
+artifacts:
+  - path: AlsuhEngine-Linux.tar
+    name: Alsuh Engine for Linux

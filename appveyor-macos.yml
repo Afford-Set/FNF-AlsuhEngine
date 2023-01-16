@@ -1,0 +1,22 @@
+version: "{build}"
+image: macos
+
+environment:
+  global:
+    HAXELIB_ROOT: /Users/appveyor/haxelib
+    HAXE_INSTALLDIR: /Users/appveyor/haxe_bin
+
+install:
+  - haxelib install hmm
+  - haxelib run lime rebuild extension-webm mac
+  - haxelib list
+
+test_script:
+  - haxelib run lime test mac
+
+build_script:
+  - haxelib run lime build mac
+
+artifacts:
+  - path: "Alsuh Engine.app"
+    name: Alsuh Engine for MacOS

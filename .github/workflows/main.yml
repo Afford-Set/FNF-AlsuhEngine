@@ -63,9 +63,7 @@ jobs:
           haxelib install hxcpp > /dev/null --quiet
           haxelib install hmm --quiet
           haxelib run hmm install
-        shell: cmd
-      - name: Load Extension-Webm
-        run: haxelib run lime rebuild extension-webm windows
+          haxelib run lime rebuild extension-webm windows
         shell: cmd
       - name: Create Version Tag
         run: echo "${{github.run_id}}" > VERSION
@@ -93,8 +91,6 @@ jobs:
           haxelib install hxcpp > /dev/null --quiet
           haxelib install hmm --quiet
           haxelib run hmm install
-      - name: Load Extension-Webm
-        run: haxelib run lime rebuild extension-webm macos
       - name: Create Version Tag
         run: echo "${{github.run_id}}" > VERSION
       - name: Compile

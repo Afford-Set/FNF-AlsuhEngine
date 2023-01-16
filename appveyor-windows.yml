@@ -6,16 +6,13 @@ environment:
 
 install:
   - haxelib install hmm
-  - haxelib run lime rebuild extension-webm windows
   - haxelib list
 
 test_script:
   - haxelib run lime test windows
-  # haxelib run lime test windows
 
 build_script:
   - haxelib run lime build windows
-  # haxelib run lime build linux
 
 artifacts:
   - path: export/release/windows/bin

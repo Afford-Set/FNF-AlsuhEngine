@@ -8,7 +8,6 @@ environment:
 
 install:
   - haxelib install hmm
-  - haxelib run lime rebuild extension-webm linux
   - haxelib list
 
 test_script:

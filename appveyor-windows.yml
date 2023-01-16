@@ -6,6 +6,7 @@ environment:
 
 install:
   - haxelib install hmm
+  - haxelib run lime rebuild extension-webm windows
   - haxelib list
 
 test_script:

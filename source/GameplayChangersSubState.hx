@@ -850,7 +850,7 @@ class GameplayOption
 		}
 	}
 
-	private function get_type()
+	private function get_type():String
 	{
 		var newValue:String = 'bool';
 
@@ -863,7 +863,6 @@ class GameplayOption
 		}
 
 		type = newValue;
-
 		return type;
 	}
 }

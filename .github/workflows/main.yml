@@ -31,9 +31,11 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Install Haxelib
         run: |
+          sudo apt-get install vlc-bin
           sudo apt-get install libvlc-dev
           sudo apt-get install libvlccore-dev
-          sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev g++ g++-multilib gcc-multilib libasound2-dev libx11-dev libxext-dev libxi-dev libxrandr-dev libxinerama-dev
+          sudo apt-get -y install libidn12
+          sudo apt-get install gcc-multilib g++-multilib haxe -y
           haxelib setup ~/haxelib
           haxelib install hxcpp > /dev/null --quiet
           haxelib install hmm --quiet

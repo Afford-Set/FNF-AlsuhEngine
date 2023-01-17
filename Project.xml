@@ -50,7 +50,7 @@
 	<define name="LUA_ALLOWED" if="windows" />
 	<define name="hscriptPos" />
 	<define name="MP4_ALLOWED" if="desktop || android" unless="32bits"/>
-	<define name="WEBM_ALLOWED" if="windows" unless="32bits"/>
+	<define name="WEBM_ALLOWED" if="desktop" unless="32bits"/>
 	<define name="CRASH_HANDLER" if="desktop release" />
 
 	<!-- DONT ENABLE THIS -->

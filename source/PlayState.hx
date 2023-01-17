@@ -31,6 +31,10 @@ import DialogueBoxPsych;
 import shaders.WiggleEffect;
 import transition.Transition;
 
+#if MP4_ALLOWED
+import hxcodec.VideoHandler;
+#end
+
 #if WEBM_ALLOWED
 import webmlmfao.WebmHandler;
 import webmlmfao.VideoSubState;
@@ -1669,7 +1673,7 @@ class PlayState extends MusicBeatState
 				{
 					Debug.logWarn('Couldnt find video file: ' + name);
 					startAndEnd();
-		
+
 					return;
 				}
 
@@ -1693,7 +1697,7 @@ class PlayState extends MusicBeatState
 				{
 					Debug.logWarn('Couldnt find video file: ' + name);
 					startAndEnd();
-		
+
 					return;
 				}
 		

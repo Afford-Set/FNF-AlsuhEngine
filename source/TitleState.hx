@@ -487,16 +487,16 @@ class TitleState extends MusicBeatState
 				if (OptionData.watermarks)
 					createCoolText(['afford-set']);
 				else
-					createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er']);
+					createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er'], -30);
 			}
 			case 3:
-				addMoreText('present');
+				addMoreText('present', 30);
 			case 4:
 				deleteCoolText();
 			case 5:
 			{
 				if (OptionData.watermarks)
-					createCoolText(['Original by'], -20);
+					createCoolText(['Original by']);
 				else
 					createCoolText(['In association', 'with'], -40);
 			}
@@ -504,10 +504,10 @@ class TitleState extends MusicBeatState
 			{
 				if (OptionData.watermarks)
 				{
-					addMoreText('ninjamuffin99', 20);
-					addMoreText('phantomArcade', 20);
-					addMoreText('kawaisprite', 20);
-					addMoreText('evilsk8er', 20);
+					addMoreText('ninjamuffin99', 30);
+					addMoreText('phantomArcade', 30);
+					addMoreText('kawaisprite', 30);
+					addMoreText('evilsk8er', 30);
 				}
 				else
 				{

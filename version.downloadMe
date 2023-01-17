@@ -1,5 +1,7 @@
-1.6.9;
+1.6.10;
+- .Webm Videos now available on Linux and MacOS
 - Added lua callbacks: addBehindGF, addBehindDad, addBehindBF
+- Fixed stage lua check
 - Fixed lua methods: onStart, onEnd, onEndSong, onEndSongPost
 - Fixed some gameplay settings stuff
 - Fixed Starting Song on dialogue error

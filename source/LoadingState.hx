@@ -269,7 +269,7 @@ class LoadingState extends TransitionableState
 		var rootPath:Null<String> = null;
 
 		@:privateAccess
-		var libraryPaths = LimeAssets.libraryPaths;
+		var libraryPaths:Map<String, String> = LimeAssets.libraryPaths;
 		if (libraryPaths.exists(id))
 		{
 			path = libraryPaths[id];

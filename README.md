@@ -9,6 +9,8 @@ You must have [version 4.2.5 of Haxe](https://haxe.org/download/version/4.2.5/),
 open up a Command Prompt/PowerShell or Terminal, type `haxelib install hmm`
 after it finishes, simply type `haxelib run hmm install` in order to install all the needed libraries for *Alsuh Engine!*
 
+**WARNING:** After the libraries installation is complete, on Command Prompt/PowerShell type the following command: `haxelib run lime rebuild extension-webm [linux/windows/macos]`
+
 ## Customization:
 
 if you wish to disable things like *Lua Scripts* or *.MP4 Cutscenes* or *.Webm Cutscenes*, you can read over to `Project.xml`

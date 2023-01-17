@@ -477,7 +477,7 @@ class DebugLogWriter
 		#if sys
 		Sys.println(msg);
 		#else
-		haxe.Log.trace(msg, null); // Pass null to exclude the position.
+		Log.trace(msg, null); // Pass null to exclude the position.
 		#end
 	}
 }

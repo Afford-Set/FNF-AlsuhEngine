@@ -347,7 +347,7 @@ class AchievementObject extends FlxSpriteGroup
 		}
 
 		alpha = 0;
-	
+
 		achievementBG.cameras = cam;
 		achievementName.cameras = cam;
 		achievementText.cameras = cam;

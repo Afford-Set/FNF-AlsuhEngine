@@ -61,9 +61,9 @@ class Note extends FlxSprite
 	private var earlyHitMult:Float = 0.5;
 
 	public static var swagWidth:Float = 160 * 0.7;
+	public static var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
 
 	private var maxNote:Int = 4;
-	private var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
 	private var pixelInt:Array<Int> = [0, 1, 2, 3];
 
 	// Lua shit

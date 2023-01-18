@@ -1,6 +1,7 @@
-1.6.11;
+1.6.12;
 - .Webm Videos now available on Linux and MacOS
 - Added lua callbacks: addBehindGF, addBehindDad, addBehindBF
+- Fixed Note Colors Menu at vanilla notes
 - Fixed path "assets/fonts"
 - Fixed stage lua check
 - Fixed lua methods: onStart, onEnd, onEndSong, onEndSongPost

@@ -144,8 +144,8 @@ class NotesSubState extends MusicBeatSubState
 
 			var animations:Array<String> = Note.colArray.copy();
 			animations[i] = animations[i] + ' instance';
-			trace(animations[i]);
-			trace(animations[i] + ' 10000');
+			//trace(animations[i]);
+			//trace(animations[i] + ' 10000');
 			if (note.frames.getByName(animations[i] + ' 10000') == null) animations[i] = Note.colArray[i] + '0';
 
 			note.animation.addByPrefix('idle', animations[i]);

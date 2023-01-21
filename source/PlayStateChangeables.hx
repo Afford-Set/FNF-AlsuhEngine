@@ -12,6 +12,7 @@ class PlayStateChangeables
 	public static var playbackRate:Float = 1.0;
 	public static var healthGain:Float = 1.0;
 	public static var healthLoss:Float = 1.0;
+	public static var randomNotes:Bool = false;
 	public static var instaKill:Bool = false;
 	public static var botPlay:Bool = false;
 	public static var practiceMode:Bool = false;
@@ -23,6 +24,7 @@ class PlayStateChangeables
 		FlxG.save.data.playbackRate = playbackRate;
 		FlxG.save.data.healthGain = healthGain;
 		FlxG.save.data.healthLoss = healthLoss;
+		FlxG.save.data.randomNotes = randomNotes;
 		FlxG.save.data.instaKill = instaKill;
 		FlxG.save.data.botPlay = botPlay;
 		FlxG.save.data.practiceMode = practiceMode;
@@ -45,6 +47,9 @@ class PlayStateChangeables
 		}
 		if (FlxG.save.data.healthLoss != null) {
 			healthLoss = FlxG.save.data.healthLoss;
+		}
+		if (FlxG.save.data.randomNotes != null) {
+			randomNotes = FlxG.save.data.randomNotes;
 		}
 		if (FlxG.save.data.instaKill != null) {
 			instaKill = FlxG.save.data.instaKill;

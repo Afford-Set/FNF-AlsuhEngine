@@ -535,7 +535,7 @@ class NotesSubState extends MusicBeatSubState
 			PlayState.instance.notes.forEachAlive(function(note:Note):Void
 			{
 				@:privateAccess
-				var maxNote:Int = note.maxNote;
+				var maxNote:Int = Note.maxNote;
 				var noteData:Int = note.noteData;
 
 				if (noteData > -1 && noteData < OptionData.arrowHSV.length)

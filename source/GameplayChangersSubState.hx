@@ -95,6 +95,9 @@ class GameplayChangersSubState extends BaseSubState
 
 		if (!isPause)
 		{
+			var option:GameplayOption = new GameplayOption('Random Notes', 'randomNotes', 'bool', false);
+			optionsArray.push(option);
+
 			var option:GameplayOption = new GameplayOption('Instakill on Miss', 'instaKill', 'bool', false);
 			option.luaAllowed = true;
 			option.luaString = 'instakillOnMiss';

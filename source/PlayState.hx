@@ -1022,6 +1022,7 @@ class PlayState extends MusicBeatState
 
 	public var healthGain:Float = 1;
 	public var healthLoss:Float = 1;
+	public var randomNotes:Bool = false;
 	public var instakillOnMiss:Bool = false;
 	public var cpuControlled(default, set):Bool = false;
 	public var practiceMode:Bool = false;
@@ -1097,6 +1098,7 @@ class PlayState extends MusicBeatState
 		healthLoss = PlayStateChangeables.healthLoss;
 
 		instakillOnMiss = PlayStateChangeables.instaKill;
+		randomNotes = PlayStateChangeables.randomNotes;
 		cpuControlled = PlayStateChangeables.botPlay;
 		practiceMode = PlayStateChangeables.practiceMode;
 		playbackRate = PlayStateChangeables.playbackRate;
@@ -3029,14 +3031,13 @@ class PlayState extends MusicBeatState
 					gottaHitNote = !section.mustHitSection;
 				}
 
-				var oldNote:Note;
+				var oldNote:Note = null;
 
-				if (unspawnNotes.length > 0)
+				if (unspawnNotes.length > 0) {
 					oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
-				else
-					oldNote = null;
+				}
 
-				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote, false, false, gottaHitNote);
+				var swagNote:Note = new Note(daStrumTime, randomNotes ? FlxG.random.int(0, Note.maxNote - 1) : daNoteData, oldNote, false, false, gottaHitNote);
 				swagNote.mustPress = gottaHitNote;
 				swagNote.sustainLength = songNotes[2];
 				swagNote.gfNote = (section.gfSection && (songNotes[1] < 4));
@@ -3058,9 +3059,9 @@ class PlayState extends MusicBeatState
 					{
 						oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
 
-						var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote) + (Conductor.stepCrochet / FlxMath.roundDecimal(songSpeed, 2)), daNoteData, oldNote, true, false, gottaHitNote);
+						var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote) + (Conductor.stepCrochet / FlxMath.roundDecimal(songSpeed, 2)), swagNote.noteData, oldNote, true, false, gottaHitNote);
 						sustainNote.mustPress = gottaHitNote;
-						sustainNote.gfNote = (section.gfSection && (songNotes[1]<4));
+						sustainNote.gfNote = (section.gfSection && (songNotes[1] < 4));
 						sustainNote.noteType = swagNote.noteType;
 						sustainNote.scrollFactor.set();
 						swagNote.tail.push(sustainNote);

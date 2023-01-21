@@ -50,7 +50,7 @@ class MainMenuState extends TransitionableState
 	var camFollowPos:FlxObject;
 	var camFollow:FlxPoint;
 
-	public static var engineVersion:String = '1.6.13';
+	public static var engineVersion:String = '1.6.14';
 	public static var psychEngineVersion:String = '0.6.4';
 
 	public static var gameVersion(get, never):String;

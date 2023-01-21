@@ -1559,8 +1559,7 @@ class PlayState extends MusicBeatState
 						onComplete: function(twn:FlxTween):Void
 						{
 							camHUD.visible = true;
-
-							stopAndStart();
+							startCountdown();
 						}
 					});
 				}
@@ -1589,7 +1588,7 @@ class PlayState extends MusicBeatState
 							remove(whiteScreen);
 
 							moveCameraToGF(true);
-							stopAndStart();
+							startCountdown();
 						}
 					});
 
@@ -1635,7 +1634,7 @@ class PlayState extends MusicBeatState
 							onComplete: function(twn:FlxTween):Void
 							{
 								moveCameraToGF(true);
-								stopAndStart();
+								startCountdown();
 							}
 						});
 					});
@@ -1753,7 +1752,7 @@ class PlayState extends MusicBeatState
 			endSong();
 		}
 		else {
-			stopAndStart();
+			startCountdown();
 		}
 	}
 
@@ -1982,9 +1981,8 @@ class PlayState extends MusicBeatState
 			if (endingSong) {
 				doof.finishThing = endSong;
 			}
-			else
-			{
-				doof.finishThing = stopAndStart;
+			else {
+				doof.finishThing = startCountdown;
 			}
 
 			doof.nextDialogueThing = startNextDialogue;
@@ -2095,7 +2093,7 @@ class PlayState extends MusicBeatState
 					}
 				}
 				else {
-					stopAndStart();
+					startCountdown();
 				}
 
 				remove(black);
@@ -2153,7 +2151,7 @@ class PlayState extends MusicBeatState
 			weekSevenTweenCameraZoomShit = FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, timeForStuff, {ease: FlxEase.quadInOut});
 			cameraMovement('dad');
 
-			stopAndStart();
+			startCountdown();
 
 			blockedCameraMovementOnStart = false;
 			cameraMovementSection();

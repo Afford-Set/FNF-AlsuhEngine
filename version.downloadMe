@@ -1,8 +1,6 @@
-1.6.14;
+1.6.15;
+- Added Random Notes
 - Added Background Characters's Dance on Countdown
 - Fixed Difficulty Index Variable
 - Fixed Limo Dancers on enabling option "Low Quality"
-- Fixed Note Colors Menu at vanilla notes
-- Fixed path "assets/fonts"
 - Fixed returning to the chart editor when some settings are enabled
-- Fixed stage lua check

@@ -1,9 +1,7 @@
-1.6.12;
-- .Webm Videos now available on Linux and MacOS
-- Added lua callbacks: addBehindGF, addBehindDad, addBehindBF
+1.6.13;
+- Added Background Characters's Dance on Countdown
+- Fixed Difficulty Index Variable
 - Fixed Note Colors Menu at vanilla notes
 - Fixed path "assets/fonts"
+- Fixed returning to the chart editor when some settings are enabled
 - Fixed stage lua check
-- Fixed lua methods: onStart, onEnd, onEndSong, onEndSongPost
-- Fixed some gameplay settings stuff
-- Fixed Starting Song on dialogue error

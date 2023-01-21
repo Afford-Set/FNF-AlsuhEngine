@@ -325,7 +325,7 @@ class Debug
 			PlayState.SONG = Song.loadFromJson(songName + CoolUtil.getDifficultySuffix(difficulty, false, difficulties), songName);
 			PlayState.gameMode = 'freeplay';
 			PlayState.isStoryMode = false;
-			PlayState.storyDifficulty = difficulty;
+			PlayState.storyDifficultyID = difficulty;
 			PlayState.lastDifficulty = difficulty;
 			PlayState.seenCutscene = false;
 	

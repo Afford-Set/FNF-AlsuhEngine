@@ -143,8 +143,8 @@ class ReplaysMenuState extends TransitionableState
 					PlayState.isStoryMode = false;
 					PlayState.difficulties = PlayState.rep.replay.difficulties;
 					PlayState.lastDifficulty = PlayState.rep.replay.songDiff;
-					PlayState.storyDifficulty = PlayState.rep.replay.songDiff;
-					PlayState.storyWeek = PlayState.rep.replay.weekID;
+					PlayState.storyDifficultyID = PlayState.rep.replay.songDiff;
+					PlayState.storyWeekText = PlayState.rep.replay.weekID;
 					PlayState.storyWeekName = PlayState.rep.replay.weekName;
 
 					Debug.logInfo('Loading song ${PlayState.SONG.songName} from week ${PlayState.storyWeekName} into Replay...');

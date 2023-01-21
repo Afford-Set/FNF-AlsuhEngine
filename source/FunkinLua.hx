@@ -140,6 +140,8 @@ class FunkinLua
 		set('luaDebugMode', false);
 		set('luaDeprecatedWarnings', true);
 		set('inChartEditor', false);
+		set('playingCutscene', false);
+		set('allowPlayCutscene', false);
 
 		set('curBpm', Conductor.bpm);
 		set('bpm', PlayState.SONG.bpm);
@@ -148,19 +150,24 @@ class FunkinLua
 		set('stepCrochet', Conductor.stepCrochet);
 		set('songLength', FlxG.sound.music.length);
 		set('songID', PlayState.SONG.songID);
+		set('songPath', PlayState.SONG.songID);
 		set('songName', PlayState.SONG.songName);
 		set('startedCountdown', false);
+		set('curStage', PlayState.SONG.stage);
 
 		set('gameMode', PlayState.gameMode);
 		set('isStoryMode', PlayState.isStoryMode);
+		set('difficulty', PlayState.lastDifficultyNumber);
 		set('difficultyID', PlayState.lastDifficulty);
 		set('difficultyName', CoolUtil.getDifficultyName(PlayState.lastDifficulty, PlayState.difficulties));
 		set('difficultySuffix', CoolUtil.getDifficultySuffix(PlayState.lastDifficulty, PlayState.difficulties));
-
-		set('storyDifficultyID', PlayState.storyDifficulty);
-		set('storyDifficultyName', CoolUtil.getDifficultyName(PlayState.storyDifficulty, PlayState.difficulties));
-		set('storyDifficultySuffix', CoolUtil.getDifficultySuffix(PlayState.storyDifficulty, PlayState.difficulties));
-		set('weekID', PlayState.storyWeek);
+		set('storyDifficulty', PlayState.storyDifficulty);
+		set('storyDifficultyID', PlayState.storyDifficultyID);
+		set('storyDifficultyName', CoolUtil.getDifficultyName(PlayState.storyDifficultyID, PlayState.difficulties));
+		set('storyDifficultySuffix', CoolUtil.getDifficultySuffix(PlayState.storyDifficultyID, PlayState.difficulties));
+		set('weekRaw', PlayState.storyWeek);
+		set('week', WeekData.weeksList[PlayState.storyWeek]);
+		set('weekID', PlayState.storyWeekText);
 		set('weekName', PlayState.storyWeekName);
 		set('seenCutscene', PlayState.seenCutscene);
 
@@ -190,8 +197,6 @@ class FunkinLua
 		set('mustHitSection', false);
 		set('altAnim', false);
 		set('gfSection', false);
-
-		set('curStage', PlayState.SONG.stage);
 
 		set('healthGainMult', PlayStateChangeables.healthGain);
 		set('healthLossMult', PlayStateChangeables.healthLoss);
@@ -681,7 +686,7 @@ class FunkinLua
 			if (Paths.fileExists('data/' + name + '/' + name + diff + '.json', TEXT))
 			{
 				PlayState.SONG = Song.loadFromJson(name + diff, name);
-				PlayState.storyDifficulty = difficulty;
+				PlayState.storyDifficultyID = difficulty;
 				PlayState.lastDifficulty = difficulty;
 				PlayState.instance.persistentUpdate = false;
 
@@ -4260,6 +4265,9 @@ class FunkinLua
 					}
 					case 'ratingFC': {
 						newVar = 'comboRank';
+					}
+					case 'playingCutscene': {
+						newVar = 'allowPlayCutscene';
 					}
 				}
 			}

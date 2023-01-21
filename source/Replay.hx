@@ -87,7 +87,7 @@ class Replay
 		var json = {
 			"songID": PlayState.SONG.songID,
 			"songName": PlayState.SONG.songName,
-			"weekID": PlayState.storyWeek,
+			"weekID": PlayState.storyWeekText,
 			"weekName": PlayState.storyWeekName,
 			"songDiff": PlayState.lastDifficulty,
 			"difficulties": PlayState.difficulties,

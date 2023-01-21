@@ -331,7 +331,7 @@ class PauseSubState extends BaseSubState
 
 					PlayState.SONG = Song.loadFromJson(PlayState.SONG.songID + difficulty, PlayState.SONG.songID);
 					PlayState.lastDifficulty = CoolUtil.getDifficultyID(daSelected, false, PlayState.difficulties);
-					PlayState.usedPractice = PlayState.storyDifficulty != PlayState.lastDifficulty;
+					PlayState.usedPractice = PlayState.storyDifficultyID != PlayState.lastDifficulty;
 
 					FlxG.sound.music.volume = 0;
 					FlxG.resetState();

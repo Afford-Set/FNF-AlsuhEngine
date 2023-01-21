@@ -368,9 +368,9 @@ class StoryMenuState extends MusicBeatState
 
 					PlayState.storyPlaylist = songArray;
 					PlayState.weekLength = songArray.length;
-					PlayState.storyDifficulty = curDifficultyString;
+					PlayState.storyDifficultyID = curDifficultyString;
 					PlayState.lastDifficulty = curDifficultyString;
-					PlayState.storyWeek = curWeek.weekID;
+					PlayState.storyWeekText = curWeek.weekID;
 					PlayState.storyWeekName = curWeek.weekName;
 					PlayState.difficulties = curWeek.difficulties;
 
@@ -426,6 +426,7 @@ class StoryMenuState extends MusicBeatState
 		curWeek = weeksArray[curSelected];
 
 		WeekData.setDirectoryFromWeek(curWeek);
+		PlayState.storyWeekText = curWeek.weekID;
 
 		var bullShit:Int = 0;
 

@@ -9,7 +9,7 @@ You must have [version 4.2.5 of Haxe](https://haxe.org/download/version/4.2.5/),
 open up a Command Prompt/PowerShell or Terminal, type `haxelib install hmm`
 after it finishes, simply type `haxelib run hmm install` in order to install all the needed libraries for *Alsuh Engine!*
 
-**WARNING:** After the libraries installation is complete, on Command Prompt/PowerShell type the following command: `haxelib run lime rebuild extension-webm [linux/windows/macos]`
+**WARNING:** After the libraries installation is complete, on Command Prompt/PowerShell type this command: `haxelib run lime rebuild extension-webm [linux/windows/macos]`, if *.Webm Cutscenes* supported on selected platform.
 
 ## Customization:
 
@@ -28,7 +28,7 @@ It's the same as in the Psych Engine, only there are changes and additions shown
 
 ### Additions
 - Custom Inst and Voices on other difficulties
-- .WEBM Videos Support
+- .WEBM Videos Support (supported on Linux/Windows/MacOS)
 - Replays
 - Custom Achievements (original by [TheWorldMachinima](https://github.com/TheWorldMachinima))
 - PlayBack Rate/Pitch on other platforms (original by [Raltyro](https://github.com/Raltyro))

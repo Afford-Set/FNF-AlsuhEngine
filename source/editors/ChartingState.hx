@@ -55,9 +55,6 @@ import flixel.addons.display.FlxGridOverlay;
 
 using StringTools;
 
-@:access(flixel.system.FlxSound._sound)
-@:access(openfl.media.Sound.__buffer)
-
 class ChartingState extends MusicBeatUIState
 {
 	public static var noteTypeList:Array<String> =
@@ -1677,7 +1674,9 @@ class ChartingState extends MusicBeatUIState
 			updateGrid();
 			updateSectionUI();
 
-			vocals.play();
+			if (vocals != null) {
+				vocals.play();
+			}
 		};
 	}
 
@@ -2431,7 +2430,7 @@ class ChartingState extends MusicBeatUIState
 		}
 
 		lastConductorPos = Conductor.songPosition;
-		if (FlxG.sound.music.playing) updateText();
+		updateText();
 
 		super.update(elapsed);
 	}
@@ -2553,7 +2552,7 @@ class ChartingState extends MusicBeatUIState
 		{
 			var sound:FlxSound = FlxG.sound.music;
 
-			if (sound.buffer != null)
+			if (sound != null && sound.buffer != null)
 			{
 				var bytes:Bytes = sound.buffer.data.toBytes();
 
@@ -2573,7 +2572,7 @@ class ChartingState extends MusicBeatUIState
 		{
 			var sound:FlxSound = vocals;
 
-			if (sound.buffer != null)
+			if (sound != null && sound.buffer != null)
 			{
 				var bytes:Bytes = sound.buffer.data.toBytes();
 

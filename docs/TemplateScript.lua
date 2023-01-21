@@ -1,6 +1,6 @@
 -- Lua stuff
 
-function onStart(playingCutscene)
+function onStart(allowPlayCutscene)
 	-- this function is very simple, it is more similar to onStartCountdown
 	-- with this you can enable cut-scenes
 
@@ -8,7 +8,7 @@ function onStart(playingCutscene)
 
 	-- for dialogue cutscenes:
 	--[[
-			if playingCutscene then
+			if allowPlayCutscene then
 				runTimer('startDialogue', 0.8);
 				setProperty('inCutscene', true);
 				return Function_Stop;
@@ -18,7 +18,7 @@ function onStart(playingCutscene)
 
 	-- for mp4 cutscenes:
 	--[[
-			if playingCutscene then
+			if allowPlayCutscene then
 				startVideo('your-video', 'mp4');
 				setProperty('inCutscene', true);
 				return Function_Stop;
@@ -28,7 +28,7 @@ function onStart(playingCutscene)
 
 	-- for webm cutscenes:
 	--[[
-			if playingCutscene then
+			if allowPlayCutscene then
 				startVideo('your-video', 'webm');
 				setProperty('inCutscene', true);
 				return Function_Stop;
@@ -102,20 +102,56 @@ function onSongStart()
 	-- Inst and Vocals start playing, songPosition = 0
 end
 
-function onEndSong(playingCutscene)
+function onEndSong(allowPlayCutscene)
 	-- song ended/starting transition (Will be delayed if you're unlocking an achievement)
 	-- return Function_Stop to stop the song from ending for playing a cutscene or something.
-	return Function_Continue;
+
+	-- with this you can enable cut-scenes
+
+	-- Example:
+
+	-- for dialogue cutscenes:
+	--[[
+			if allowPlayCutscene then
+				runTimer('startDialogue', 0.8);
+				setProperty('inCutscene', true);
+				return Function_Stop;
+			end
+			return Function_Continue;
+	-- ]]
+
+	-- for mp4 cutscenes:
+	--[[
+			if allowPlayCutscene then
+				startVideo('your-video', 'mp4');
+				setProperty('inCutscene', true);
+				return Function_Stop;
+			end
+			return Function_Continue;
+	-- ]]
+
+	-- for webm cutscenes:
+	--[[
+			if allowPlayCutscene then
+				startVideo('your-video', 'webm');
+				setProperty('inCutscene', true);
+				return Function_Stop;
+			end
+			return Function_Continue;
+	-- ]]
 end
 
-function onEndSongPost(playingCutscene)
+function onEndSongPost(allowPlayCutscene)
 	-- end of "onEndSong"
 end
 
-function onEnd(playingCutscene)
-	-- this is a simple function like "onStart" and it is more similar to onEndSong and onEndSongPost
-	-- with this you can enable cut-scenes
+--[[
+-- this caller is no more available lol
+-- use onEndSong instead
+function onEnd()
+	return Function_Continue;
 end
+- ]]
 
 -- Substate interactions
 function onPause()

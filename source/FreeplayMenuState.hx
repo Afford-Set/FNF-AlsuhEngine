@@ -369,9 +369,9 @@ class FreeplayMenuState extends TransitionableState
 				PlayState.gameMode = 'freeplay';
 				PlayState.isStoryMode = false;
 				PlayState.difficulties = curSong.difficulties;
-				PlayState.storyDifficulty = curDifficultyString;
+				PlayState.storyDifficultyID = curDifficultyString;
 				PlayState.lastDifficulty = curDifficultyString;
-				PlayState.storyWeek = curSong.weekID;
+				PlayState.storyWeekText = curSong.weekID;
 				PlayState.storyWeekName = curSong.weekName;
 				PlayState.seenCutscene = false;
 
@@ -446,6 +446,7 @@ class FreeplayMenuState extends TransitionableState
 		curSelected = CoolUtil.boundSelection(curSelected + change, songsArray.length);
 
 		curSong = songsArray[curSelected];
+		PlayState.storyWeekText = curSong.weekID;
 
 		var bullShit:Int = 0;
 

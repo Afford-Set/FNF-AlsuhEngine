@@ -15,6 +15,7 @@ import flixel.math.FlxMath;
 import flixel.util.FlxTimer;
 import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
+import lime.app.Application;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
@@ -49,10 +50,22 @@ class MainMenuState extends TransitionableState
 	var camFollowPos:FlxObject;
 	var camFollow:FlxPoint;
 
-	public static var engineVersion:String = '1.6.12';
+	public static var engineVersion:String = '1.6.13';
 	public static var psychEngineVersion:String = '0.6.4';
 
-	public static var gameVersion:String = '0.2.8';
+	public static var gameVersion(get, never):String;
+
+	private static function get_gameVersion():String
+	{
+		var newValue:String = null;
+
+		if (Application.current != null && Application.current.meta != null) {
+			newValue = Application.current.meta.get('version');
+		}
+
+		if (newValue != null || newValue.length > 0) return newValue;
+		return '0.2.7.1';
+	}
 
 	var debugKeys:Array<FlxKey>;
 
@@ -170,7 +183,7 @@ class MainMenuState extends TransitionableState
 		#if ACHIEVEMENTS_ALLOWED
 		Achievements.loadAchievements();
 
-		var leDate = Date.now();
+		var leDate:Date = Date.now();
 
 		if (leDate.getDay() == 5 && leDate.getHours() >= 18)
 		{
@@ -252,7 +265,6 @@ class MainMenuState extends TransitionableState
 				if (FlxG.mouse.wheel != 0)
 				{
 					FlxG.sound.play(Paths.getSound('scrollMenu'));
-
 					changeSelection(-1 * FlxG.mouse.wheel);
 				}
 			}
@@ -362,7 +374,6 @@ class MainMenuState extends TransitionableState
 				}
 
 				camFollow.set(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y - add);
-
 				spr.centerOffsets();
 			}
 		});

@@ -17,6 +17,15 @@ using StringTools;
 
 class CoolUtil
 {
+	public static function getDifficultyIndex(diff:String, ?difficulties:Array<Dynamic> = null):Int
+	{
+		if (difficulties == null) {
+			difficulties = PlayState.difficulties;
+		}
+
+		return difficulties[1].indexOf(diff);
+	}
+
 	public static function getDifficultyName(diff:String, ?isSuffix:Null<Bool> = false, ?difficulties:Array<Dynamic> = null):String
 	{
 		if (difficulties == null) {

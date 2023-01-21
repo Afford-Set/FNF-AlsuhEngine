@@ -433,6 +433,18 @@ class WeekData
 		return (!leWeek.startUnlocked && leWeek.weekBefore.length > 0 && (!weekCompleted.exists(leWeek.weekBefore) || !weekCompleted.get(leWeek.weekBefore)));
 	}
 
+	@:deprecated("`WeekData.getWeekFileName()` is deprecated, use `PlayState.storyWeekText` instead")
+	public static function getWeekFileName():String
+	{
+		Debug.logWarn("`WeekData.getWeekFileName()` is deprecated! use `PlayState.storyWeekText` instead");
+		return weeksList[PlayState.storyWeek];
+	}
+
+	public static function getCurrentWeek():WeekData
+	{
+		return weeksLoaded.get(weeksList[PlayState.storyWeek]);
+	}
+
 	public static function setDirectoryFromWeek(?data:WeekData = null):Void
 	{
 		Paths.currentModDirectory = '';

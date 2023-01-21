@@ -2565,9 +2565,12 @@ class PlayState extends MusicBeatState
 					}
 					case 'limo':
 					{
-						grpLimoDancers.forEach(function(dancer:BackgroundDancer):Void {
-							dancer.dance();
-						});
+						if (grpLimoDancers != null)
+						{
+							grpLimoDancers.forEach(function(dancer:BackgroundDancer):Void {
+								dancer.dance();
+							});
+						}
 					}
 					case 'mall':
 					{
@@ -7004,9 +7007,12 @@ class PlayState extends MusicBeatState
 			}
 			case 'limo':
 			{
-				grpLimoDancers.forEach(function(dancer:BackgroundDancer):Void {
-					dancer.dance();
-				});
+				if (grpLimoDancers != null)
+				{
+					grpLimoDancers.forEach(function(dancer:BackgroundDancer):Void {
+						dancer.dance();
+					});
+				}
 
 				if (FlxG.random.bool(10) && fastCarCanDrive) {
 					fastCarDrive();

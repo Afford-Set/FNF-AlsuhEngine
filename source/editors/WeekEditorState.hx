@@ -1086,13 +1086,13 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 		difficultiesSuffixesInputText = new FlxUIInputText(10, difficultiesNamesInputText.y + 40, 200, '', 8);
 		blockPressWhileTypingOn.push(difficultiesSuffixesInputText);
 
-		tab_group.add(new FlxText(defaultDiffInputText.x, defaultDiffInputText.y - 20, 0, 'Default Difficulty\'s ID:Void:'));
+		tab_group.add(new FlxText(defaultDiffInputText.x, defaultDiffInputText.y - 20, 0, 'Default Difficulty\'s ID:'));
 		tab_group.add(new FlxText(difficultiesInputText.x, difficultiesInputText.y - 20, 0, 'Difficulties\'s IDs:'));
 		tab_group.add(new FlxText(difficultiesNamesInputText.x, difficultiesNamesInputText.y - 20, 0, 'Difficulties\'s Names:'));
 		tab_group.add(new FlxText(difficultiesSuffixesInputText.x, difficultiesSuffixesInputText.y - 20, 0, 'Difficulties\'s Suffixes:'));
 		tab_group.add(new FlxText(difficultiesSuffixesInputText.x, difficultiesSuffixesInputText.y + 20, 0, 'Default difficulties are "Easy, Normal, Hard"\nwithout quotes.'));
 
-		var hideFreeplayCheckbox:FlxUICheckBox = new FlxUICheckBox(10, 317.5, null, null, "Hide W:Voideek from Freeplay?", 100);
+		var hideFreeplayCheckbox:FlxUICheckBox = new FlxUICheckBox(10, 317.5, null, null, "Hide Week from Freeplay?", 100);
 		hideFreeplayCheckbox.checked = weekFile.hideFreeplay;
 		hideFreeplayCheckbox.callback = function():Void {
 			weekFile.hideFreeplay = hideFreeplayCheckbox.checked;

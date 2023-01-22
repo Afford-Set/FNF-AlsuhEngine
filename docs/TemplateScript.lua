@@ -1,5 +1,7 @@
 -- Lua stuff
 
+local allowStart = false;
+
 function onStart(allowPlayCutscene)
 	-- this function is very simple, it is more similar to onStartCountdown
 	-- with this you can enable cut-scenes
@@ -8,9 +10,10 @@ function onStart(allowPlayCutscene)
 
 	-- for dialogue cutscenes:
 	--[[
-			if allowPlayCutscene then
+			if allowPlayCutscene and not allowStart then
 				runTimer('startDialogue', 0.8);
 				setProperty('inCutscene', true);
+				allowStart = true;
 				return Function_Stop;
 			end
 			return Function_Continue;
@@ -18,9 +21,10 @@ function onStart(allowPlayCutscene)
 
 	-- for mp4 cutscenes:
 	--[[
-			if allowPlayCutscene then
+			if allowPlayCutscene and not allowStart then
 				startVideo('your-video', 'mp4');
 				setProperty('inCutscene', true);
+				allowStart = true;
 				return Function_Stop;
 			end
 			return Function_Continue;
@@ -28,9 +32,10 @@ function onStart(allowPlayCutscene)
 
 	-- for webm cutscenes:
 	--[[
-			if allowPlayCutscene then
+			if allowPlayCutscene and not allowStart then
 				startVideo('your-video', 'webm');
 				setProperty('inCutscene', true);
+				allowStart = true;
 				return Function_Stop;
 			end
 			return Function_Continue;
@@ -102,6 +107,8 @@ function onSongStart()
 	-- Inst and Vocals start playing, songPosition = 0
 end
 
+local allowEnd = false;
+
 function onEndSong(allowPlayCutscene)
 	-- song ended/starting transition (Will be delayed if you're unlocking an achievement)
 	-- return Function_Stop to stop the song from ending for playing a cutscene or something.
@@ -112,9 +119,10 @@ function onEndSong(allowPlayCutscene)
 
 	-- for dialogue cutscenes:
 	--[[
-			if allowPlayCutscene then
+			if allowPlayCutscene and not allowEnd then
 				runTimer('startDialogue', 0.8);
 				setProperty('inCutscene', true);
+				allowEnd = true;
 				return Function_Stop;
 			end
 			return Function_Continue;
@@ -122,9 +130,10 @@ function onEndSong(allowPlayCutscene)
 
 	-- for mp4 cutscenes:
 	--[[
-			if allowPlayCutscene then
+			if allowPlayCutscene and not allowEnd then
 				startVideo('your-video', 'mp4');
 				setProperty('inCutscene', true);
+				allowEnd = true;
 				return Function_Stop;
 			end
 			return Function_Continue;
@@ -132,9 +141,10 @@ function onEndSong(allowPlayCutscene)
 
 	-- for webm cutscenes:
 	--[[
-			if allowPlayCutscene then
+			if allowPlayCutscene and not allowEnd then
 				startVideo('your-video', 'webm');
 				setProperty('inCutscene', true);
+				allowEnd = true;
 				return Function_Stop;
 			end
 			return Function_Continue;

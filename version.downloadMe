@@ -1,6 +1,7 @@
 1.6.15;
 - Added Random Notes
 - Added Background Characters's Dance on Countdown
+- Fixed Cutscene Lua callbacks
 - Fixed Difficulty Index Variable
 - Fixed Limo Dancers on enabling option "Low Quality"
 - Fixed returning to the chart editor when some settings are enabled

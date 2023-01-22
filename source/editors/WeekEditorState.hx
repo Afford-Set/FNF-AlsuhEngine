@@ -76,7 +76,13 @@ class WeekEditorState extends MusicBeatUIState
 		
 		var ui_tex = Paths.getSparrowAtlas('storymenu/campaign_menu_UI_assets');
 
-		var bgYellow:FlxSprite = new FlxSprite(0, 56).makeGraphic(FlxG.width, 386, 0xFFF9CF51);
+		if (Paths.fileExists('images/campaign_menu_UI_assets.png', IMAGE)) {
+			ui_tex = Paths.getSparrowAtlas('campaign_menu_UI_assets');
+		}
+
+		var bgYellow:FlxSprite = new FlxSprite(0, 56);
+		bgYellow.makeGraphic(FlxG.width, 386, 0xFFF9CF51);
+
 		bgSprite = new FlxSprite(0, 56);
 		bgSprite.antialiasing = OptionData.globalAntialiasing;
 
@@ -85,7 +91,8 @@ class WeekEditorState extends MusicBeatUIState
 		weekThing.antialiasing = OptionData.globalAntialiasing;
 		add(weekThing);
 
-		var blackBarThingie:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, 56, FlxColor.BLACK);
+		var blackBarThingie:FlxSprite = new FlxSprite();
+		blackBarThingie.makeGraphic(FlxG.width, 56, FlxColor.BLACK);
 		add(blackBarThingie);
 		
 		grpWeekCharacters = new FlxTypedGroup<MenuCharacter>();
@@ -117,7 +124,14 @@ class WeekEditorState extends MusicBeatUIState
 		add(grpWeekCharacters);
 
 		var tracksSprite:FlxSprite = new FlxSprite(FlxG.width * 0.07, bgSprite.y + 435);
-		tracksSprite.loadGraphic(Paths.getImage('storymenu/Menu_Tracks'));
+
+		if (Paths.fileExists('images/Menu_Tracks.png', IMAGE)) {
+			tracksSprite.loadGraphic(Paths.getImage('Menu_Tracks'));
+		}
+		else {
+			tracksSprite.loadGraphic(Paths.getImage('storymenu/Menu_Tracks'));
+		}
+
 		tracksSprite.antialiasing = OptionData.globalAntialiasing;
 		add(tracksSprite);
 
@@ -156,25 +170,22 @@ class WeekEditorState extends MusicBeatUIState
 		UI_box.selected_tab_id = 'Week';
 		add(UI_box);
 
-		var loadWeekButton:FlxButton = new FlxButton(0, 650, "Load Week", function():Void
-		{
+		var loadWeekButton:FlxButton = new FlxButton(0, 650, "Load Week", function():Void {
 			loadWeek();
 		});
 
 		loadWeekButton.screenCenter(X);
 		loadWeekButton.x -= 120;
 		add(loadWeekButton);
-		
-		var freeplayButton:FlxButton = new FlxButton(0, 650, "Freeplay", function():Void
-		{
+
+		var freeplayButton:FlxButton = new FlxButton(0, 650, "Freeplay", function():Void {
 			FlxG.switchState(new WeekEditorFreeplayState(weekFile));
 		});
 
 		freeplayButton.screenCenter(X);
 		add(freeplayButton);
-	
-		var saveWeekButton:FlxButton = new FlxButton(0, 650, "Save Week", function():Void
-		{
+
+		var saveWeekButton:FlxButton = new FlxButton(0, 650, "Save Week", function():Void {
 			saveWeek(weekFile);
 		});
 
@@ -236,8 +247,7 @@ class WeekEditorState extends MusicBeatUIState
 		reloadWeekThing();
 
 		hideCheckbox = new FlxUICheckBox(10, weekFileInputText.y + 25, null, null, "Hide Week from Story Mode?", 100);
-		hideCheckbox.callback = function():Void
-		{
+		hideCheckbox.callback = function():Void {
 			weekFile.hideStoryMode = hideCheckbox.checked;
 		};
 
@@ -289,8 +299,7 @@ class WeekEditorState extends MusicBeatUIState
 		};
 
 		hiddenUntilUnlockCheckbox = new FlxUICheckBox(10, lockedCheckbox.y + 25, null, null, "Hidden until Unlocked", 110);
-		hiddenUntilUnlockCheckbox.callback = function():Void
-		{
+		hiddenUntilUnlockCheckbox.callback = function():Void {
 			weekFile.hiddenUntilUnlocked = hiddenUntilUnlockCheckbox.checked;
 		};
 		hiddenUntilUnlockCheckbox.alpha = 0.4;
@@ -442,17 +451,19 @@ class WeekEditorState extends MusicBeatUIState
 
 		if (assetName != null && assetName.length > 0)
 		{
-			if (#if MODS_ALLOWED FileSystem.exists(Paths.modsImages('storymenu/menubackgrounds/menu_' + assetName)) || #end
-				Assets.exists(Paths.getPath('images/storymenu/menubackgrounds/menu_' + assetName + '.png', IMAGE), IMAGE))
+			if (Paths.fileExists('images/menubackgrounds/menu_' + assetName + '.png', IMAGE))
+			{
+				bgSprite.loadGraphic(Paths.getImage('menubackgrounds/menu_' + assetName));
+				isMissing = false;
+			}
+			else if (Paths.fileExists('images/storymenu/menubackgrounds/menu_' + assetName + '.png', IMAGE))
 			{
 				bgSprite.loadGraphic(Paths.getImage('storymenu/menubackgrounds/menu_' + assetName));
 				isMissing = false;
 			}
 		}
 
-		if (isMissing) {
-			bgSprite.visible = false;
-		}
+		bgSprite.visible = !isMissing;
 	}
 
 	function reloadWeekThing():Void

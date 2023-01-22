@@ -170,10 +170,10 @@ class StoryMenuState extends MusicBeatState
 		var tracksSprite:FlxSprite = new FlxSprite(FlxG.width * 0.07, bgYellow.y + 425);
 
 		if (Paths.fileExists('images/Menu_Tracks.png', IMAGE)) {
-			tracksSprite.loadGraphic('Menu_Tracks');
+			tracksSprite.loadGraphic(Paths.getImage('Menu_Tracks'));
 		}
 		else {
-			tracksSprite.loadGraphic('storymenu/Menu_Tracks');
+			tracksSprite.loadGraphic(Paths.getImage('storymenu/Menu_Tracks'));
 		}
 
 		tracksSprite.antialiasing = OptionData.globalAntialiasing;

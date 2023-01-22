@@ -168,7 +168,14 @@ class StoryMenuState extends MusicBeatState
 		add(rightArrow);
 
 		var tracksSprite:FlxSprite = new FlxSprite(FlxG.width * 0.07, bgYellow.y + 425);
-		tracksSprite.loadGraphic(Paths.getImage('storymenu/Menu_Tracks'));
+
+		if (Paths.fileExists('images/Menu_Tracks.png', IMAGE)) {
+			tracksSprite.loadGraphic('Menu_Tracks');
+		}
+		else {
+			tracksSprite.loadGraphic('storymenu/Menu_Tracks');
+		}
+
 		tracksSprite.antialiasing = OptionData.globalAntialiasing;
 		add(tracksSprite);
 
@@ -503,6 +510,10 @@ class StoryMenuState extends MusicBeatState
 		}
 
 		curDifficultyString = newDifficulty;
+
+		PlayState.storyDifficultyID = curDifficultyString;
+		PlayState.lastDifficulty = curDifficultyString;
+		PlayState.difficulties = curWeek.difficulties;
 
 		#if !switch
 		intendedScore = Highscore.getWeekScore(CoolUtil.formatSong(curWeek.weekID, curDifficultyString));

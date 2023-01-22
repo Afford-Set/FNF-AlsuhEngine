@@ -525,6 +525,10 @@ class FreeplayMenuState extends TransitionableState
 		curDifficulty = CoolUtil.boundSelection(curDifficulty + change, curSong.difficulties[1].length);
 		curDifficultyString = curSong.difficulties[1][curDifficulty];
 
+		PlayState.storyDifficultyID = curDifficultyString;
+		PlayState.lastDifficulty = curDifficultyString;
+		PlayState.difficulties = curSong.difficulties;
+
 		#if !switch
 		intendedScore = Highscore.getScore(CoolUtil.formatSong(curSong.songID, curDifficultyString));
 		intendedAccuracy = Highscore.getAccuracy(CoolUtil.formatSong(curSong.songID, curDifficultyString));

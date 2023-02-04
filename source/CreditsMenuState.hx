@@ -183,7 +183,7 @@ class CreditsMenuState extends TransitionableState
 		add(descBox);
 
 		descText = new FlxText(50, 600, 1180, "", 32);
-		descText.setFormat(Paths.getFont("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		descText.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		descText.scrollFactor.set();
 		descText.borderSize = 2.4;
 		add(descText);
@@ -245,7 +245,7 @@ class CreditsMenuState extends TransitionableState
 				}
 			}
 
-			if ((controls.ACCEPT || FlxG.mouse.justPressed) && nextAccept <= 0 && (curCredit[3] != null || curCredit[3].length > 4))
+			if ((controls.ACCEPT || FlxG.mouse.justPressed) && nextAccept <= 0 && (curCredit[3] == null || curCredit[3].length > 4))
 			{
 				if (OptionData.flashingLights)
 				{

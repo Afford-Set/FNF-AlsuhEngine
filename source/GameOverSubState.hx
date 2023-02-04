@@ -120,7 +120,7 @@ class GameOverSubState extends MusicBeatSubState
 		bg.alpha = CoolUtil.coolLerp(bg.alpha, 0, 0.04);
 
 		if (updateCamera) {
-			camFollowPos.setPosition(CoolUtil.coolLerp(camFollowPos.x, camFollow.x, 0.025), CoolUtil.coolLerp(camFollowPos.y, camFollow.y, 0.025));
+			camFollowPos.setPosition(CoolUtil.coolLerp(camFollowPos.x, camFollow.x, 0.04), CoolUtil.coolLerp(camFollowPos.y, camFollow.y, 0.04));
 		}
 
 		var exit:Bool = controls.BACK || FlxG.mouse.justPressedRight;
@@ -209,26 +209,17 @@ class GameOverSubState extends MusicBeatSubState
 						PlayState.chartingMode = false;
 
 						WeekData.loadTheFirstEnabledMod();
-			
+
 						switch (PlayState.gameMode)
 						{
-							case 'story':
-							{
-								FlxG.switchState(new StoryMenuState());
-							}
-							case 'freeplay':
-							{
-								FlxG.switchState(new FreeplayMenuState());
-							}
+							case 'story': FlxG.switchState(new StoryMenuState());
+							case 'freeplay': FlxG.switchState(new FreeplayMenuState());
 							case 'replay':
 							{
 								Replay.resetVariables();
 								FlxG.switchState(new options.ReplaysMenuState());
 							}
-							default:
-							{
-								FlxG.switchState(new MainMenuState());
-							}
+							default: FlxG.switchState(new MainMenuState());
 						}
 					}
 					else {

@@ -104,12 +104,7 @@ class DialogueCharacter extends FlxSprite
 			path = Paths.getFile('portraits/$character.json', TEXT);
 		}
 
-		#if MODS_ALLOWED
-		rawJson = File.getContent(path);
-		#else
-		rawJson = Assets.getText(path);
-		#end
-		
+		rawJson = Paths.getTextFromFile(path);
 		jsonFile = cast Json.parse(rawJson);
 	}
 
@@ -650,13 +645,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 
 	public static function parseDialogue(path:String):DialogueFile
 	{
-		#if MODS_ALLOWED
-		if (FileSystem.exists(path)) {
-			return cast Json.parse(File.getContent(path));
-		}
-		#end
-
-		return cast Json.parse(Assets.getText(path));
+		return cast Json.parse(Paths.getTextFromFile(path));
 	}
 
 	public static function updateBoxOffsets(box:FlxSprite):Void // Had to make it static because of the editors

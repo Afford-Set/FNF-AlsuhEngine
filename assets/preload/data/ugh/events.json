@@ -1,11 +1,21 @@
 {
 	"song": {
-		"speed": 2.3,
-		"stage": "tank",
+		"speed": 1.8,
+		"stage": null,
 		"player1": "bf",
 		"player2": "tankman",
 		"player3": null,
 		"events": [
+			[
+				5625,
+				[
+					[
+						"Play Animation",
+						"singUP-alt",
+						"dad"
+					]
+				]
+			],
 			[
 				9375,
 				[
@@ -115,15 +125,48 @@
 						""
 					]
 				]
+			],
+			[
+				41625,
+				[
+					[
+						"Play Animation",
+						"singUP-alt",
+						"dad"
+					]
+				]
+			],
+			[
+				49125,
+				[
+					[
+						"Play Animation",
+						"singUP-alt",
+						"dad"
+					]
+				]
+			],
+			[
+				77625,
+				[
+					[
+						"Play Animation",
+						"singUP-alt",
+						"dad"
+					]
+				]
 			]
 		],
 		"notes": [],
-		"splashSkin": null,
-		"validScore": false,
-		"gfVersion": "gf-tankmen",
+		"splashSkin": "noteSplashes",
+		"arrowSkin2": "",
+		"gfVersion": null,
 		"bpm": 160,
-		"arrowSkin": null,
+		"splashSkin2": "noteSplashes",
+		"arrowSkin": "",
 		"needsVoices": true,
+		"songID": "ugh",
+		"songName": "Ugh",
 		"song": "Ugh"
 	}
 }

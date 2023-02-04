@@ -451,7 +451,7 @@ class ChartingState extends MusicBeatUIState
 		#end
 
 		var tempMap:Map<String, Bool> = new Map<String, Bool>();
-		var characters:Array<String> = CoolUtil.coolTextFile(Paths.getTxt('characterList'));
+		var characters:Array<String> = CoolUtil.listFromString(Paths.getTextFromFile('data/characterList.txt'));
 
 		for (i in 0...characters.length) {
 			tempMap.set(characters[i], true);
@@ -522,7 +522,7 @@ class ChartingState extends MusicBeatUIState
 
 		tempMap.clear();
 
-		var stageFile:Array<String> = CoolUtil.coolTextFile(Paths.getTxt('stageList'));
+		var stageFile:Array<String> = CoolUtil.listFromString(Paths.getTextFromFile('data/stageList.txt'));
 		var stages:Array<String> = [];
 
 		for (i in 0...stageFile.length) // Prevent duplicates
@@ -674,8 +674,16 @@ class ChartingState extends MusicBeatUIState
 
 		var loadAutosaveBtn:FlxButton = new FlxButton(200, reloadSongJson.y + 30, 'Load Autosave', function():Void
 		{
-			PlayState.SONG = Song.parseJSONshit(FlxG.save.data.autosave);
-			FlxG.resetState();
+			var newSong:SwagSong = Song.parseJSONshit(FlxG.save.data.autosave);
+
+			if (newSong != null)
+			{
+				PlayState.SONG = newSong;
+				FlxG.resetState();
+			}
+			else {
+				Debug.logWarn('Cannot load autosave.');
+			}
 		});
 
 		var saveEvents:FlxButton = new FlxButton(200, loadAutosaveBtn.y + 30, 'Save Events', function():Void {
@@ -685,13 +693,9 @@ class ChartingState extends MusicBeatUIState
 		var loadEventJson:FlxButton = new FlxButton(200, saveEvents.y + 30, 'Load Events', function():Void
 		{
 			var songName:String = _song.songID;
-			var file:String = Paths.getJson(songName + '/events');
+			var path:String = Paths.getJson('data/' + songName + '/events');
 
-			#if sys
-			if (#if MODS_ALLOWED FileSystem.exists(Paths.modsJson(songName + '/events')) || #end FileSystem.exists(file))
-			#else
-			if (OpenFlAssets.exists(file))
-			#end
+			if (Paths.fileExists(path, TEXT))
 			{
 				clearEvents();
 
@@ -1169,6 +1173,8 @@ class ChartingState extends MusicBeatUIState
 		}
 		#end
 
+		directories.push(Paths.getLibraryPathForce('custom_notetypes/', Paths.currentLevel));
+		directories.push(Paths.getLibraryPathForce('custom_notetypes/'));
 		directories.push(Paths.getPreloadPath('custom_notetypes/'));
 
 		for (i in 0...directories.length)
@@ -1250,6 +1256,8 @@ class ChartingState extends MusicBeatUIState
 		}
 		#end
 
+		directories.push(Paths.getLibraryPathForce('custom_events/', Paths.currentLevel));
+		directories.push(Paths.getLibraryPathForce('custom_events/'));
 		directories.push(Paths.getPreloadPath('custom_events/'));
 
 		for (i in 0...directories.length)
@@ -2904,27 +2912,11 @@ class ChartingState extends MusicBeatUIState
 	function loadHealthIconFromCharacter(char:String):String
 	{
 		var characterPath:String = 'characters/' + char + '.json';
-		#if MODS_ALLOWED
-		var path:String = Paths.modFolders(characterPath);
+		var rawJson:String = Paths.getTextFromFile('characters/' + Character.DEFAULT_CHARACTER + '.json');
 
-		if (!FileSystem.exists(path)) {
-			path = Paths.getPreloadPath(characterPath);
+		if (Paths.fileExists(characterPath, TEXT)) {
+			rawJson = Paths.getTextFromFile(characterPath);
 		}
-
-		if (!FileSystem.exists(path))
-		#else
-		var path:String = Paths.getPreloadPath(characterPath);
-
-		if (!OpenFlAssets.exists(path))
-		#end {
-			path = Paths.getPreloadPath('characters/' + Character.DEFAULT_CHARACTER + '.json'); // If a character couldn't be found, change him to BF just to prevent a crash
-		}
-
-		#if MODS_ALLOWED
-		var rawJson:String = File.getContent(path);
-		#else
-		var rawJson:String = OpenFlAssets.getText(path);
-		#end
 
 		var json:CharacterFile = cast Json.parse(rawJson);
 		return json.healthicon;
@@ -3015,7 +3007,7 @@ class ChartingState extends MusicBeatUIState
 				if (typeInt == null) theType = '?';
 
 				var daText:AttachedFlxText = new AttachedFlxText(0, 0, 100, theType, 24);
-				daText.setFormat(Paths.getFont("vcr.ttf"), 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				daText.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 				daText.xAdd = -32;
 				daText.yAdd = 6;
 				daText.borderSize = 1;
@@ -3041,7 +3033,7 @@ class ChartingState extends MusicBeatUIState
 				if (note.eventLength > 1) text = note.eventLength + ' Events:\n' + note.eventName;
 
 				var daText:AttachedFlxText = new AttachedFlxText(0, 0, 400, text, 12);
-				daText.setFormat(Paths.getFont("vcr.ttf"), 12, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE_FAST, FlxColor.BLACK);
+				daText.setFormat(Paths.getFont('vcr.ttf'), 12, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE_FAST, FlxColor.BLACK);
 				daText.xAdd = -410;
 				daText.borderSize = 1;
 				if (note.eventLength > 1) daText.yAdd += 8;

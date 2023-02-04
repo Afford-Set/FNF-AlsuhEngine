@@ -7,12 +7,15 @@ import sys.FileSystem;
 #end
 
 import haxe.Json;
-import flixel.FlxG;
-import lime.utils.Assets;
-import flash.media.Sound;
-import openfl.system.System;
-import openfl.utils.AssetType;
 import haxe.format.JsonParser;
+
+import flixel.FlxG;
+import openfl.text.Font;
+import lime.utils.Assets;
+import openfl.media.Sound;
+import openfl.system.System;
+import lime.media.AudioBuffer;
+import openfl.utils.AssetType;
 import openfl.display.BitmapData;
 import flixel.graphics.FlxGraphic;
 import openfl.utils.Assets as OpenFlAssets;
@@ -22,6 +25,8 @@ using StringTools;
 
 class Paths
 {
+	public static var songLibrary:String = 'songs';
+
 	public static var SOUND_EXT:String = #if web 'mp3' #else 'ogg' #end;
 	public static var VIDEO_EXT:String = 'mp4';
 
@@ -35,7 +40,7 @@ class Paths
 		'custom_notetypes',
 		'menucharacters',
 		'data',
-		'songs',
+		songLibrary,
 		'music',
 		'sounds',
 		'title',
@@ -60,7 +65,7 @@ class Paths
 	[
 		'assets/music/freakyMenu.$SOUND_EXT',
 		'assets/shared/music/breakfast.$SOUND_EXT',
-		'assets/shared/music/tea-time.$SOUND_EXT',
+		'assets/shared/music/tea-time.$SOUND_EXT'
 	];
 
 	public static function clearUnusedMemory():Void
@@ -103,7 +108,7 @@ class Paths
 
 		for (key in currentTrackedSounds.keys())
 		{
-			if (!localTrackedAssets.contains(key) && !dumpExclusions.contains(key) && key != null)
+			if (key != null && !localTrackedAssets.contains(key) && !dumpExclusions.contains(key))
 			{
 				Assets.cache.clear(key);
 				currentTrackedSounds.remove(key);
@@ -111,7 +116,10 @@ class Paths
 		}
 
 		localTrackedAssets = [];
-		#if !html5 openfl.Assets.cache.clear("songs"); #end
+
+		#if !html5
+		openfl.Assets.cache.clear(songLibrary);
+		#end
 	}
 
 	public static var currentLevel:String;
@@ -121,10 +129,15 @@ class Paths
 		currentLevel = name.toLowerCase();
 	}
 
-	public static function getPath(file:String, type:AssetType, ?library:Null<String> = null):String
+	public static function getPath(file:String, type:AssetType = TEXT, ?library:Null<String> = null):String
 	{
-		if (library != null) {
-			return getLibraryPath(file, library);
+		if (library != null)
+		{
+			if (library == 'preload' || library == 'default') {
+				return getPreloadPath(file);
+			}
+
+			return getLibraryPathForce(file, library);
 		}
 
 		if (currentLevel != null)
@@ -135,14 +148,14 @@ class Paths
 			{
 				levelPath = getLibraryPathForce(file, currentLevel);
 
-				if (OpenFlAssets.exists(levelPath, type)) {
+				if (fileExists(levelPath, type, currentLevel)) {
 					return levelPath;
 				}
 			}
 
-			levelPath = getLibraryPathForce(file, "shared");
+			levelPath = getLibraryPathForce(file, 'shared');
 
-			if (OpenFlAssets.exists(levelPath, type)) {
+			if (fileExists(levelPath, type, 'shared')) {
 				return levelPath;
 			}
 		}
@@ -150,14 +163,9 @@ class Paths
 		return getPreloadPath(file);
 	}
 
-	public static function getLibraryPath(file:String, library = "preload"):String
+	public static function getLibraryPathForce(file:String = '', library:String = 'shared'):String
 	{
-		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
-	}
-
-	public static function getLibraryPathForce(file:String, library:String):String
-	{
-		return '$library:assets/$library/$file';
+		return #if !sys '$library:' + #end getPreloadPath('$library/$file');
 	}
 
 	public static function getPreloadPath(file:String = ''):String
@@ -165,7 +173,7 @@ class Paths
 		return 'assets/$file';
 	}
 
-	public static function getFile(file:String, type:AssetType = TEXT, ?library:String):String
+	public static function getFile(file:String, type:AssetType = TEXT, ?library:Null<String> = null):String
 	{
 		#if MODS_ALLOWED
 		var path:String = modFolders(file);
@@ -188,91 +196,43 @@ class Paths
 
 	public static function getTxt(key:String, ?library:String):String
 	{
-		#if MODS_ALLOWED
-		var path:String = modsTxt(key);
-
-		if (FileSystem.exists(path)) {
-			return path;
+		if (key.endsWith('.txt')) {
+			key = key.replace('.txt', '');
 		}
-		#end
 
-		return getPath('data/$key.txt', TEXT, library);
-	}
-
-	@:deprecated("`Paths.txt()` is deprecated, use 'Paths.getTxt()' instead")
-	public static function txt(key:String, ?library:String):String
-	{
-		Debug.logWarn("`Paths.txt()` is deprecated! use 'Paths.getTxt()' instead");
-
-		return getTxt(key, library);
+		return getFile('$key.txt', TEXT, library);
 	}
 
 	public static function getXml(key:String, ?library:String):String
 	{
-		#if MODS_ALLOWED
-		var path:String = modsXml(key);
-
-		if (FileSystem.exists(path)) {
-			return path;
+		if (key.endsWith('.xml')) {
+			key = key.replace('.xml', '');
 		}
-		#end
 
-		return getPath('data/$key.xml', TEXT, library);
-	}
-
-	@:deprecated("`Paths.xml()` is deprecated, use 'Paths.getXml()' instead")
-	public static function xml(key:String, ?library:String):String
-	{
-		Debug.logWarn("`Paths.xml()` is deprecated! use 'Paths.getXml()' instead");
-
-		return getXml(key, library);
+		return getFile('$key.xml', TEXT, library);
 	}
 
 	public static function getJson(key:String, ?library:String):String
 	{
-		#if MODS_ALLOWED
-		var path:String = modsJson(key);
-
-		if (FileSystem.exists(path)) {
-			return path;
+		if (key.endsWith('.json')) {
+			key = key.replace('.json', '');
 		}
-		#end
 
-		return getPath('data/$key.json', TEXT, library);
-	}
-
-	@:deprecated("`Paths.json()` is deprecated, use 'Paths.getJson()' instead")
-	public static function json(key:String, ?library:String):String
-	{
-		Debug.logWarn("`Paths.json()` is deprecated! use 'Paths.getJson()' instead");
-
-		return getJson(key, library);
+		return getFile('$key.json', TEXT, library);
 	}
 
 	public static function getLua(key:String, ?library:String):String
 	{
-		#if MODS_ALLOWED
-		var path:String = modsLua(key);
-
-		if (FileSystem.exists(path)) {
-			return path;
+		if (key.endsWith('.lua')) {
+			key = key.replace('.lua', '');
 		}
-		#end
 
-		return getPath('$key.lua', TEXT, library);
-	}
-
-	@:deprecated("`Paths.lua()` is deprecated, use 'Paths.getLua()' instead")
-	public static function lua(key:String, ?library:String):String
-	{
-		Debug.logWarn("`Paths.lua()` is deprecated! use 'Paths.getLua()' instead");
-
-		return getLua(key, library);
+		return getFile('$key.lua', TEXT, library);
 	}
 
 	public static function getSound(key:String, ?library:String):Sound
 	{
-		return returnSound('sounds', key, library);
+		return getTrackedAudioFromFile('sounds', '$key', library);
 	}
 
 	@:deprecated("`Paths.sound()` is deprecated, use 'Paths.getSound()' instead")
@@ -298,7 +258,7 @@ class Paths
 
 	public static function getMusic(key:String, ?library:String):Sound
 	{
-		return returnSound('music', key, library);
+		return getTrackedAudioFromFile('music', '$key', library);
 	}
 
 	@:deprecated("`Paths.music()` is deprecated, use 'Paths.getMusic()' instead")
@@ -309,115 +269,115 @@ class Paths
 		return getMusic(key, library);
 	}
 
-	public static function getInst(song:String, ?difficulty:String = '', ?string:Bool = false):Any
+	public static function getInst(song:String, ?diffPath:String = '', ?isString:Bool = false):Any
 	{
-		var path:String = 'songs/' + song.toLowerCase() + '/Inst' + '.' + SOUND_EXT;
-		var pathAlt:String = 'songs/' + song.toLowerCase() + '/Inst' + difficulty + '.' + SOUND_EXT;
+		var songPath:String = Paths.formatToSongPath(song);
 
-		if (string)
+		var path:String = '$songPath/Inst.$SOUND_EXT';
+		var diffPath:String = '$songPath/Inst-$diffPath.$SOUND_EXT';
+
+		if (fileExists(#if sys songLibrary + '/' + #end diffPath, SOUND #if web , songLibrary #end))
 		{
-			if (fileExists(pathAlt, SOUND) || fileExists(pathAlt, MUSIC))
-			{
-				#if MODS_ALLOWED
-				if (FileSystem.exists(modFolders(pathAlt))) {
-					return modFolders(pathAlt);
-				}
-				#end
-
-				return #if !MODS_ALLOWED 'songs:' + #end 'assets/' + pathAlt;
+			if (isString) {
+				return getFile(#if sys songLibrary + '/' + #end diffPath, SOUND #if web , songLibrary #end);
 			}
 
-			if (Assets.exists('songs:assets/' + pathAlt)) {
-				return #if !MODS_ALLOWED 'songs:' + #end 'assets/' + pathAlt;
-			}
-
-			return #if !MODS_ALLOWED 'songs:' + #end 'assets/' + path;
+			return getTrackedAudioFromFile(songLibrary, diffPath);
 		}
 
-		if (fileExists(pathAlt, SOUND) || fileExists(pathAlt, MUSIC)) {
-			return returnSound('songs', song.toLowerCase() + '/Inst' + difficulty);
+		if (isString) {
+			return getFile(#if sys songLibrary + '/' + #end path, SOUND #if web , songLibrary #end);
 		}
 
-		return returnSound('songs', song.toLowerCase() + '/Inst');
+		return getTrackedAudioFromFile(songLibrary, path);
 	}
 
 	@:deprecated("`Paths.inst()` is deprecated, use 'Paths.getInst()' instead")
-	public static function inst(song:String, ?difficulty:String = '', ?string:Bool = false):Any
+	public static function inst(song:String, ?diffPath:String = '', ?isString:Bool = false):Any
 	{
 		Debug.logWarn("`Paths.inst()` is deprecated! use 'Paths.getInst()' instead");
 
-		return getInst(song, difficulty, string);
+		return getInst(song, diffPath, isString);
 	}
 
-	public static function getVoices(song:String, ?difficulty:String = '', ?string:Bool = false):Any
+	public static function getVoices(song:String, ?diffPath:String = '', ?isString:Bool = false):Any
 	{
-		var path:String = 'songs/' + song.toLowerCase() + '/Voices' + '.' + SOUND_EXT;
-		var pathAlt:String = 'songs/' + song.toLowerCase() + '/Voices' + difficulty + '.' + SOUND_EXT;
+		var songPath:String = Paths.formatToSongPath(song);
 
-		if (string)
+		var path:String = '$songPath/Voices.$SOUND_EXT';
+		var diffPath:String = '$songPath/Voices-$diffPath.$SOUND_EXT';
+
+		if (fileExists(#if sys songLibrary + '/' + #end diffPath, SOUND #if web , songLibrary #end))
 		{
-			if (fileExists(pathAlt, SOUND) || fileExists(pathAlt, MUSIC))
-			{
-				#if MODS_ALLOWED
-				if (FileSystem.exists(modFolders(pathAlt))) {
-					return modFolders(pathAlt);
-				}
-				#end
-
-				return #if !MODS_ALLOWED 'songs:' + #end 'assets/' + pathAlt;
+			if (isString) {
+				return getFile(#if sys songLibrary + '/' + #end diffPath, SOUND #if web , songLibrary #end);
 			}
 
-			if (Assets.exists('songs:assets/' + pathAlt)) {
-				return #if !MODS_ALLOWED 'songs:' + #end 'assets/' + pathAlt;
-			}
-
-			return #if !MODS_ALLOWED 'songs:' + #end 'assets/' + path;
+			return getTrackedAudioFromFile(songLibrary, diffPath);
 		}
 
-		if (fileExists(pathAlt, SOUND) || fileExists(pathAlt, MUSIC)) {
-			return returnSound('songs', song.toLowerCase() + '/Voices' + difficulty);
+		if (isString) {
+			return getFile(#if sys songLibrary + '/' + #end path, SOUND #if web , songLibrary #end);
 		}
 
-		return returnSound('songs', song.toLowerCase() + '/Voices');
+		return getTrackedAudioFromFile(songLibrary, path);
 	}
 
 	@:deprecated("`Paths.voices()` is deprecated, use 'Paths.getVoices()' instead")
-	public static function voices(song:String, ?difficulty:String = '', ?string:Bool = false):Any
+	public static function voices(song:String, ?diffPath:String = '', ?isString:Bool = false):Any
 	{
 		Debug.logWarn("`Paths.voices()` is deprecated! use 'Paths.getVoices()' instead");
 
-		return getVoices(song, difficulty, string);
+		return getVoices(song, diffPath, isString);
 	}
 
-	public static function getImage(key:String, ?library:String):FlxGraphic
+	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
+
+	public static function getImage(key:String, ?library:String = null):FlxGraphic
 	{
-		return returnGraphic(key, library);
+		if (key.endsWith('.png')) {
+			key.replace('.png', '');
+		}
+
+		var ourFile:String = getFile('images/$key.png', IMAGE, library);
+
+		if (fileExists(ourFile, IMAGE, library))
+		{
+			if (!currentTrackedAssets.exists(ourFile))
+			{
+				#if sys
+				var newBitmap:BitmapData = BitmapData.fromFile(ourFile);
+				var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(newBitmap, false, ourFile);
+				#else
+				var newGraphic:FlxGraphic = FlxG.bitmap.add(ourFile, false, ourFile);
+				#end
+
+				newGraphic.persist = true;
+				currentTrackedAssets.set(ourFile, newGraphic);
+			}
+
+			localTrackedAssets.push(ourFile);
+			return currentTrackedAssets.get(ourFile);
+		}
+
+		return null;
 	}
 
 	@:deprecated("`Paths.image()` is deprecated, use 'Paths.getImage()' instead")
-	public static function image(key:String, ?library:String):FlxGraphic
+	public static function image(key:String, ?library:String = null):FlxGraphic
 	{
 		Debug.logWarn("`Paths.image()` is deprecated! use 'Paths.getImage()' instead");
 
 		return getImage(key, library);
 	}
 
-	public static function getVideo(key:String, ?library:String, ?blyad:Bool = false):String
+	public static function getVideo(key:String, ?library:String):String
 	{
-		#if MODS_ALLOWED
-		var file:String = modsVideo(key);
-
-		if (FileSystem.exists(file)) {
-			return file;
+		if (key.endsWith('.$VIDEO_EXT')) {
+			key = key.replace('.$VIDEO_EXT', '');
 		}
-		#end
 
-		var shit:String = getPath('videos/$key.$VIDEO_EXT', BINARY, library);
-		if (blyad) return shit;
-
-		var replacedPath:String = shit.replace(currentLevel + ':', '');
-		replacedPath = replacedPath.replace(library + ':', '');
-		return replacedPath;
+		return getFile('videos/$key.$VIDEO_EXT', BINARY, library);
 	}
 
 	@:deprecated("`Paths.video()` is deprecated, use 'Paths.getVideo()' instead")
@@ -428,22 +388,13 @@ class Paths
 		return getVideo(key, library);
 	}
 
-	public static function getWebm(key:String, ?library:String, ?blyad:Bool = false):String
+	public static function getWebm(key:String, ?library:String):String
 	{
-		#if MODS_ALLOWED
-		var file:String = modsWebm(key);
-
-		if (FileSystem.exists(file)) {
-			return file;
+		if (key.endsWith('.webm')) {
+			key = key.replace('.webm', '');
 		}
-		#end
 
-		var shit:String = getPath('videos/$key.webm', BINARY, library);
-		if (blyad) return shit;
-
-		var replacedPath:String = shit.replace(currentLevel + ':', '');
-		replacedPath = replacedPath.replace(library + ':', '');
-		return replacedPath;
+		return getFile('videos/$key.webm', BINARY, library);
 	}
 
 	@:deprecated("`Paths.webm()` is deprecated, use 'Paths.getWebm()' instead")
@@ -456,7 +407,7 @@ class Paths
 
 	public static function getWebmSound(key:String, ?library:String):Sound
 	{
-		return returnSound('videos', key, library);
+		return getTrackedAudioFromFile('videos', key, library);
 	}
 
 	@:deprecated("`Paths.webmSound()` is deprecated, use 'Paths.getWebmSound()' instead")
@@ -464,169 +415,74 @@ class Paths
 	{
 		Debug.logWarn("`Paths.webmSound()` is deprecated! use 'Paths.getWebmSound()' instead");
 
-		return getWebmSound('videos', library);
+		return getWebmSound(key, library);
 	}
 
-	public static function getTextFromFile(key:String, ?ignoreMods:Bool = false):String
+	public static function getTextFromFile(key:String, ?library:String = null):String
 	{
-		#if sys
-		#if MODS_ALLOWED
-		if (!ignoreMods && FileSystem.exists(modFolders(key))) {
-			return File.getContent(modFolders(key));
-		}
-		#end
+		var ourPath:String = getFile(key, TEXT, library);
 
-		if (FileSystem.exists(getPreloadPath(key))) {
-			return File.getContent(getPreloadPath(key));
-		}
-
-		if (currentLevel != null)
+		if (Paths.fileExists(ourPath, TEXT, library))
 		{
-			var levelPath:String = '';
-	
-			if (currentLevel != 'shared')
-			{
-				levelPath = getLibraryPathForce(key, currentLevel);
-	
-				if (FileSystem.exists(levelPath)) {
-					return File.getContent(levelPath);
-				}
-			}
-
-			levelPath = getLibraryPathForce(key, 'shared');
-	
-			if (FileSystem.exists(levelPath)) {
-				return File.getContent(levelPath);
-			}
+			#if sys
+			return File.getContent(ourPath);
+			#else
+			return OpenFlAssets.getText(ourPath);
+			#end
 		}
-		#end
 
-		return Assets.getText(getPath(key, TEXT));
+		#if sys
+		return File.getContent(key);
+		#else
+		return OpenFlAssets.getText(key);
+		#end
 	}
 
 	public static function getFont(key:String, ?library:String):String
 	{
-		#if MODS_ALLOWED
-		var file:String = modsFont(key);
-
-		if (FileSystem.exists(file)) {
-			return file;
-		}
-		#end
-
-		return getPath('fonts/$key', FONT, library);
-	}
-
-	@:deprecated("`Paths.font()` is deprecated, use 'Paths.getFont()' instead")
-	public static function font(key:String, ?library:String):String
-	{
-		Debug.logWarn("`Paths.font()` is deprecated! use 'Paths.getFont()' instead");
-
-		return getFont(key, library);
+		return getFile('fonts/$key', FONT, library);
 	}
 
 	public static function getSparrowAtlas(key:String, ?library:String):FlxAtlasFrames
 	{
-		#if MODS_ALLOWED
-		var imageLoaded:FlxGraphic = returnGraphic(key);
-		var xmlExists:Bool = false;
-
-		if (FileSystem.exists(modsXml(key))) {
-			xmlExists = true;
-		}
-
-		return FlxAtlasFrames.fromSparrow((imageLoaded != null ? imageLoaded : getImage(key, library)), (xmlExists ? File.getContent(modsXml(key)) : getFile('images/$key.xml', library)));
-		#else
-		return FlxAtlasFrames.fromSparrow(getImage(key, library), getFile('images/$key.xml', library));
-		#end
+		return FlxAtlasFrames.fromSparrow(getImage(key, library), getTextFromFile(getXml('images/$key', library)));
 	}
 
 	public static function getPackerAtlas(key:String, ?library:String):FlxAtlasFrames
 	{
-		#if MODS_ALLOWED
-		var imageLoaded:FlxGraphic = returnGraphic(key);
-		var txtExists:Bool = false;
-
-		if (FileSystem.exists(modsTxt(key))) {
-			txtExists = true;
-		}
-
-		return FlxAtlasFrames.fromSpriteSheetPacker((imageLoaded != null ? imageLoaded : getImage(key, library)), (txtExists ? File.getContent(modsTxt(key)) : getFile('images/$key.txt', library)));
-		#else
-		return FlxAtlasFrames.fromSpriteSheetPacker(getImage(key, library), getFile('images/$key.txt', library));
-		#end
-	}
-
-	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
-
-	public static function returnGraphic(key:String, ?library:String):FlxGraphic
-	{
-		#if MODS_ALLOWED
-		var modKey:String = modsImages(key);
-
-		if (FileSystem.exists(modKey))
-		{
-			if (!currentTrackedAssets.exists(modKey))
-			{
-				var newBitmap:BitmapData = BitmapData.fromFile(modKey);
-				var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(newBitmap, false, modKey);
-
-				newGraphic.persist = true;
-				currentTrackedAssets.set(modKey, newGraphic);
-			}
-
-			localTrackedAssets.push(modKey);
-			return currentTrackedAssets.get(modKey);
-		}
-		#end
-
-		var path:String = getPath('images/$key.png', IMAGE, library);
-
-		if (OpenFlAssets.exists(path, IMAGE))
-		{
-			if (!currentTrackedAssets.exists(path))
-			{
-				var newGraphic:FlxGraphic = FlxG.bitmap.add(path, false, path);
-				newGraphic.persist = true;
-
-				currentTrackedAssets.set(path, newGraphic);
-			}
-
-			localTrackedAssets.push(path);
-			return currentTrackedAssets.get(path);
-		}
-
-		return null;
+		return FlxAtlasFrames.fromSpriteSheetPacker(getImage(key, library), getTextFromFile(getTxt('images/$key', library)));
 	}
 
 	public static var currentTrackedSounds:Map<String, Sound> = [];
 
-	public static function returnSound(path:String, key:String, ?library:String):Sound
+	public static function getTrackedAudioFromFile(path:String, key:String, ?library:String):Sound
 	{
-		#if MODS_ALLOWED
-		var file:String = modsSounds(path, key);
+		if (key.endsWith('.$SOUND_EXT')) {
+			key = key.replace('.$SOUND_EXT', '');
+		}
 
-		if (FileSystem.exists(file))
-		{
-			if (!currentTrackedSounds.exists(file)) {
-				currentTrackedSounds.set(file, Sound.fromFile(file));
-			}
+		var gottenPath:String = getFile('$key.$SOUND_EXT', SOUND, library);
 
-			localTrackedAssets.push(key);
-			return currentTrackedSounds.get(file);
+		if (path != null && path.length > 0) {
+			gottenPath = getFile('$path/$key.$SOUND_EXT', SOUND, library);
+		}
+
+		#if web
+		if (path == songLibrary) {
+			gottenPath = '$songLibrary:$gottenPath';
 		}
 		#end
 
-		var gottenPath:String = getPath('$path/$key.$SOUND_EXT', SOUND, library);
-		gottenPath = gottenPath.substring(gottenPath.indexOf(':') + 1, gottenPath.length);
-
 		if (!currentTrackedSounds.exists(gottenPath))
 		{
-			#if MODS_ALLOWED
-			currentTrackedSounds.set(gottenPath, Sound.fromFile('./' + gottenPath));
-			#else
-			currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound((path == 'songs' ? 'songs:' : '') + getPath('$path/$key.$SOUND_EXT', SOUND, library)));
-			#end
+			if (fileExists(gottenPath, SOUND, library))
+			{
+				#if sys
+				currentTrackedSounds.set(gottenPath, Sound.fromFile(gottenPath));
+				#else
+				currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(gottenPath));
+				#end
+			}
 		}
 
 		localTrackedAssets.push(gottenPath);
@@ -638,21 +494,23 @@ class Paths
 		var invalidChars:EReg = ~/[~&\\;:<>#]/;
 		var hideChars:EReg = ~/[.,'"%?!]/;
 
-		var path:String = invalidChars.split(path.replace(' ', '-')).join("-");
-		return hideChars.split(path).join("").toLowerCase();
+		var path:String = invalidChars.split(path.replace(' ', '-')).join('-');
+		return hideChars.split(path).join('').toLowerCase();
 	}
 
-	public static function fileExists(key:String, type:AssetType, ?ignoreMods:Bool = false):Bool
+	public static function fileExists(key:String, type:AssetType, ?library:String):Bool
 	{
-		#if MODS_ALLOWED
-		if (FileSystem.exists(mods(currentModDirectory + '/' + key)) || FileSystem.exists(mods(key))) {
+		var altPath:String = getFile(key, type, library);
+
+		#if sys
+		if (FileSystem.exists(key) || FileSystem.exists(altPath)) {
+			return true;
+		}
+		#else
+		if (OpenFlAssets.exists(key) || OpenFlAssets.exists(altPath)) {
 			return true;
 		}
 		#end
-		
-		if (OpenFlAssets.exists(Paths.getPath(key, type))) {
-			return true;
-		}
 
 		return false;
 	}
@@ -661,51 +519,6 @@ class Paths
 	public static function mods(key:String = ''):String
 	{
 		return 'mods/' + key;
-	}
-
-	public static function modsFont(key:String):String
-	{
-		return modFolders('fonts/' + key);
-	}
-
-	public static function modsJson(key:String):String
-	{
-		return modFolders('data/' + key + '.json');
-	}
-
-	public static function modsLua(key:String):String
-	{
-		return modFolders(key + '.lua');
-	}
-
-	public static function modsVideo(key:String):String
-	{
-		return modFolders('videos/' + key + '.' + VIDEO_EXT);
-	}
-
-	public static function modsWebm(key:String):String
-	{
-		return modFolders('videos/' + key + '.webm');
-	}
-
-	public static function modsSounds(path:String, key:String):String
-	{
-		return modFolders(path + '/' + key + '.' + SOUND_EXT);
-	}
-
-	public static function modsImages(key:String):String
-	{
-		return modFolders('images/' + key + '.png');
-	}
-
-	public static function modsXml(key:String):String
-	{
-		return modFolders('images/' + key + '.xml');
-	}
-
-	public static function modsTxt(key:String):String 
-	{
-		return modFolders('images/' + key + '.txt');
 	}
 
 	public static function modFolders(key:String):String
@@ -727,7 +540,7 @@ class Paths
 				return fileToCheck;
 			}
 		}
-	
+
 		return 'mods/' + key;
 	}
 
@@ -750,7 +563,7 @@ class Paths
 
 			for (i in list)
 			{
-				var dat = i.split("|");
+				var dat:Array<String> = i.split("|");
 	
 				if (dat[1] == "1")
 				{
@@ -793,7 +606,7 @@ class Paths
 			{
 				var path:String = Path.join([modsFolder, folder]);
 
-				if (sys.FileSystem.isDirectory(path) && !ignoreModFolders.contains(folder) && !list.contains(folder)) {
+				if (FileSystem.isDirectory(path) && !ignoreModFolders.contains(folder) && !list.contains(folder)) {
 					list.push(folder);
 				}
 			}

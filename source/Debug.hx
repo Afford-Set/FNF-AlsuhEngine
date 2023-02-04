@@ -3,6 +3,8 @@ package;
 import Song;
 
 #if desktop
+import sys.io.File;
+import sys.FileSystem;
 import sys.io.FileOutput;
 #end
 
@@ -32,7 +34,7 @@ class Debug
 	 * @param input The message to display.
 	 * @param pos This magic type is auto-populated, and includes the line number and class it was called from.
 	 */
-	public static inline function logError(input:Dynamic, ?pos:haxe.PosInfos):Void
+	public static inline function logError(input:Dynamic, ?pos:PosInfos):Void
 	{
 		if (input == null) return;
 
@@ -48,7 +50,7 @@ class Debug
 	 * @param input The message to display.
 	 * @param pos This magic type is auto-populated, and includes the line number and class it was called from.
 	 */
-	public static inline function logWarn(input:Dynamic, ?pos:haxe.PosInfos):Void
+	public static inline function logWarn(input:Dynamic, ?pos:PosInfos):Void
 	{
 		if (input == null) return;
 
@@ -63,7 +65,7 @@ class Debug
 	 * @param input The message to display.
 	 * @param pos This magic type is auto-populated, and includes the line number and class it was called from.
 	 */
-	public static inline function logInfo(input:Dynamic, ?pos:haxe.PosInfos):Void
+	public static inline function logInfo(input:Dynamic, ?pos:PosInfos):Void
 	{
 		if (input == null) return;
 
@@ -79,7 +81,7 @@ class Debug
 	 * @param input The message to display.
 	 * @param pos This magic type is auto-populated, and includes the line number and class it was called from.
 	 */
-	public static function logTrace(input:Dynamic, ?pos:haxe.PosInfos):Void
+	public static function logTrace(input:Dynamic, ?pos:PosInfos):Void
 	{
 		if (input == null) return;
 
@@ -343,7 +345,7 @@ class Debug
 		}
 	}
 
-	static function formatOutput(input:Dynamic, pos:haxe.PosInfos):Array<Dynamic>
+	static function formatOutput(input:Dynamic, pos:PosInfos):Array<Dynamic>
 	{
 		var inArray:Array<Dynamic> = null; // This code is junk but I kept getting Null Function References.
 
@@ -449,7 +451,7 @@ class DebugLogWriter
 	/**
 	 * Output text to the log file.
 	 */
-	public function write(input:Array<Dynamic>, logLevel = 'TRACE'):Void
+	public function write(input:Array<Dynamic>, logLevel:String = 'TRACE'):Void
 	{
 		var ts = FlxStringUtil.formatTime(getTime(), true);
 		var msg = '$ts [${logLevel.rpad(' ', 5)}] ${input.join('')}';

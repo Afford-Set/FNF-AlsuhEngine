@@ -44,7 +44,7 @@ class PreferencesSubState extends MusicBeatSubState
 		};
 		addOption(option);
 
-		#if !web
+		#if sys
 		var option:Option = new Option('Screen Resolution',
 			true,
 			'Choose your preferred screen resolution.',
@@ -836,7 +836,7 @@ class PreferencesSubState extends MusicBeatSubState
 		add(descBox);
 
 		descText = new FlxText(50, 600, 1180, "", 32);
-		descText.setFormat(Paths.getFont("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		descText.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		descText.scrollFactor.set();
 		descText.borderSize = 2.4;
 		add(descText);
@@ -1219,7 +1219,7 @@ class PreferencesSubState extends MusicBeatSubState
 
 	function onChangeHitsoundVolume():Void
 	{
-		#if !web
+		#if sys
 		if (OptionData.hitsoundType != 'None')
 		{
 			if (OptionData.hitsoundType == 'Kade') {

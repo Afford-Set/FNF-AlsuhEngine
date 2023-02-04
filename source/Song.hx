@@ -46,8 +46,6 @@ class Song
 			songJson.songID = Paths.formatToSongPath(songJson.song);
 		}
 
-		songJson.songID = Paths.formatToSongPath(songJson.songID);
-
 		if (songJson.songName == null) {
 			songJson.songName = CoolUtil.formatToName(songJson.song);
 		}
@@ -109,24 +107,8 @@ class Song
 
 	public static function loadFromJson(jsonInput:String, ?folder:Null<String> = null):Null<SwagSong>
 	{
-		var rawJson:String = null;
-
-		#if MODS_ALLOWED
-		var moddyFile:String = Paths.modsJson(folder + '/' + jsonInput);
-
-		if (FileSystem.exists(moddyFile)) {
-			rawJson = File.getContent(moddyFile).trim();
-		}
-		#end
-
-		if (rawJson == null)
-		{
-			#if sys
-			rawJson = File.getContent(Paths.getJson(folder + '/' + jsonInput)).trim();
-			#else
-			rawJson = Assets.getText(Paths.getJson(folder + '/' + jsonInput)).trim();
-			#end
-		}
+		var path:String = Paths.getJson('data/${Paths.formatToSongPath(folder)}/${Paths.formatToSongPath(jsonInput)}');
+		var rawJson:String = Paths.getTextFromFile(path);
 
 		while (!rawJson.endsWith('}')) {
 			rawJson = rawJson.substr(0, rawJson.length - 1);

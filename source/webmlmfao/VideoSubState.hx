@@ -50,16 +50,16 @@ class VideoSubState extends BaseSubState
 			"If Your On HTML5\nTap Anything...\nThe Bottom Text Indicates If You\nAre Using HTML5...\n\n" +
 			(isHTML ? "You Are Using HTML5!" : "You Are Not Using HTML5...\nThe Video Didnt Load!"),
 			32);
-		txt.setFormat(Paths.getFont("vcr.ttf"), 32, FlxColor.WHITE, CENTER);
+		txt.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, CENTER);
 		txt.screenCenter();
 		add(txt);
 
 		skipTxt = new FlxText(FlxG.width / 1.5, FlxG.height - 50, FlxG.width, 'hold ANY KEY to skip', 32);
-		skipTxt.setFormat(Paths.getFont("vcr.ttf"), 32, FlxColor.WHITE, LEFT);
+		skipTxt.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, LEFT);
 
 		if (GlobalVideo.isWebm)
 		{
-			if (Paths.fileExists('videos/$leSource.' + Paths.SOUND_EXT, SOUND) || Paths.fileExists('videos/$leSource.' + Paths.SOUND_EXT, MUSIC)) {
+			if (Paths.fileExists('videos/$leSource.${Paths.SOUND_EXT}', SOUND)) {
 				vidSound = FlxG.sound.play(Paths.getWebmSound(leSource), 1, false, null, true);
 			}
 		}

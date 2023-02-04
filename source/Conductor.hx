@@ -23,7 +23,7 @@ class Conductor
 
 	public static var bpmChangeMap:Array<BPMChangeEvent> = [];
 
-	public static function judgeNote(note:Note, diff:Float = 0, ?string:Null<Bool> = false):Any
+	public static function judgeNote(note:Note, diff:Float = 0, ?isString:Null<Bool> = false):Any
 	{
 		var data:Array<RatingData> = PlayState.instance.ratingsData; // shortening cuz fuck u
 
@@ -50,11 +50,11 @@ class Conductor
 		for (i in 0...data.length - 1) // skips last window (Shit)
 		{
 			if (diff <= data[i].hitWindow) {
-				return string ? data[i].image : data[i];
+				return isString ? data[i].image : data[i];
 			}
 		}
 	
-		return string ? data[data.length - 1].image : data[data.length - 1];
+		return isString ? data[data.length - 1].image : data[data.length - 1];
 	}
 
 	public static function getCrotchetAtTime(time:Float):Float

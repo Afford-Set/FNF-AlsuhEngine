@@ -4,13 +4,16 @@ package;
 import Discord.DiscordClient;
 #end
 
+#if desktop
+import lime.app.Application;
+#end
+
 #if CRASH_HANDLER
 import sys.io.File;
 import haxe.io.Path;
 import sys.FileSystem;
 import haxe.CallStack;
 import sys.io.Process;
-import lime.app.Application;
 import openfl.events.UncaughtErrorEvent;
 #end
 

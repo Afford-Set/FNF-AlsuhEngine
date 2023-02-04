@@ -76,13 +76,12 @@ class NoteSplash extends FlxSprite
 		colorSwap.brightness = brtColor;
 
 		var animNum:Int = FlxG.random.int(1, 2);
-		offset.x = -10;
 
 		if (isPsychArray[note][animNum]) {
-			offset.y = 0;
+			offset.set(-10, 0);
 		}
 		else {
-			offset.y = offset.x;
+			offset.set(-15, -15);
 		}
 
 		var ourPrefix:String = 'note$note-$animNum';

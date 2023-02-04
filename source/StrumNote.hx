@@ -23,7 +23,6 @@ class StrumNote extends FlxSprite
 	private var colors:Array<String> = ['purple', 'blue', 'green', 'red'];
 	private var colArray:Array<String> = ['LEFT', 'DOWN', 'UP', 'RIGHT'];
 	private var colArray2:Array<String> = [];
-	private var pixelInt:Array<Int> = [0, 1, 2, 3];
 	private var colArrayButVanilInt:Array<Int> = [1, 2, 4, 3];
 
 	public function new(x:Float, y:Float, leData:Int, player:Int):Void
@@ -117,7 +116,7 @@ class StrumNote extends FlxSprite
 
 	function loadPixelNoteAnims():Void
 	{
-		var pixelInt:Int = pixelInt[noteData];
+		var pixelInt:Int = Note.pixelInt[noteData];
 		animation.add(colors[noteData], [pixelInt + Note.maxNote]);
 
 		animation.add('static', [pixelInt]);

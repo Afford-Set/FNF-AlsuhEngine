@@ -120,7 +120,7 @@ class FreeplayMenuState extends TransitionableState
 			songText.setPosition(0, (70 * i) + 30);
 			grpSongs.add(songText);
 
-			var maxWidth:Float = 980;
+			var maxWidth:Int = 980;
 	
 			if (songText.width > maxWidth) {
 				songText.scaleX = maxWidth / songText.width;
@@ -138,7 +138,7 @@ class FreeplayMenuState extends TransitionableState
 		WeekData.setDirectoryFromWeek();
 
 		scoreText = new FlxText(FlxG.width * 0.7, 5, 0, "", 32);
-		scoreText.setFormat(Paths.getFont("vcr.ttf"), 32, FlxColor.WHITE, RIGHT);
+		scoreText.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, RIGHT);
 		add(scoreText);
 
 		scoreBG = new FlxSprite(scoreText.x - 6, 0);
@@ -165,7 +165,7 @@ class FreeplayMenuState extends TransitionableState
 		add(textBG);
 
 		var text:FlxText = new FlxText(textBG.x, textBG.y + 4, FlxG.width, leText, size);
-		text.setFormat(Paths.getFont("vcr.ttf"), size, FlxColor.WHITE, RIGHT);
+		text.setFormat(Paths.getFont('vcr.ttf'), size, FlxColor.WHITE, RIGHT);
 		text.scrollFactor.set();
 		add(text);
 
@@ -365,31 +365,37 @@ class FreeplayMenuState extends TransitionableState
 
 			if (Paths.fileExists('data/' + curSong.songID + '/' + curSong.songID + diffic + '.json', TEXT))
 			{
-				PlayState.SONG = Song.loadFromJson(curSong.songID + diffic, curSong.songID);
-				PlayState.gameMode = 'freeplay';
-				PlayState.isStoryMode = false;
-				PlayState.difficulties = curSong.difficulties;
-				PlayState.storyDifficultyID = curDifficultyString;
-				PlayState.lastDifficulty = curDifficultyString;
-				PlayState.storyWeekText = curSong.weekID;
-				PlayState.storyWeekName = curSong.weekName;
-				PlayState.seenCutscene = false;
-
-				Debug.logInfo('Loading song ${PlayState.SONG.songName} from week ${PlayState.storyWeekName} into Free Play...');
-
-				if (!OptionData.loadingScreen)
+				try
 				{
-					FlxG.sound.music.volume = 0;
-					destroyFreeplayVocals();
-				}
+					PlayState.SONG = Song.loadFromJson(curSong.songID + diffic, curSong.songID);
+					PlayState.gameMode = 'freeplay';
+					PlayState.isStoryMode = false;
+					PlayState.difficulties = curSong.difficulties;
+					PlayState.storyDifficultyID = curDifficultyString;
+					PlayState.lastDifficulty = curDifficultyString;
+					PlayState.storyWeekText = curSong.weekID;
+					PlayState.storyWeekName = curSong.weekName;
+					PlayState.seenCutscene = false;
 
-				#if MODS_ALLOWED
-				if (FlxG.keys.pressed.SHIFT) {
-					LoadingState.loadAndSwitchState(new editors.ChartingState(), true);
+					Debug.logInfo('Loading song ${PlayState.SONG.songName} from week ${PlayState.storyWeekName} into Free Play...');
+
+					if (!OptionData.loadingScreen)
+					{
+						FlxG.sound.music.volume = 0;
+						destroyFreeplayVocals();
+					}
+
+					#if desktop
+					if (FlxG.keys.pressed.SHIFT) {
+						LoadingState.loadAndSwitchState(new editors.ChartingState(), true);
+					}
+					else { #end
+						LoadingState.loadAndSwitchState(new PlayState(), true);
+					#if desktop } #end
 				}
-				else { #end
-					LoadingState.loadAndSwitchState(new PlayState(), true);
-				#if MODS_ALLOWED } #end
+				catch (e:Dynamic) {
+					Debug.logError('Error on file "' + curSong.songID + '/' + curSong.songID + diffic + '.json' + '": ' + e);
+				}
 			}
 			else {
 				Debug.logError('File "' + curSong.songID + '/' + curSong.songID + diffic + '.json' + '" does not exist!');

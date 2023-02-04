@@ -105,7 +105,7 @@ class WeekEditorState extends MusicBeatUIState
 		add(lock);
 		
 		missingFileText = new FlxText(0, 0, FlxG.width, "");
-		missingFileText.setFormat(Paths.getFont("vcr.ttf"), 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		missingFileText.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		missingFileText.borderSize = 2;
 		missingFileText.visible = false;
 		add(missingFileText); 
@@ -137,7 +137,7 @@ class WeekEditorState extends MusicBeatUIState
 
 		txtTracklist = new FlxText(FlxG.width * 0.05, tracksSprite.y + 60, 0, "", 32);
 		txtTracklist.alignment = CENTER;
-		txtTracklist.font = Paths.getFont("vcr.ttf");
+		txtTracklist.font = Paths.getFont('vcr.ttf');
 		txtTracklist.color = 0xFFe55777;
 		add(txtTracklist);
 		add(txtWeekTitle);
@@ -477,8 +477,17 @@ class WeekEditorState extends MusicBeatUIState
 
 		if (assetName != null && assetName.length > 0)
 		{
-			if (#if MODS_ALLOWED FileSystem.exists(Paths.modsImages('storymenu/menuitems/' + assetName)) || #end
-				Assets.exists(Paths.getPath('images/storymenu/menuitems/' + assetName + '.png', IMAGE), IMAGE))
+			if (Paths.fileExists('storymenu/$assetName.png', IMAGE))
+			{
+				weekThing.loadGraphic(Paths.getImage('storymenu/menuitems/' + assetName));
+				isMissing = false;
+			}
+			else if (Paths.fileExists('images/menuitems/' + assetName + '.png', IMAGE))
+			{
+				weekThing.loadGraphic(Paths.getImage('menuitems/' + assetName));
+				isMissing = false;
+			}
+			else if (Paths.fileExists('images/storymenu/menuitems/' + assetName + '.png', IMAGE))
 			{
 				weekThing.loadGraphic(Paths.getImage('storymenu/menuitems/' + assetName));
 				isMissing = false;

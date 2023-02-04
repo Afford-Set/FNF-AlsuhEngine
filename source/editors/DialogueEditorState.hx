@@ -96,17 +96,17 @@ class DialogueEditorState extends MusicBeatUIState
 		FlxG.mouse.visible = true;
 
 		var addLineText:FlxText = new FlxText(10, 10, FlxG.width - 20, 'Press O to remove the current dialogue line, Press P to add another line after the current one.', 8);
-		addLineText.setFormat(Paths.getFont("vcr.ttf"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		addLineText.setFormat(Paths.getFont('vcr.ttf'), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		addLineText.scrollFactor.set();
 		add(addLineText);
 
 		selectedText = new FlxText(10, 32, FlxG.width - 20, '', 8);
-		selectedText.setFormat(Paths.getFont("vcr.ttf"), 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		selectedText.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		selectedText.scrollFactor.set();
 		add(selectedText);
 
 		animText = new FlxText(10, 62, FlxG.width - 20, '', 8);
-		animText.setFormat(Paths.getFont("vcr.ttf"), 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		animText.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		animText.scrollFactor.set();
 		add(animText);
 

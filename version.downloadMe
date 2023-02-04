@@ -1,7 +1,10 @@
 1.6.15;
+- New Loading Screen 3.0
+- Added Optimized PNGs
 - Added Random Notes
-- Added Background Characters's Dance on Countdown
-- Fixed Cutscene Lua callbacks
-- Fixed Difficulty Index Variable
-- Fixed Limo Dancers on enabling option "Low Quality"
-- Fixed returning to the chart editor when some settings are enabled
+- Added uploading custom files to assets/ support
+- Replaced some from Fanmade files to Vanilla files
+- Fixed crash on other weeks
+- Fixed some stuff on Week Editor, Menu Character Editor and Story Menu
+- Fixed texts/strings stuff
+- Removed typos on Week Editor

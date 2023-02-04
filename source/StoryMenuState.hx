@@ -200,7 +200,7 @@ class StoryMenuState extends MusicBeatState
 		add(textBG);
 
 		var text:FlxText = new FlxText(textBG.x, textBG.y + 4, FlxG.width, "Press CTRL to open the Gameplay Changers Menu | Press RESET to Reset your Score.", 18);
-		text.setFormat(Paths.getFont("vcr.ttf"), 18, FlxColor.WHITE, RIGHT);
+		text.setFormat(Paths.getFont('vcr.ttf'), 18, FlxColor.WHITE, RIGHT);
 		text.scrollFactor.set();
 		add(text);
 

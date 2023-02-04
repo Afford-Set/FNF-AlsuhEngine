@@ -69,6 +69,28 @@
 		},
 		{
 			"offsets": [
+				-15,
+				-8
+			],
+			"indices": [],
+			"fps": 24,
+			"anim": "singLEFT-alt",
+			"loop": false,
+			"name": "TANKMAN UGH"
+		},
+		{
+			"offsets": [
+				-15,
+				-8
+			],
+			"indices": [],
+			"fps": 24,
+			"anim": "singRIGHT-alt",
+			"loop": false,
+			"name": "TANKMAN UGH"
+		},
+		{
+			"offsets": [
 				1,
 				16
 			],

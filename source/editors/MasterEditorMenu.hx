@@ -30,7 +30,7 @@ class MasterEditorMenu extends TransitionableState
 	];
 	private var directories:Array<String> = [null];
 
-	private var grpEditors:FlxTypedGroup<Alphabet>;
+	private var grpTexts:FlxTypedGroup<Alphabet>;
 	private var directoryTxt:FlxText;
 
 	public override function create():Void
@@ -62,16 +62,16 @@ class MasterEditorMenu extends TransitionableState
 		bg.color = 0xFF353535;
 		add(bg);
 
-		grpEditors = new FlxTypedGroup<Alphabet>();
-		add(grpEditors);
+		grpTexts = new FlxTypedGroup<Alphabet>();
+		add(grpTexts);
 
 		for (i in 0...editorsArray.length)
 		{
-			var editorText:Alphabet = new Alphabet(90, 320, editorsArray[i], true);
-			editorText.isMenuItem = true;
-			editorText.targetY = i - curSelected;
-			editorText.setPosition(0, (70 * i) + 30);
-			grpEditors.add(editorText);
+			var text:Alphabet = new Alphabet(90, 320, editorsArray[i], true);
+			text.isMenuItem = true;
+			text.targetY = i - curSelected;
+			text.setPosition(0, (70 * i) + 30);
+			grpTexts.add(text);
 		}
 
 		#if MODS_ALLOWED
@@ -81,7 +81,7 @@ class MasterEditorMenu extends TransitionableState
 		add(textBG);
 
 		directoryTxt = new FlxText(textBG.x, textBG.y + 4, FlxG.width, '', 32);
-		directoryTxt.setFormat(Paths.getFont("vcr.ttf"), 32, FlxColor.WHITE, CENTER);
+		directoryTxt.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, CENTER);
 		directoryTxt.scrollFactor.set();
 		add(directoryTxt);
 		
@@ -192,23 +192,23 @@ class MasterEditorMenu extends TransitionableState
 			}
 			case 'Character Editor':
 			{
-				LoadingState.loadAndSwitchState(new CharacterEditorState(Character.DEFAULT_CHARACTER, false), true);
+				LoadingState.loadAndSwitchState(new CharacterEditorState(Character.DEFAULT_CHARACTER, false), true, true);
 				return;
 			}
 			case 'Dialogue Editor':
 			{
-				LoadingState.loadAndSwitchState(new DialogueEditorState(), true);
+				LoadingState.loadAndSwitchState(new DialogueEditorState(), true, true);
 				return;
 			}
 			case 'Dialogue Portrait Editor':
 			{
-				LoadingState.loadAndSwitchState(new DialogueCharacterEditorState(), true);
+				LoadingState.loadAndSwitchState(new DialogueCharacterEditorState(), true, true);
 				return;
 			}
 			case 'Chart Editor':
 			{
 				PlayState.SONG = Song.loadFromJson('test', 'test');
-				LoadingState.loadAndSwitchState(new ChartingState(), true);
+				LoadingState.loadAndSwitchState(new ChartingState(), true, true);
 
 				return;
 			}
@@ -227,7 +227,7 @@ class MasterEditorMenu extends TransitionableState
 
 		var bullShit:Int = 0;
 
-		for (item in grpEditors.members)
+		for (item in grpTexts.members)
 		{
 			item.targetY = bullShit - curSelected;
 			bullShit++;
@@ -245,12 +245,7 @@ class MasterEditorMenu extends TransitionableState
 	#if MODS_ALLOWED
 	function changeDirectory(change:Int = 0):Void
 	{
-		curDirectory += change;
-
-		if (curDirectory < 0)
-			curDirectory = directories.length - 1;
-		if (curDirectory >= directories.length)
-			curDirectory = 0;
+		curDirectory += CoolUtil.boundSelection(curDirectory + change, directories.length);
 	
 		WeekData.setDirectoryFromWeek();
 

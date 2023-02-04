@@ -250,7 +250,7 @@ class ComboSubState extends BaseSubState
 		for (i in 0...4)
 		{
 			var text:FlxText = new FlxText(10, 48 + (i * 30), 0, '', 24);
-			text.setFormat(Paths.getFont("vcr.ttf"), 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+			text.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 			text.scrollFactor.set();
 			text.borderSize = 2;
 			dumbTexts.add(text);

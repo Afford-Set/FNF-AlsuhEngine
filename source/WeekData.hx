@@ -8,10 +8,7 @@ import sys.FileSystem;
 
 import haxe.Json;
 import Type.ValueType;
-
-import lime.utils.Assets;
 import haxe.format.JsonParser;
-import openfl.utils.Assets as OpenFlAssets;
 
 using StringTools;
 
@@ -410,15 +407,9 @@ class WeekData
 	{
 		var rawJson:String = null;
 
-		#if MODS_ALLOWED
-		if (FileSystem.exists(path)) {
-			rawJson = File.getContent(path);
+		if (Paths.fileExists(path, TEXT)) {
+			rawJson = Paths.getTextFromFile(path);
 		}
-		#else
-		if (OpenFlAssets.exists(path)) {
-			rawJson = Assets.getText(path);
-		}
-		#end
 
 		if (rawJson != null && rawJson.length > 0) {
 			return cast Json.parse(rawJson);

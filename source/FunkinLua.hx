@@ -1,7 +1,8 @@
 package;
 
-#if DISCORD_ALLOWED
-import Discord.DiscordClient;
+#if sys
+import sys.io.File;
+import sys.FileSystem;
 #end
 
 #if LUA_ALLOWED
@@ -11,9 +12,8 @@ import llua.State;
 import llua.Convert;
 #end
 
-#if sys
-import sys.io.File;
-import sys.FileSystem;
+#if DISCORD_ALLOWED
+import Discord.DiscordClient;
 #end
 
 #if hscript
@@ -53,6 +53,7 @@ import flixel.util.FlxTimer;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
+import openfl.utils.AssetType;
 import flixel.system.FlxSound;
 import openfl.display.BlendMode;
 import openfl.display.BitmapData;
@@ -233,7 +234,7 @@ class FunkinLua
 
 		for (value in luaPrefsMap)
 		{
-			if ((value != null || value.length > 1) && (value[0] != null || value[0].length > 0) && (value[1] != null)) {
+			if ((value != null && value.length > 1) && (value[0] != null && value[0].length > 0) && (value[1] != null)) {
 				set(value[0], value[1]);
 			}
 		}
@@ -641,30 +642,11 @@ class FunkinLua
 
 			var doPush:Bool = false;
 
-			#if MODS_ALLOWED
-			if (FileSystem.exists(Paths.modFolders(cervix)))
-			{
-				cervix = Paths.modFolders(cervix);
-				doPush = true;
-			}
-			else if (FileSystem.exists(cervix)) {
-				doPush = true;
-			}
-			else 
-			{
-				cervix = Paths.getPreloadPath(cervix);
+			cervix = Paths.getFile(cervix);
 
-				if (FileSystem.exists(cervix)) {
-					doPush = true;
-				}
-			}
-			#else
-			cervix = Paths.getPreloadPath(cervix);
-
-			if (Assets.exists(cervix)) {
+			if (Paths.fileExists(cervix, TEXT)) {
 				doPush = true;
 			}
-			#end
 
 			if (doPush)
 			{
@@ -739,7 +721,7 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "getProperty", function(variable:String):Dynamic
 		{
-			if (variable != null || variable.length > 0)
+			if (variable != null && variable.length > 0)
 			{
 				var blyad:String = getVariableByPrefix(getInstanceName(), variable);
 				variable = blyad;
@@ -760,7 +742,7 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "setProperty", function(variable:String, value:Dynamic):Bool
 		{
-			if (variable != null || variable.length > 0)
+			if (variable != null && variable.length > 0)
 			{
 				var blyad:String = getVariableByPrefix(getInstanceName(), variable);
 				variable = blyad;
@@ -780,7 +762,7 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "callFromObject", function(variable:String, ?arguments:Array<Dynamic>):Dynamic
 		{
-			if (variable != null || variable.length > 0)
+			if (variable != null && variable.length > 0)
 			{
 				var blyad:String = getCallerByPrefix(getInstanceName(), variable);
 				variable = blyad;
@@ -889,11 +871,11 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "getPropertyFromClass", function(classVar:String, variable:String):Dynamic
 		{
-			if (classVar != null || classVar.length > 0) {
+			if (classVar != null && classVar.length > 0) {
 				classVar = getClassNameByPrefix(classVar);
 			}
 
-			if ((classVar != null || classVar.length > 0) && (variable != null || variable.length > 0))
+			if ((classVar != null && classVar.length > 0) && (variable != null && variable.length > 0))
 			{
 				var blyad:String = getVariableByPrefix(classVar, variable);
 				variable = blyad;
@@ -913,11 +895,11 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "setPropertyFromClass", function(classVar:String, variable:String, value:Dynamic):Bool
 		{
-			if (classVar != null || classVar.length > 0) {
+			if (classVar != null && classVar.length > 0) {
 				classVar = getClassNameByPrefix(classVar);
 			}
 
-			if ((classVar != null || classVar.length > 0) && (variable != null || variable.length > 0))
+			if ((classVar != null && classVar.length > 0) && (variable != null && variable.length > 0))
 			{
 				var blyad:String = getVariableByPrefix(classVar, variable);
 				variable = blyad;
@@ -939,11 +921,11 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "callFromClass", function(classVar:String, variable:String, ?arguments:Array<Dynamic>):Dynamic
 		{
-			if (classVar != null || classVar.length > 0) {
+			if (classVar != null && classVar.length > 0) {
 				classVar = getClassNameByPrefix(classVar);
 			}
 
-			if ((classVar != null || classVar.length > 0) && (variable != null || variable.length > 0))
+			if ((classVar != null && classVar.length > 0) && (variable != null && variable.length > 0))
 			{
 				var blyad:String = getCallerByPrefix(classVar, variable);
 				variable = blyad;
@@ -1554,7 +1536,7 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "precacheImage", function(name:String):Void
 		{
-			Paths.returnGraphic(name);
+			Paths.getImage(name);
 		});
 
 		Lua_helper.add_callback(lua, "precacheSound", function(name:String):Void
@@ -1894,30 +1876,11 @@ class FunkinLua
 
 			var doPush:Bool = false;
 
-			#if MODS_ALLOWED
-			if (FileSystem.exists(Paths.modFolders(cervix)))
-			{
-				cervix = Paths.modFolders(cervix);
-				doPush = true;
-			}
-			else if (FileSystem.exists(cervix)) {
-				doPush = true;
-			}
-			else 
-			{
-				cervix = Paths.getPreloadPath(cervix);
+			cervix = Paths.getFile(cervix);
 
-				if (FileSystem.exists(cervix)) {
-					doPush = true;
-				}
-			}
-			#else
-			cervix = Paths.getPreloadPath(cervix);
-
-			if (Assets.exists(cervix)) {
+			if (Paths.fileExists(cervix, TEXT)) {
 				doPush = true;
 			}
-			#end
 
 			if (doPush)
 			{
@@ -1954,30 +1917,11 @@ class FunkinLua
 
 			var doPush:Bool = false;
 
-			#if MODS_ALLOWED
-			if (FileSystem.exists(Paths.modFolders(cervix)))
-			{
-				cervix = Paths.modFolders(cervix);
-				doPush = true;
-			}
-			else if (FileSystem.exists(cervix)) {
-				doPush = true;
-			}
-			else
-			{
-				cervix = Paths.getPreloadPath(cervix);
-	
-				if (FileSystem.exists(cervix)) {
-					doPush = true;
-				}
-			}
-			#else
-			cervix = Paths.getPreloadPath(cervix);
+			cervix = Paths.getFile(cervix);
 
-			if (Assets.exists(cervix)) {
+			if (Paths.fileExists(cervix, TEXT)) {
 				doPush = true;
 			}
-			#end
 
 			if (doPush)
 			{
@@ -1997,37 +1941,19 @@ class FunkinLua
 
 			var doPush:Bool = false;
 
-			#if MODS_ALLOWED
-			if (FileSystem.exists(Paths.modFolders(cervix)))
-			{
-				cervix = Paths.modFolders(cervix);
-				doPush = true;
-			}
-			else if (FileSystem.exists(cervix)) {
-				doPush = true;
-			}
-			else
-			{
-				cervix = Paths.getPreloadPath(cervix);
+			cervix = Paths.getFile(cervix);
 
-				if (FileSystem.exists(cervix)) {
-					doPush = true;
-				}
-			}
-			#else
-			cervix = Paths.getPreloadPath(cervix);
-
-			if (Assets.exists(cervix)) {
+			if (Paths.fileExists(cervix, TEXT)) {
 				doPush = true;
 			}
-			#end
 
 			if (doPush)
 			{
 				for (luaInstance in PlayState.instance.luaArray)
 				{
-					if (luaInstance.scriptName == cervix)
+					if (luaInstance.scriptName == cervix) {
 						return true;
+					}
 				}
 			}
 
@@ -2041,30 +1967,11 @@ class FunkinLua
 
 			var doPush:Bool = false;
 
-			#if MODS_ALLOWED
-			if (FileSystem.exists(Paths.modFolders(cervix)))
-			{
-				cervix = Paths.modFolders(cervix);
-				doPush = true;
-			}
-			else if (FileSystem.exists(cervix)) {
-				doPush = true;
-			}
-			else
-			{
-				cervix = Paths.getPreloadPath(cervix);
+			cervix = Paths.getFile(cervix);
 
-				if (FileSystem.exists(cervix)) {
-					doPush = true;
-				}
-			}
-			#else
-			cervix = Paths.getPreloadPath(cervix);
-
-			if (Assets.exists(cervix)) {
+			if (Paths.fileExists(cervix, TEXT)) {
 				doPush = true;
 			}
-			#end
 
 			if (doPush)
 			{
@@ -2094,30 +2001,11 @@ class FunkinLua
 
 			var doPush:Bool = false;
 
-			#if MODS_ALLOWED
-			if (FileSystem.exists(Paths.modFolders(cervix)))
-			{
-				cervix = Paths.modFolders(cervix);
-				doPush = true;
-			}
-			else if (FileSystem.exists(cervix)) {
-				doPush = true;
-			}
-			else
-			{
-				cervix = Paths.getPreloadPath(cervix);
+			cervix = Paths.getFile(cervix);
 
-				if (FileSystem.exists(cervix)) {
-					doPush = true;
-				}
-			}
-			#else
-			cervix = Paths.getPreloadPath(cervix);
-
-			if (Assets.exists(cervix)) {
+			if (Paths.fileExists(cervix, TEXT)) {
 				doPush = true;
 			}
-			#end
 
 			if (doPush)
 			{
@@ -2794,21 +2682,11 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "startDialogue", function(dialogueFile:String, music:String = null):Bool
 		{
-			var path:String = null;
-
-			#if MODS_ALLOWED
-			path = Paths.modsJson(PlayState.SONG.songID + '/' + dialogueFile);
-			if (!FileSystem.exists(path))
-			#end
-				path = Paths.getJson(PlayState.SONG.songID + '/' + dialogueFile);
+			var path:String = Paths.getJson('data/' + PlayState.SONG.songID + '/' + dialogueFile);
 
 			luaTrace('startDialogue: Trying to load dialogue: ' + path);
 
-			#if MODS_ALLOWED
-			if (FileSystem.exists(path))
-			#else
-			if (Assets.exists(path))
-			#end
+			if (Paths.fileExists(path, TEXT))
 			{
 				var dialogue:DialogueFile = DialogueBoxPsych.parseDialogue(path);
 
@@ -2845,7 +2723,7 @@ class FunkinLua
 				case 'webm':
 				{
 					#if WEBM_ALLOWED
-					if (FileSystem.exists(Paths.getWebm(videoFile)))
+					if (Paths.fileExists(Paths.getWebm(videoFile), BINARY))
 					{
 						PlayState.instance.startVideo(videoFile, type);
 						return;
@@ -2860,7 +2738,7 @@ class FunkinLua
 				default:
 				{
 					#if MP4_ALLOWED
-					if (FileSystem.exists(Paths.getVideo(videoFile)))
+					if (Paths.fileExists(Paths.getVideo(videoFile), BINARY))
 					{
 						PlayState.instance.startVideo(videoFile, type);
 						return;
@@ -3324,82 +3202,57 @@ class FunkinLua
 			luaTrace('setDataFromSave: Save file not initialized: ' + name, false, false, FlxColor.RED);
 		});
 
-		Lua_helper.add_callback(lua, "checkFileExists", function(filename:String, ?absolute:Bool = false):Bool
+		Lua_helper.add_callback(lua, "checkFileExists", function(filename:String, ?absolute:Bool = false, type:AssetType = TEXT):Bool
 		{
 			#if MODS_ALLOWED
 			if (absolute) {
 				return FileSystem.exists(filename);
 			}
-
-			var path:String = Paths.modFolders(filename);
-
-			if (FileSystem.exists(path)) {
-				return true;
-			}
-			return FileSystem.exists(Paths.getPath('assets/$filename', TEXT));
-			#else
-			if (absolute) {
-				return Assets.exists(filename);
-			}
-			return Assets.exists(Paths.getPath('assets/$filename', TEXT));
 			#end
+			
+			return Paths.fileExists(filename, type);
 		});
 
 		Lua_helper.add_callback(lua, "saveFile", function(path:String, content:String, ?absolute:Bool = false):Bool
 		{
 			try
 			{
+				#if MODS_ALLOWED
 				if (!absolute) {
 					File.saveContent(Paths.mods(path), content);
 				}
-				else {
+				else #end
 					File.saveContent(path, content);
-				}
 
 				return true;
 			}
 			catch (e:Dynamic) {
-				luaTrace("saveFile: Error trying to save " + path + ": " + e, false, false, FlxColor.RED);
+				luaTrace("saveFile: Error trying to save file on path \"" + path + "\": " + e, false, false, FlxColor.RED);
 			}
 
 			return false;
 		});
 
-		Lua_helper.add_callback(lua, "deleteFile", function(path:String, ?ignoreModFolders:Bool = false):Bool
+		Lua_helper.add_callback(lua, "deleteFile", function(path:String, ?ignoreModFolders:Bool = false):Void
 		{
 			try
 			{
-				#if MODS_ALLOWED
-				if (!ignoreModFolders)
-				{
-					var lePath:String = Paths.modFolders(path);
+				var lePath:String = Paths.getFile(path, TEXT);
 
-					if (FileSystem.exists(lePath))
-					{
-						FileSystem.deleteFile(lePath);
-						return true;
-					}
-				}
-				#end
-
-				var lePath:String = Paths.getPath(path, TEXT);
-
-				if (Assets.exists(lePath))
+				if (Paths.fileExists(lePath, TEXT))
 				{
 					FileSystem.deleteFile(lePath);
-					return true;
+					return;
 				}
 			}
 			catch (e:Dynamic) {
-				luaTrace("deleteFile: Error trying to delete " + path + ": " + e, false, false, FlxColor.RED);
+				luaTrace("deleteFile: Error trying to delete file on path \"" + path + "\": " + e, false, false, FlxColor.RED);
 			}
-
-			return false;
 		});
 
-		Lua_helper.add_callback(lua, "getTextFromFile", function(path:String, ?ignoreModFolders:Bool = false):String
+		Lua_helper.add_callback(lua, "getTextFromFile", function(path:String):String
 		{
-			return Paths.getTextFromFile(path, ignoreModFolders);
+			return Paths.getTextFromFile(path);
 		});
 
 		Lua_helper.add_callback(lua, "objectPlayAnimation", function(obj:String, name:String, forced:Bool = false, ?startFrame:Int = 0):Bool // DEPRECATED, DONT MESS WITH THESE SHITS, ITS JUST THERE FOR BACKWARD COMPATIBILITY
@@ -4426,7 +4279,7 @@ class ModchartText extends FlxText
 	{
 		super(x, y, width, text, 16);
 
-		setFormat(Paths.getFont("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		setFormat(Paths.getFont('vcr.ttf'), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 
 		cameras = [PlayState.instance.camHUD];
 
@@ -4447,7 +4300,7 @@ class DebugLuaText extends FlxText
 
 		super(10, 10, 0, text, 16);
 
-		setFormat(Paths.getFont("vcr.ttf"), 20, color, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		setFormat(Paths.getFont('vcr.ttf'), 20, color, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 
 		scrollFactor.set();
 		borderSize = 1;

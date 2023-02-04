@@ -55,7 +55,7 @@
 		{
 			"name": "hxcpp-debug-server",
 			"type": "haxelib",
-			"version": null
+			"version": "1.2.4"
 		},
 		{
 			"name": "actuate",
@@ -86,14 +86,14 @@
 		{
 			"name": "hxCodec",
 			"type": "git",
-			"version": null,
+			"dir": null,
 			"ref": "main",
 			"url": "https://github.com/polybiusproxy/hxCodec"
 		},
 		{
 			"name": "extension-webm",
 			"type": "git",
-			"version": null,
+			"dir": null,
 			"ref": "master",
 			"url": "https://github.com/GrowtopiaFli/extension-webm"
 		}

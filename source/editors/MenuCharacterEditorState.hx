@@ -88,7 +88,7 @@ class MenuCharacterEditorState extends MusicBeatUIState
 		var tipText:FlxText = new FlxText(0, 540, FlxG.width,
 			"Arrow Keys - Change Offset (Hold shift for 10x speed)
 			\nSpace - Play \"Start Press\" animation (Boyfriend Character Type)", 16);
-		tipText.setFormat(Paths.getFont("vcr.ttf"), 16, FlxColor.WHITE, CENTER);
+		tipText.setFormat(Paths.getFont('vcr.ttf'), 16, FlxColor.WHITE, CENTER);
 		tipText.scrollFactor.set();
 		add(tipText);
 
@@ -318,9 +318,15 @@ class MenuCharacterEditorState extends MusicBeatUIState
 	function reloadSelectedCharacter():Void
 	{
 		var char:MenuCharacter = grpWeekCharacters.members[curTypeSelected];
-
 		char.alpha = 1;
-		char.frames = Paths.getSparrowAtlas('storymenu/menucharacters/' + characterFile.image);
+
+		if (Paths.fileExists('menucharacters/' + characterFile.image + '.png', IMAGE)) {
+			char.frames = Paths.getSparrowAtlas('menucharacters/' + characterFile.image);
+		}
+		else {
+			char.frames = Paths.getSparrowAtlas('storymenu/menucharacters/' + characterFile.image);
+		}
+
 		char.isDanced = characterFile.isGF;
 
 		if (char.isDanced)

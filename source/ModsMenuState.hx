@@ -85,7 +85,7 @@ class ModsMenuState extends TransitionableState
 		add(bg);
 
 		noModsTxt = new FlxText(0, 0, FlxG.width, "NO MODS INSTALLED\nPRESS BACK TO EXIT AND INSTALL A MOD", 48);
-		noModsTxt.setFormat(Paths.getFont("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		noModsTxt.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		noModsTxt.scrollFactor.set();
 		noModsTxt.borderSize = 2;
 		noModsTxt.screenCenter();
@@ -158,7 +158,7 @@ class ModsMenuState extends TransitionableState
 		buttonsArray.push(buttonToggle);
 		visibleWhenHasMods.push(buttonToggle);
 
-		buttonToggle.label.setFormat(Paths.getFont("vcr.ttf"), 24, FlxColor.WHITE, CENTER);
+		buttonToggle.label.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.WHITE, CENTER);
 
 		setAllLabelsOffset(buttonToggle, -15, 10);
 		startX -= 70;
@@ -175,7 +175,7 @@ class ModsMenuState extends TransitionableState
 
 		buttonsArray.push(buttonUp);
 		visibleWhenHasMods.push(buttonUp);
-		buttonUp.label.setFormat(Paths.getFont("vcr.ttf"), 24, FlxColor.BLACK, CENTER);
+		buttonUp.label.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.BLACK, CENTER);
 
 		setAllLabelsOffset(buttonUp, -15, 10);
 		startX -= 70;
@@ -192,7 +192,7 @@ class ModsMenuState extends TransitionableState
 
 		buttonsArray.push(buttonDown);
 		visibleWhenHasMods.push(buttonDown);
-		buttonDown.label.setFormat(Paths.getFont("vcr.ttf"), 24, FlxColor.BLACK, CENTER);
+		buttonDown.label.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.BLACK, CENTER);
 
 		setAllLabelsOffset(buttonDown, -15, 10);
 
@@ -215,7 +215,7 @@ class ModsMenuState extends TransitionableState
 
 		buttonTop.setGraphicSize(80, 50);
 		buttonTop.updateHitbox();
-		buttonTop.label.setFormat(Paths.getFont("vcr.ttf"), 24, FlxColor.BLACK, CENTER);
+		buttonTop.label.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.BLACK, CENTER);
 		setAllLabelsOffset(buttonTop, 0, 10);
 		add(buttonTop);
 
@@ -246,7 +246,7 @@ class ModsMenuState extends TransitionableState
 
 		buttonDisableAll.setGraphicSize(170, 50);
 		buttonDisableAll.updateHitbox();
-		buttonDisableAll.label.setFormat(Paths.getFont("vcr.ttf"), 24, FlxColor.BLACK, CENTER);
+		buttonDisableAll.label.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.BLACK, CENTER);
 		buttonDisableAll.label.fieldWidth = 170;
 		setAllLabelsOffset(buttonDisableAll, 0, 10);
 		add(buttonDisableAll);
@@ -277,7 +277,7 @@ class ModsMenuState extends TransitionableState
 
 		buttonEnableAll.setGraphicSize(170, 50);
 		buttonEnableAll.updateHitbox();
-		buttonEnableAll.label.setFormat(Paths.getFont("vcr.ttf"), 24, FlxColor.BLACK, CENTER);
+		buttonEnableAll.label.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.BLACK, CENTER);
 		buttonEnableAll.label.fieldWidth = 170;
 		setAllLabelsOffset(buttonEnableAll, 0, 10);
 		add(buttonEnableAll);
@@ -288,7 +288,7 @@ class ModsMenuState extends TransitionableState
 		var startX:Int = 1100;
 
 		descriptionTxt = new FlxText(148, 0, FlxG.width - 216, "", 32);
-		descriptionTxt.setFormat(Paths.getFont("vcr.ttf"), 32, FlxColor.WHITE, LEFT);
+		descriptionTxt.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, LEFT);
 		descriptionTxt.scrollFactor.set();
 		add(descriptionTxt);
 

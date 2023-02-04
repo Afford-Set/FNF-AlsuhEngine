@@ -11,7 +11,7 @@ using StringTools;
 class OptionData
 {
 	public static var fullScreen:Bool = false;
-	#if !web
+	#if sys
 	public static var screenRes:String = '1280x720';
 	#end
 	public static var lowQuality:Bool = false;
@@ -68,7 +68,7 @@ class OptionData
 	#end
 	public static var autoPause:Bool = false;
 	public static var watermarks:Bool = #if ALSUH_WATERMARKS true #else false #end;
-	public static var loadingScreen:Bool = #if NO_PRELOAD_ALL true #else false #end;
+	public static var loadingScreen:Bool = true;
 	public static var flashingLights:Bool = true;
 
 	public static var comboOffset:Array<Int> = [0, 0, 0, 0];
@@ -134,7 +134,7 @@ class OptionData
 						case 'fullScreen': {
 							FlxG.fullscreen = fullScreen;
 						}
-						#if !web
+						#if sys
 						case 'screenRes':
 						{
 							var res:Array<String> = OptionData.screenRes.split('x');

@@ -75,7 +75,6 @@ class PauseSubState extends BaseSubState
 		difficultyChoices.push('BACK');
 
 		menuItems = menuItemsOG;
-
 		goToOptions = false;
 
 		if (!fromOptions)
@@ -205,7 +204,7 @@ class PauseSubState extends BaseSubState
 			if (menuItems[i] == 'Skip Time')
 			{
 				skipTimeText = new FlxText(0, 0, 0, '', 64);
-				skipTimeText.setFormat(Paths.getFont("vcr.ttf"), 64, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				skipTimeText.setFormat(Paths.getFont('vcr.ttf'), 64, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 				skipTimeText.scrollFactor.set();
 				skipTimeText.borderSize = 2;
 				skipTimeTracker = menuItem;

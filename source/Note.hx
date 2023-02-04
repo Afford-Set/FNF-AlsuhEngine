@@ -26,6 +26,7 @@ class Note extends FlxSprite
 	public var spawned:Bool = false;
 
 	public var rating:String = 'unknown';
+	public var ratingSus:String = 'shit';
 	public var ratingMod:Float = 0; // 9 = unknown, 0.25 = shit, 0.5 = bad, 0.75 = good, 1 = sick
 	public var ratingDisabled:Bool = false;
 
@@ -62,9 +63,8 @@ class Note extends FlxSprite
 
 	public static var maxNote:Int = 4;
 	public static var swagWidth:Float = 160 * 0.7;
+	public static var pixelInt:Array<Int> = [0, 1, 2, 3];
 	public static var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
-
-	private var pixelInt:Array<Int> = [0, 1, 2, 3];
 
 	// Lua shit
 	public var quickNoteSplash:Bool = false;
@@ -90,14 +90,14 @@ class Note extends FlxSprite
 	public var copyAngle:Bool = true;
 	public var copyAlpha:Bool = true;
 
-	public var hithealth_sick:Float = 0.025;
-	public var hithealth_sick_sus:Float = 0.0125;
-	public var hithealth_good:Float = 0.020;
-	public var hithealth_good_sus:Float = 0.010;
-	public var hithealth_bad:Float = 0.010;
-	public var hithealth_bad_sus:Float = 0.005;
-	public var hithealth_shit:Float = 0;
-	public var hithealth_shit_sus:Float = 0;
+	public static var hithealth_sick:Float = 0.025;
+	public static var hithealth_sick_sus:Float = 0.0125;
+	public static var hithealth_good:Float = 0.020;
+	public static var hithealth_good_sus:Float = 0.010;
+	public static var hithealth_bad:Float = 0.010;
+	public static var hithealth_bad_sus:Float = 0.005;
+	public static var hithealth_shit:Float = 0;
+	public static var hithealth_shit_sus:Float = 0;
 
 	public var missHealth:Float = 0.0475;
 
@@ -424,14 +424,15 @@ class Note extends FlxSprite
 	function loadPixelNoteAnims():Void
 	{
 		var ourCol:String = colArray[noteData];
+		var pixelInt:Int = pixelInt[noteData];
 
 		if (isSustainNote)
 		{
-			animation.add(ourCol + 'holdend', [pixelInt[noteData] + maxNote]);
-			animation.add(ourCol + 'hold', [pixelInt[noteData]]);
+			animation.add(ourCol + 'holdend', [pixelInt + maxNote]);
+			animation.add(ourCol + 'hold', [pixelInt]);
 		}
 		else {
-			animation.add(ourCol + 'Scroll', [pixelInt[noteData] + maxNote]);
+			animation.add(ourCol + 'Scroll', [pixelInt + maxNote]);
 		}
 	}
 

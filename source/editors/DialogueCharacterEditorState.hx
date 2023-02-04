@@ -137,27 +137,27 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 		hudGroup.add(box);
 
 		tipText = new FlxText(10, 10, FlxG.width - 20, TIP_TEXT_MAIN, 8);
-		tipText.setFormat(Paths.getFont("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		tipText.setFormat(Paths.getFont('vcr.ttf'), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		tipText.cameras = [camHUD];
 		tipText.scrollFactor.set();
 		add(tipText);
 
 		offsetLoopText = new FlxText(10, 10, 0, '', 32);
-		offsetLoopText.setFormat(Paths.getFont("vcr.ttf"), 32, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		offsetLoopText.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		offsetLoopText.cameras = [camHUD];
 		offsetLoopText.scrollFactor.set();
 		offsetLoopText.visible = false;
 		add(offsetLoopText);
 
 		offsetIdleText = new FlxText(10, 46, 0, '', 32);
-		offsetIdleText.setFormat(Paths.getFont("vcr.ttf"), 32, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		offsetIdleText.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		offsetIdleText.cameras = [camHUD];
 		offsetIdleText.scrollFactor.set();
 		offsetIdleText.visible = false;
 		add(offsetIdleText);
 
 		animText = new FlxText(10, 22, FlxG.width - 20, '', 8);
-		animText.setFormat(Paths.getFont("vcr.ttf"), 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		animText.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		animText.scrollFactor.set();
 		add(animText);
 

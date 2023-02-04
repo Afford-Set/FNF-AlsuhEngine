@@ -50,7 +50,7 @@ class MainMenuState extends TransitionableState
 	var camFollowPos:FlxObject;
 	var camFollow:FlxPoint;
 
-	public static var engineVersion:String = '1.6.14';
+	public static var engineVersion:String = '1.6.15';
 	public static var psychEngineVersion:String = '0.6.4';
 
 	public static var gameVersion(get, never):String;
@@ -63,7 +63,7 @@ class MainMenuState extends TransitionableState
 			newValue = Application.current.meta.get('version');
 		}
 
-		if (newValue != null || newValue.length > 0) return newValue;
+		if (newValue != null && newValue.length > 0) return newValue;
 		return '0.2.7.1';
 	}
 
@@ -350,7 +350,7 @@ class MainMenuState extends TransitionableState
 			case 'credits':
 				FlxG.switchState(new CreditsMenuState());
 			case 'options':
-				LoadingState.loadAndSwitchState(new options.OptionsMenuState());
+				LoadingState.loadAndSwitchState(new options.OptionsMenuState(), false, true);
 		}
 	}
 

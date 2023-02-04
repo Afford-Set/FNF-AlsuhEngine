@@ -1,9 +1,10 @@
 {
 	"song": {
 		"speed": 2.3,
-		"stage": "stage",
+		"stage": null,
 		"player1": "bf",
 		"player2": "dad",
+		"player3": null,
 		"events": [
 			[
 				32000,
@@ -237,12 +238,15 @@
 			]
 		],
 		"notes": [],
-		"splashSkin": null,
-		"validScore": false,
-		"gfVersion": "gf",
+		"splashSkin": "noteSplashes",
+		"arrowSkin2": "",
+		"gfVersion": null,
 		"bpm": 180,
-		"arrowSkin": null,
+		"splashSkin2": "noteSplashes",
+		"arrowSkin": "",
 		"needsVoices": true,
+		"songID": "dad-battle",
+		"songName": "Dad Battle",
 		"song": "Dad Battle"
 	}
 }

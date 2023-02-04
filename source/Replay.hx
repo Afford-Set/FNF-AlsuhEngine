@@ -99,7 +99,7 @@ class Replay
 			"timestamp": Date.now()
 		};
 
-		var data:String = Json.stringify(json);
+		var data:String = Json.stringify(json, 't');
 
 		#if sys
 		File.saveContent("assets/replays/replay-" + PlayState.SONG.songID + '-' + PlayState.lastDifficulty + "-time-" + Date.now().getTime() + ".rep", data);

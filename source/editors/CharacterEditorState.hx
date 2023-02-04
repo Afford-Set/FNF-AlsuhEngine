@@ -143,7 +143,7 @@ class CharacterEditorState extends MusicBeatUIState
 		add(dumbTexts);
 
 		textAnim = new FlxText(300, 16);
-		textAnim.setFormat(Paths.getFont("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		textAnim.setFormat(Paths.getFont('vcr.ttf'), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		textAnim.borderSize = 1;
 		textAnim.size = 32;
 		textAnim.scrollFactor.set();
@@ -1217,7 +1217,7 @@ class CharacterEditorState extends MusicBeatUIState
 			}
 		}
 		#else
-		characterList = CoolUtil.coolTextFile(Paths.getTxt('characterList'));
+		characterList = CoolUtil.listFromString(Paths.getTextFromFile('data/characterList.txt'));
 		#end
 
 		charDropDown.setData(FlxUIDropDownMenuCustom.makeStrIdLabelArray(characterList, true));

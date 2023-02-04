@@ -86,11 +86,7 @@ class MenuCharacter extends FlxSprite
 					path = Paths.getFile('menucharacters/$character.json', TEXT);
 				}
 
-				#if MODS_ALLOWED
-				rawJson = File.getContent(path);
-				#else
-				rawJson = Assets.getText(path);
-				#end
+				rawJson = Paths.getTextFromFile(path);
 				
 				var charFile:MenuCharacterFile = cast Json.parse(rawJson);
 

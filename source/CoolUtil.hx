@@ -69,12 +69,15 @@ class CoolUtil
 
 	public static function boundSelection(selection:Int, max:Int):Int
 	{
-		return if (selection < 0)
-			max - 1;
-		else if (selection >= max)
-			0;
-		else
-			selection;
+		if (selection < 0) {
+			return max - 1;
+		}
+
+		if (selection >= max) {
+			return 0;
+		}
+
+		return selection;
 	}
 
 	public static function quantize(f:Float, snap:Float):Float

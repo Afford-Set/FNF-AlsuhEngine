@@ -68,7 +68,7 @@ class OutdatedState extends TransitionableState
 		}
 
 		if (controls.ACCEPT || FlxG.mouse.justPressed) {
-			CoolUtil.browserLoad('https://github.com/AlanSurtaev2008/FNF-AlsuhEngine/releases/latest');
+			CoolUtil.browserLoad('https://github.com/Afford-Set/FNF-AlsuhEngine/releases/latest');
 		}
 	}
 }

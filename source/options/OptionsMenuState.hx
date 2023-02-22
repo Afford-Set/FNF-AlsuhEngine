@@ -20,7 +20,7 @@ class OptionsMenuState extends TransitionableState
 {
 	public static var curSelected:Int = 0;
 
-	private var options:Array<String> = ['Preferences', 'Controls', 'Note Colors', 'Adjust Delay and Combo', #if sys 'Replays', #end 'Exit'];
+	private var options:Array<String> = ['Preferences', 'Controls', 'Note Colors', 'Adjust Delay and Combo', #if REPLAYS_ALLOWED 'Replays', #end 'Exit'];
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 
 	var selectorLeft:Alphabet;
@@ -55,7 +55,7 @@ class OptionsMenuState extends TransitionableState
 				FlxG.sound.play(Paths.getSound('cancelMenu'));
 				FlxG.switchState(new CreditsMenuState());
 			}
-			#if sys
+			#if REPLAYS_ALLOWED
 			case 'Replays':
 			{
 				FlxG.sound.play(Paths.getSound('cancelMenu'));
@@ -80,7 +80,7 @@ class OptionsMenuState extends TransitionableState
 
 		super.create();
 
-		if (FlxG.sound.music.playing == false || FlxG.sound.music.volume == 0) {
+		if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {
 			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 		}
 

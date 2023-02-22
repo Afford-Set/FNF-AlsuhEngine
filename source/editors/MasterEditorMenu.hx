@@ -41,7 +41,7 @@ class MasterEditorMenu extends TransitionableState
 
 		FlxG.camera.bgColor = FlxColor.BLACK;
 
-		if (FlxG.sound.music.playing == false || FlxG.sound.music.volume == 0) {
+		if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {
 			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 		}
 
@@ -214,11 +214,8 @@ class MasterEditorMenu extends TransitionableState
 			}
 		}
 
-		if (!OptionData.loadingScreen)
-		{
-			FlxG.sound.music.volume = 0;
-			FreeplayMenuState.destroyFreeplayVocals();
-		}
+		FlxG.sound.music.volume = 0;
+		FreeplayMenuState.destroyFreeplayVocals();
 	}
 
 	function changeSelection(change:Int = 0)
@@ -245,7 +242,7 @@ class MasterEditorMenu extends TransitionableState
 	#if MODS_ALLOWED
 	function changeDirectory(change:Int = 0):Void
 	{
-		curDirectory += CoolUtil.boundSelection(curDirectory + change, directories.length);
+		curDirectory = CoolUtil.boundSelection(curDirectory + change, directories.length);
 	
 		WeekData.setDirectoryFromWeek();
 

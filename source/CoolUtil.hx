@@ -1,17 +1,11 @@
 package;
 
 import flixel.FlxG;
+import flixel.FlxSprite;
 import flixel.math.FlxMath;
 import flixel.util.FlxSave;
 import flixel.util.FlxColor;
 import flixel.input.keyboard.FlxKey;
-
-#if sys
-import sys.io.File;
-import sys.FileSystem;
-#else
-import openfl.utils.Assets;
-#end
 
 using StringTools;
 
@@ -64,7 +58,26 @@ class CoolUtil
 			fileSuffix = '';
 		}
 
-		return Paths.formatToSongPath(fileSuffix);
+		var result:String = Paths.formatToSongPath(fileSuffix);
+
+		if (result == diff) {
+			return diff;
+		}
+
+		if (diff.contains('normal')) {
+			return '';
+		}
+
+		if (diff.startsWith('-')) {
+			return diff.substring(1, diff.length);
+		}
+
+		return result;
+	}
+
+	public static function fromSuffixToID(suffix:String):String
+	{
+		return suffix.substring(1, suffix.length);
 	}
 
 	public static function boundSelection(selection:Int, max:Int):Int
@@ -87,7 +100,14 @@ class CoolUtil
 
 	public static function formatSong(song:String, diff:String):String
 	{
-		return Paths.formatToSongPath(song + '-' + diff);
+		var song:String = Paths.formatToSongPath(song);
+		var diff:String = Paths.formatToSongPath(diff);
+
+		if (diff != null && diff.length > 0) {
+			return song + '-' + diff;
+		}
+
+		return song;
 	}
 
 	public static function formatToName(name:String):String
@@ -105,56 +125,56 @@ class CoolUtil
 
 	public static function getKeyName(key:FlxKey):String
 	{
-		switch (key)
+		return switch (key)
 		{
-			case BACKSPACE: return "BckSpc";
-			case CONTROL: return "Ctrl";
-			case ALT: return "Alt";
-			case CAPSLOCK: return "Caps";
-			case PAGEUP: return "PgUp";
-			case PAGEDOWN: return "PgDown";
-			case ZERO: return "0";
-			case ONE: return "1";
-			case TWO: return "2";
-			case THREE: return "3";
-			case FOUR: return "4";
-			case FIVE: return "5";
-			case SIX: return "6";
-			case SEVEN: return "7";
-			case EIGHT: return "8";
-			case NINE: return "9";
-			case NUMPADZERO: return "#0";
-			case NUMPADONE: return "#1";
-			case NUMPADTWO: return "#2";
-			case NUMPADTHREE: return "#3";
-			case NUMPADFOUR: return "#4";
-			case NUMPADFIVE: return "#5";
-			case NUMPADSIX: return "#6";
-			case NUMPADSEVEN: return "#7";
-			case NUMPADEIGHT: return "#8";
-			case NUMPADNINE: return "#9";
-			case NUMPADMULTIPLY: return "#*";
-			case NUMPADPLUS: return "#+";
-			case NUMPADMINUS: return "#-";
-			case NUMPADPERIOD: return "#.";
-			case SEMICOLON: return ";";
-			case COMMA: return ",";
-			case PERIOD: return ".";
-			case GRAVEACCENT: return "`";
-			case LBRACKET: return "[";
-			case RBRACKET: return "]";
-			case QUOTE: return "'";
-			case PRINTSCREEN: return "PrtScrn";
-			case NONE: return '---';
+			case BACKSPACE: "BckSpc";
+			case CONTROL: "Ctrl";
+			case ALT: "Alt";
+			case CAPSLOCK: "Caps";
+			case PAGEUP: "PgUp";
+			case PAGEDOWN: "PgDown";
+			case ZERO: "0";
+			case ONE: "1";
+			case TWO: "2";
+			case THREE: "3";
+			case FOUR: "4";
+			case FIVE: "5";
+			case SIX: "6";
+			case SEVEN: "7";
+			case EIGHT: "8";
+			case NINE: "9";
+			case NUMPADZERO: "#0";
+			case NUMPADONE: "#1";
+			case NUMPADTWO: "#2";
+			case NUMPADTHREE: "#3";
+			case NUMPADFOUR: "#4";
+			case NUMPADFIVE: "#5";
+			case NUMPADSIX: "#6";
+			case NUMPADSEVEN: "#7";
+			case NUMPADEIGHT: "#8";
+			case NUMPADNINE: "#9";
+			case NUMPADMULTIPLY: "#*";
+			case NUMPADPLUS: "#+";
+			case NUMPADMINUS: "#-";
+			case NUMPADPERIOD: "#.";
+			case SEMICOLON: ";";
+			case COMMA: ",";
+			case PERIOD: ".";
+			case GRAVEACCENT: "`";
+			case LBRACKET: "[";
+			case RBRACKET: "]";
+			case QUOTE: "'";
+			case PRINTSCREEN: "PrtScrn";
+			case NONE: '---';
 			default:
 			{
 				var label:String = '' + key;
 
 				if (label.toLowerCase() == 'null') {
-					return '---';
+					'---';
 				}
 
-				return '' + label.charAt(0).toUpperCase() + label.substr(1).toLowerCase();
+				'' + label.charAt(0).toUpperCase() + label.substr(1).toLowerCase();
 			} 
 		}
 	}
@@ -167,10 +187,10 @@ class CoolUtil
 		return FlxColor.interpolate(from, to, boundTo(FlxG.elapsed * (speed * multiplier), 0, 1));
 	}
 
-	public static function coolLerp(a:Float, b:Float, ratio:Float, multiplier:Float = 54.5, ?integerShitKillMeLoopWhatEver:Null<Float> = null):Float
+	public static function coolLerp(a:Float, b:Float, ratio:Float, multiplier:Float = 54.5, ?integer:Null<Float> = null):Float
 	{
-		if (integerShitKillMeLoopWhatEver != null) {
-			return FlxMath.lerp(a, b, boundTo(integerShitKillMeLoopWhatEver - (FlxG.elapsed * (ratio * multiplier)), 0, 1));
+		if (integer != null) {
+			return FlxMath.lerp(a, b, boundTo(integer - (FlxG.elapsed * (ratio * multiplier)), 0, 1));
 		}
 
 		return FlxMath.lerp(a, b, boundTo(FlxG.elapsed * (ratio * multiplier), 0, 1));
@@ -213,44 +233,66 @@ class CoolUtil
 		return Math.floor(number * tempMult) / tempMult;
 	}
 
-	public static function coolTextFile(path:String):Array<String>
+	public static function coolTextFile(path:String, ?ignoreWarnMsg:Bool = false, ?optimize:Bool = false):Array<String>
 	{
-		var daList:Array<String> = [];
-
-		#if sys
-		if (FileSystem.exists(path)) daList = File.getContent(path).trim().split('\n');
-		#else
-		if (Assets.exists(path)) daList = Assets.getText(path).trim().split('\n');
-		#end
-
-		for (i in 0...daList.length) {
-			daList[i] = daList[i].trim();
+		if (Paths.fileExists(path, TEXT, null, optimize)) {
+			return [for (i in Paths.getTextFromFile(path).trim().split('\n')) i = i.trim()];
 		}
 
-		return daList;
+		if (!ignoreWarnMsg) {
+			Debug.logWarn('Path "$path" not found!');
+		}
+
+		return [];
 	}
 
 	public static function listFromString(string:String):Array<String>
 	{
-		var daList:Array<String> = [];
-		daList = string.trim().split('\n');
+		return [for (i in string.trim().split('\n')) i = i.trim()];
+	}
 
-		for (i in 0...daList.length) {
-			daList[i] = daList[i].trim();
+	public static function dominantColor(sprite:FlxSprite):Int
+	{
+		var countByColor:Map<Int, Int> = new Map<Int, Int>();
+
+		for (col in 0...sprite.frameWidth)
+		{
+			for (row in 0...sprite.frameHeight)
+			{
+				var colorOfThisPixel:Int = sprite.pixels.getPixel32(col, row);
+
+				if (colorOfThisPixel != 0)
+				{
+					if (countByColor.exists(colorOfThisPixel)) {
+						countByColor[colorOfThisPixel] =  countByColor[colorOfThisPixel] + 1;
+					}
+					else if (countByColor[colorOfThisPixel] != 13520687 - (2 * 13520687)) {
+						countByColor[colorOfThisPixel] = 1;
+					}
+				}
+			}
 		}
 
-		return daList;
+		var maxCount:Int = 0;
+		var maxKey:Int = 0; // after the loop this will store the max color
+
+		countByColor[FlxColor.BLACK] = 0;
+
+		for (key in countByColor.keys())
+		{
+			if (countByColor[key] >= maxCount)
+			{
+				maxCount = countByColor[key];
+				maxKey = key;
+			}
+		}
+
+		return maxKey;
 	}
 
 	public static function numberArray(max:Int, ?min = 0):Array<Int>
 	{
-		var dumbArray:Array<Int> = [];
-
-		for (i in min...max) {
-			dumbArray.push(i);
-		}
-
-		return dumbArray;
+		return [for (i in min...max) i];
 	}
 
 	public static function browserLoad(site:String):Void

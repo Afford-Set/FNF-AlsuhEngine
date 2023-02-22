@@ -6,9 +6,10 @@ import sys.FileSystem;
 #end
 
 import haxe.Json;
+import haxe.format.JsonParser;
+
 import lime.utils.Assets;
 import Section.SwagSection;
-import haxe.format.JsonParser;
 
 using StringTools;
 
@@ -107,8 +108,7 @@ class Song
 
 	public static function loadFromJson(jsonInput:String, ?folder:Null<String> = null):Null<SwagSong>
 	{
-		var path:String = Paths.getJson('data/${Paths.formatToSongPath(folder)}/${Paths.formatToSongPath(jsonInput)}');
-		var rawJson:String = Paths.getTextFromFile(path);
+		var rawJson:String = Paths.getTextFromFile('data/${Paths.formatToSongPath(folder)}/${Paths.formatToSongPath(jsonInput)}.json');
 
 		while (!rawJson.endsWith('}')) {
 			rawJson = rawJson.substr(0, rawJson.length - 1);

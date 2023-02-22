@@ -74,12 +74,16 @@ class OptionData
 	public static var comboOffset:Array<Int> = [0, 0, 0, 0];
 	public static var arrowHSV:Array<Array<Int>> = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]];
 
+	public static var hideHud(get, never):Bool;
+
+	static function get_hideHud():Bool return !scoreText && healthBarAlpha < 0.0001 && !showRatings && !showNumbers;
+
 	private static var importantMap:Map<String, Array<String>> =
 	[
-		"saveBlackList" => ["keyBinds", "defaultKeys"],
-		"saveAchievements" => ["achievementsMap", "henchmenDeath"],
-		"flixelSound" => ["volume", "sound"],
-		"loadBlackList" => ["keyBinds", "defaultKeys", "loadCtrls", "saveCtrls"],
+		'saveBlackList' => ['keyBinds', 'defaultKeys'],
+		'saveAchievements' => ['achievementsMap', 'henchmenDeath'],
+		'flixelSound' => ['volume', 'sound'],
+		'loadBlackList' => ['keyBinds', 'defaultKeys', 'loadCtrls', 'saveCtrls'],
 	];
 
 	public static function savePrefs():Void
@@ -90,27 +94,18 @@ class OptionData
 		{
 			if (Type.typeof(Reflect.field(OptionData, field)) != TFunction)
 			{
-				if (!importantMap.get("saveBlackList").contains(field)) {
+				if (!importantMap.get('saveBlackList').contains(field)) {
 					Reflect.setField(FlxG.save.data, field, Reflect.field(OptionData, field));
 				}
 			}
 		}
 
-		for (achievement in importantMap.get("saveAchievements")) {
+		for (achievement in importantMap.get('saveAchievements')) {
 			Reflect.setField(FlxG.save.data, achievement, Reflect.field(Achievements, achievement));
 		}
 
-		for (flixelS in importantMap.get("flixelSound")) {
+		for (flixelS in importantMap.get('flixelSound')) {
 			Reflect.setField(FlxG.save.data, flixelS, Reflect.field(FlxG.sound, flixelS));
-		}
-
-		for (flixelS in importantMap.get("flixelSound"))
-		{
-			var flxProp:Dynamic = Reflect.field(FlxG.save.data, flixelS);
-
-			if (flxProp != null) {
-				Reflect.setProperty(FlxG.sound, flixelS, flxProp);
-			}
 		}
 	}
 
@@ -122,7 +117,7 @@ class OptionData
 		{
 			if (Type.typeof(Reflect.field(OptionData, field)) != TFunction)
 			{
-				if (!importantMap.get("loadBlackList").contains(field))
+				if (!importantMap.get('loadBlackList').contains(field))
 				{
 					var defaultValue:Dynamic = Reflect.field(OptionData, field);
 					var flxProp:Dynamic = Reflect.field(FlxG.save.data, field);
@@ -137,13 +132,13 @@ class OptionData
 						#if sys
 						case 'screenRes':
 						{
-							var res:Array<String> = OptionData.screenRes.split('x');
+							var res:Array<String> = screenRes.split('x');
 							FlxG.resizeWindow(Std.parseInt(res[0]), Std.parseInt(res[1]));
 					
 							FlxG.fullscreen = false;
 					
 							if (!FlxG.fullscreen) {
-								FlxG.fullscreen = OptionData.fullScreen;
+								FlxG.fullscreen = fullScreen;
 							}
 						}
 						#end
@@ -239,6 +234,15 @@ class OptionData
 				}
 			}
 		}
+
+		for (flixelS in importantMap.get('flixelSound'))
+		{
+			var flxProp:Dynamic = Reflect.field(FlxG.save.data, flixelS);
+
+			if (flxProp != null) {
+				Reflect.setProperty(FlxG.sound, flixelS, flxProp);
+			}
+		}
 	}
 
 	public static var luaPrefsMap:Map<String, Array<Dynamic>> = new Map<String, Array<Dynamic>>();
@@ -247,36 +251,38 @@ class OptionData
 	{
 		luaPrefsMap.clear();
 
-		luaPrefsMap.set('ratingOffset', ['ratingOffset', OptionData.ratingOffset]);
-		luaPrefsMap.set('noteSplashes', ['noteSplashes', OptionData.splashOpacity > 0]);
-		luaPrefsMap.set('splashOpacity', ['splashOpacity', OptionData.splashOpacity]);
-		luaPrefsMap.set('naughtyness', ['naughtyness', OptionData.naughtyness]);
-		luaPrefsMap.set('safeFrames', ['safeFrames', OptionData.safeFrames]);
-		luaPrefsMap.set('downScroll', ['downscroll', OptionData.downScroll]);
-		luaPrefsMap.set('danceOffset', ['danceOffset', OptionData.danceOffset]);
-		luaPrefsMap.set('pauseMusic', ['pauseMusic', OptionData.pauseMusic]);
-		luaPrefsMap.set('middleScroll', ['middlescroll', OptionData.middleScroll]);
+		luaPrefsMap.set('ratingOffset', ['ratingOffset', ratingOffset]);
+		luaPrefsMap.set('noteSplashes', ['noteSplashes', splashOpacity > 0]);
+		luaPrefsMap.set('splashOpacity', ['splashOpacity', splashOpacity]);
+		luaPrefsMap.set('naughtyness', ['naughtyness', naughtyness]);
+		luaPrefsMap.set('safeFrames', ['safeFrames', safeFrames]);
+		luaPrefsMap.set('downScroll', ['downscroll', downScroll]);
+		luaPrefsMap.set('danceOffset', ['danceOffset', danceOffset]);
+		luaPrefsMap.set('pauseMusic', ['pauseMusic', pauseMusic]);
+		luaPrefsMap.set('middleScroll', ['middlescroll', middleScroll]);
 		#if !html5
-		luaPrefsMap.set('framerate', ['framerate', OptionData.framerate]);
+		luaPrefsMap.set('framerate', ['framerate', framerate]);
 		#end
-		luaPrefsMap.set('ghostTapping', ['ghostTapping', OptionData.ghostTapping]);
-		luaPrefsMap.set('scoreText', ['scoreText', OptionData.scoreText]);
-		luaPrefsMap.set('showRatings', ['showRatings', OptionData.showRatings]);
-		luaPrefsMap.set('showNumbers', ['showNumbers', OptionData.showNumbers]);
-		luaPrefsMap.set('songPositionType', ['songPositionType', OptionData.songPositionType]);
-		luaPrefsMap.set('camZooms', ['cameraZoomOnBeat', OptionData.camZooms]);
-		luaPrefsMap.set('camShakes', ['cameraShakes', OptionData.camShakes]);
-		luaPrefsMap.set('iconZooms', ['iconZooms', OptionData.iconZooms]);
-		luaPrefsMap.set('flashingLights', ['flashing', OptionData.flashingLights]);
-		luaPrefsMap.set('noteOffset', ['noteOffset', OptionData.noteOffset]);
-		luaPrefsMap.set('healthBarAlpha', ['healthBarAlpha', OptionData.healthBarAlpha]);
-		luaPrefsMap.set('noReset', ['noResetButton', OptionData.noReset]);
-		luaPrefsMap.set('lowQuality', ['lowQuality', OptionData.lowQuality]);
-		luaPrefsMap.set('sickWindow', ['sickWindow', OptionData.sickWindow]);
-		luaPrefsMap.set('goodWindow', ['goodWindow', OptionData.goodWindow]);
-		luaPrefsMap.set('badWindow', ['badWindow', OptionData.badWindow]);
-		luaPrefsMap.set('shitWindow', ['shitWindow', OptionData.shitWindow]);
-		luaPrefsMap.set('opponentStrumsType', ['opponentStrumsType', OptionData.opponentStrumsType]);
+		luaPrefsMap.set('hideHud', ['hideHud', hideHud]);
+		luaPrefsMap.set('ghostTapping', ['ghostTapping', ghostTapping]);
+		luaPrefsMap.set('scoreText', ['scoreText', scoreText]);
+		luaPrefsMap.set('showRatings', ['showRatings', showRatings]);
+		luaPrefsMap.set('showNumbers', ['showNumbers', showNumbers]);
+		luaPrefsMap.set('songPositionType', ['songPositionType', songPositionType]);
+		luaPrefsMap.set('camZooms', ['cameraZoomOnBeat', camZooms]);
+		luaPrefsMap.set('camShakes', ['cameraShakes', camShakes]);
+		luaPrefsMap.set('iconZooms', ['iconZooms', iconZooms]);
+		luaPrefsMap.set('flashingLights', ['flashing', flashingLights]);
+		luaPrefsMap.set('noteOffset', ['noteOffset', noteOffset]);
+		luaPrefsMap.set('healthBarAlpha', ['healthBarAlpha', healthBarAlpha]);
+		luaPrefsMap.set('noReset', ['noResetButton', noReset]);
+		luaPrefsMap.set('lowQuality', ['lowQuality', lowQuality]);
+		luaPrefsMap.set('sickWindow', ['sickWindow', sickWindow]);
+		luaPrefsMap.set('goodWindow', ['goodWindow', goodWindow]);
+		luaPrefsMap.set('badWindow', ['badWindow', badWindow]);
+		luaPrefsMap.set('shitWindow', ['shitWindow', shitWindow]);
+		luaPrefsMap.set('opponentStrumsType', ['opponentStrumsType', opponentStrumsType]);
+		luaPrefsMap.set('shadersEnabled', ['shaders', shaders]);
 	}
 
 	public static var keyBinds:Map<String, Array<FlxKey>> =

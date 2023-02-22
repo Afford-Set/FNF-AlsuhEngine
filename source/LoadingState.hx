@@ -1,9 +1,16 @@
 package;
 
+
 #if sys
 import sys.io.File;
 import sys.FileSystem;
 import sys.thread.Thread;
+
+#if cpp
+import audio.MiniMP3;
+import openfl.utils.ByteArray;
+import lime.media.AudioBuffer;
+#end
 #end
 
 import flixel.FlxG;
@@ -12,7 +19,6 @@ import lime.app.Future;
 import flixel.FlxState;
 import flixel.FlxSprite;
 import lime.app.Promise;
-import openfl.text.Font;
 import flash.media.Sound;
 import flixel.math.FlxMath;
 import openfl.utils.Assets;
@@ -57,12 +63,8 @@ class LoadingState extends TransitionableState
 	var curFile:Int = 0;
 	var filesToCheck:Array<String> = [];
 
-	var extensions:Array<String> = [];
-
 	public override function create():Void
 	{
-		extensions = ['.png', '.' + Paths.SOUND_EXT];
-
 		var bg:FlxSprite = new FlxSprite();
 		bg.makeGraphic(FlxG.width, FlxG.height, 0xFFCAFF4D);
 		add(bg);
@@ -95,8 +97,7 @@ class LoadingState extends TransitionableState
 		FlxG.camera.fade(FlxG.camera.bgColor, 0.5, true, function():Void
 		{
 			#if web
-			initSongsManifest().onComplete(function(lib:AssetLibrary):Void
-			{
+			initSongsManifest().onComplete(function(lib:AssetLibrary):Void {
 				callbacks = new MultiCallback(onLoad);
 			#end
 
@@ -139,7 +140,7 @@ class LoadingState extends TransitionableState
 	#if web
 	function checkLoadSong(path:String):Void
 	{
-		if (!Assets.cache.hasSound(path))
+		if (!isSoundLoaded(path))
 		{
 			var callback:Void->Void = callbacks.add("song:" + path);
 
@@ -169,13 +170,18 @@ class LoadingState extends TransitionableState
 		Debug.logInfo(Assets.hasLibrary(library));
 		#end
 
-		if (Assets.getLibrary(library) == null)
+		if (!isLibraryLoaded(library))
 		{
 			@:privateAccess
 			if (!LimeAssets.libraryPaths.exists(library))
 				throw "Missing library: " + library;
 
-			Assets.loadLibrary(library).onComplete(function(library:AssetLibrary):Void {
+			Assets.loadLibrary(library).onComplete(function(library:AssetLibrary):Void
+			{
+				for (i in library.list(null)) {
+					Debug.logInfo(i);
+				}
+
 				callback();
 			});
 		}
@@ -212,12 +218,15 @@ class LoadingState extends TransitionableState
 		{
 			var gottenPath:String = Path.join([pathFolder, path]);
 
-			if (FileSystem.isDirectory(gottenPath)) {
-				loadFolderForce(gottenPath);
+			if (FileSystem.isDirectory(gottenPath))
+			{
+				if (path != Paths.songLibrary) {
+					loadFolderForce(gottenPath);
+				}
 			}
 			else
 			{
-				if (!Paths.currentTrackedAssets.exists(gottenPath) && !Paths.currentTrackedSounds.exists(gottenPath)) {
+				if (!Paths.currentTrackedAssets.exists(gottenPath) && !Paths.currentTrackedSounds.exists(gottenPath) && !gottenPath.endsWith('pack.png')) {
 					filesToCheck.push(gottenPath);
 				}
 			}
@@ -228,7 +237,7 @@ class LoadingState extends TransitionableState
 	{
 		if (path.endsWith('.png'))
 		{
-			if (!Paths.currentTrackedAssets.exists(path) || !loadedPaths.exists(path))
+			if (!Paths.currentTrackedAssets.exists(path) && !loadedPaths.exists(path))
 			{
 				BitmapData.loadFromFile(path).onComplete(function(bitmap:BitmapData):Void
 				{
@@ -240,9 +249,9 @@ class LoadingState extends TransitionableState
 
 					Debug.logInfo('loaded path: ' + path);
 					onLoadComplete();
-				}).onError(function(_:Dynamic):Void
+				}).onError(function(e:Dynamic):Void
 				{
-					Debug.logWarn('path not found: ' + path);
+					Debug.logError('Error: ' + e);
 					onLoadComplete();
 				});
 			}
@@ -253,7 +262,45 @@ class LoadingState extends TransitionableState
 
 		if (path.endsWith('.${Paths.SOUND_EXT}'))
 		{
-			if (!Paths.currentTrackedSounds.exists(path) || !loadedPaths.exists(path))
+			if (!Paths.currentTrackedSounds.exists(path) && !loadedPaths.exists(path))
+			{
+				#if cpp
+				ByteArray.loadFromFile(path).onComplete(function(bytes:ByteArray):Void
+				{
+					var decoded = MiniMP3.decodeMP3(bytes);
+					var encoded:ByteArray = MiniMP3.encodeWav(decoded.data, decoded.sampleCount, decoded.sampleRate, decoded.channels);
+
+					var audioBuffer:AudioBuffer = AudioBuffer.fromBytes(encoded);
+					Paths.currentTrackedSounds.set(path, Sound.fromAudioBuffer(audioBuffer));
+					loadedPaths.set(path, true);
+
+					Debug.logInfo('loaded path: ' + path);
+					onLoadComplete();
+				})
+				#else
+				Sound.loadFromFile(path).onComplete(function(sound:Sound):Void
+				{
+					Paths.currentTrackedSounds.set(path, sound);
+					loadedPaths.set(path, true);
+
+					Debug.logInfo('loaded path: ' + path);
+					onLoadComplete();
+				})#end.onError(function(e:Dynamic):Void
+				{
+					Debug.logError('Error: ' + e);
+					onLoadComplete();
+				});
+				
+			}
+			else {
+				onLoadComplete();
+			}
+		}
+
+		#if cpp
+		if (path.endsWith('.ogg'))
+		{
+			if (!Paths.currentTrackedSounds.exists(path) && !loadedPaths.exists(path))
 			{
 				Sound.loadFromFile(path).onComplete(function(sound:Sound):Void
 				{
@@ -272,6 +319,7 @@ class LoadingState extends TransitionableState
 				onLoadComplete();
 			}
 		}
+		#end
 	}
 
 	function onLoadComplete():Void
@@ -282,7 +330,7 @@ class LoadingState extends TransitionableState
 		{
 			var ourFile:String = filesToCheck[curFile];
 
-			if (ourFile.endsWith('.png') || ourFile.endsWith('.${Paths.SOUND_EXT}')) {
+			if (ourFile.endsWith('.png') || ourFile.endsWith('.${Paths.SOUND_EXT}') #if cpp || ourFile.endsWith('.ogg') #end) {
 				checkFile(ourFile);
 			}
 			else {
@@ -342,12 +390,12 @@ class LoadingState extends TransitionableState
 
 	static function getSongPath():String
 	{
-		return Paths.getInst(PlayState.SONG.songID, CoolUtil.getDifficultySuffix(PlayState.lastDifficulty), true);
+		return Paths.getInst(PlayState.SONG.songID, PlayState.lastDifficulty, true);
 	}
 
 	static function getVocalPath():String
 	{
-		return Paths.getVoices(PlayState.SONG.songID, CoolUtil.getDifficultySuffix(PlayState.lastDifficulty), true);
+		return Paths.getVoices(PlayState.SONG.songID, PlayState.lastDifficulty, true);
 	}
 
 	public static function loadAndSwitchState(target:FlxState, stopMusic:Bool = false, skipLoading:Bool = false):Void
@@ -361,7 +409,6 @@ class LoadingState extends TransitionableState
 		var weekDir:String = StageData.forceNextDirectory;
 
 		StageData.forceNextDirectory = null;
-
 		if (weekDir != null && weekDir.length > 0 && weekDir != '') directory = weekDir;
 
 		Paths.setCurrentLevel(directory);
@@ -371,7 +418,7 @@ class LoadingState extends TransitionableState
 		if (OptionData.loadingScreen && !skipLoading)
 		{
 			if (PlayState.SONG != null) {
-				loaded = isSoundLoaded(getSongPath()) && (!PlayState.SONG.needsVoices || isSoundLoaded(getVocalPath())) && isLibraryLoaded("shared") && isLibraryLoaded(directory);
+				loaded = isSoundLoaded(getSongPath()) && (!PlayState.SONG.needsVoices || isSoundLoaded(getVocalPath())) #if web && isLibraryLoaded('shared') && isLibraryLoaded(directory) #end;
 			}
 
 			if (!loaded) {
@@ -391,13 +438,15 @@ class LoadingState extends TransitionableState
 
 	static function isSoundLoaded(path:String):Bool
 	{
-		return #if sys Paths.currentTrackedSounds.exists(path) || loadedPaths.exists(path) #else Assets.cache.hasSound(path) #end;
+		return #if sys loadedPaths.exists(path) #else Assets.cache.hasSound(path) #end;
 	}
-	
+
+	#if web
 	static function isLibraryLoaded(library:String):Bool
 	{
 		return Assets.getLibrary(library) != null;
 	}
+	#end
 
 	public override function destroy():Void
 	{
@@ -407,10 +456,11 @@ class LoadingState extends TransitionableState
 		callbacks = null;
 		#end
 	}
-	
+
+	#if web
 	static function initSongsManifest():Future<AssetLibrary>
 	{
-		var id:String = "songs";
+		var id:String = 'songs';
 		var promise:Promise<AssetLibrary> = new Promise<AssetLibrary>();
 
 		var library:AssetLibrary = LimeAssets.getLibrary(id);
@@ -469,6 +519,7 @@ class LoadingState extends TransitionableState
 
 		return promise.future;
 	}
+	#end
 }
 
 #if web
@@ -507,7 +558,6 @@ class MultiCallback
 					log('fired $id, $numRemaining remaining');
 				}
 
-				#if web
 				if (numRemaining == 0)
 				{
 					if (logId != null) {
@@ -516,7 +566,6 @@ class MultiCallback
 
 					callback();
 				}
-				#end
 			}
 			else {
 				log('already fired $id');
@@ -526,13 +575,13 @@ class MultiCallback
 		unfired.set(id, func);
 		return func;
 	}
-	
+
 	inline function log(msg:String):Void
 	{
 		if (logId != null)
 			Debug.logInfo('$logId: $msg');
 	}
-	
+
 	public function getFired():Array<String> return fired.copy();
 	public function getUnfired():Array<String> return [for (id in unfired.keys()) id];
 }

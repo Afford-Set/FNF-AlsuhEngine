@@ -50,7 +50,7 @@ class MainMenuState extends TransitionableState
 	var camFollowPos:FlxObject;
 	var camFollow:FlxPoint;
 
-	public static var engineVersion:String = '1.6.15';
+	public static var engineVersion:String = '1.7';
 	public static var psychEngineVersion:String = '0.6.4';
 
 	public static var gameVersion(get, never):String;
@@ -85,7 +85,7 @@ class MainMenuState extends TransitionableState
 
 		debugKeys = OptionData.copyKey(OptionData.keyBinds.get('debug_1'));
 
-		if (FlxG.sound.music.playing == false || FlxG.sound.music.volume == 0) {
+		if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {
 			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 		}
 

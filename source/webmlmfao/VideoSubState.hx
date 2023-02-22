@@ -62,6 +62,11 @@ class VideoSubState extends BaseSubState
 			if (Paths.fileExists('videos/$leSource.${Paths.SOUND_EXT}', SOUND)) {
 				vidSound = FlxG.sound.play(Paths.getWebmSound(leSource), 1, false, null, true);
 			}
+			#if cpp
+			else if (Paths.fileExists('videos/$leSource.ogg', SOUND)) {
+				vidSound = FlxG.sound.play(Paths.getWebmSound(leSource), 1, false, null, true);
+			}
+			#end
 		}
 
 		var ourVideo:Dynamic = GlobalVideo.get();

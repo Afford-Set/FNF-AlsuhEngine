@@ -181,7 +181,7 @@ class AudioBuffer
 		audioBuffer.data = new UInt8Array(Bytes.alloc(0));
 
 		audioBuffer = NativeCFFI.lime_audio_load_bytes(bytes, audioBuffer);
-		audioBuffer.initBuffer();
+		if (audioBuffer != null) audioBuffer.initBuffer();
 		return audioBuffer;
 		#else
 		var data:Dynamic = NativeCFFI.lime_audio_load_bytes(bytes, null);

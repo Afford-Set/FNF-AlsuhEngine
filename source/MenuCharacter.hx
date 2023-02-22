@@ -3,13 +3,7 @@ package;
 import haxe.Json;
 import haxe.format.JsonParser;
 
-#if MODS_ALLOWED
-import sys.io.File;
-import sys.FileSystem;
-#end
-
 import flixel.FlxSprite;
-import openfl.utils.Assets;
 
 using StringTools;
 
@@ -124,7 +118,7 @@ class MenuCharacter extends FlxSprite
 					}
 				}
 
-				flipX = (charFile.flipX == true);
+				flipX = charFile.flipX == true;
 
 				if (charFile.scale != 1)
 				{

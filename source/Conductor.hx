@@ -23,28 +23,32 @@ class Conductor
 
 	public static var bpmChangeMap:Array<BPMChangeEvent> = [];
 
+	public static function getDefaultRatings():Array<RatingData>
+	{
+		var good:RatingData = new RatingData('good');
+		good.ratingMod = 0.7;
+		good.score = 200;
+		good.noteSplash = false;
+
+		var bad:RatingData = new RatingData('bad');
+		bad.ratingMod = 0.4;
+		bad.score = 100;
+		bad.noteSplash = false;
+
+		var shit:RatingData = new RatingData('shit');
+		shit.ratingMod = 0;
+		shit.score = 50;
+		shit.noteSplash = false;
+
+		return [new RatingData('sick'), good, bad, shit];
+	}
+
 	public static function judgeNote(note:Note, diff:Float = 0, ?isString:Null<Bool> = false):Any
 	{
-		var data:Array<RatingData> = PlayState.instance.ratingsData; // shortening cuz fuck u
+		var data:Array<RatingData> = getDefaultRatings();
 
-		if (data == null)
-		{
-			var good:RatingData = new RatingData('good');
-			good.ratingMod = 0.7;
-			good.score = 200;
-			good.noteSplash = false;
-	
-			var bad:RatingData = new RatingData('bad');
-			bad.ratingMod = 0.4;
-			bad.score = 100;
-			bad.noteSplash = false;
-	
-			var shit:RatingData = new RatingData('shit');
-			shit.ratingMod = 0;
-			shit.score = 50;
-			shit.noteSplash = false;
-
-			data = [new RatingData('sick'), good, bad, shit];
+		if (PlayState.instance != null) {
+			data = PlayState.instance.ratingsData;
 		}
 
 		for (i in 0...data.length - 1) // skips last window (Shit)

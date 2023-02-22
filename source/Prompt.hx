@@ -36,8 +36,8 @@ class Prompt extends BaseSubState
 		theText = promptText;
 		goAnyway = acceptOnDefault;
 		
-		var op1 = 'OK';
-		var op2 = 'CANCEL';
+		var op1:String = 'OK';
+		var op2:String = 'CANCEL';
 		
 		if (option1 != null) op1 = option1;
 		if (option2 != null) op2 = option2;

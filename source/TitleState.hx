@@ -11,7 +11,6 @@ import haxe.format.JsonParser;
 import flixel.FlxG;
 import openfl.Assets;
 import flixel.FlxSprite;
-import shaders.ColorSwap;
 import flixel.math.FlxMath;
 import lime.app.Application;
 import flixel.util.FlxColor;
@@ -20,7 +19,7 @@ import flixel.group.FlxGroup;
 import flixel.tweens.FlxEase;
 import openfl.display.Bitmap;
 import transition.Transition;
-import openfl.display.BitmapData;
+import shaderslmfao.ColorSwap;
 import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepad;
 import flixel.graphics.frames.FlxFrame;
@@ -64,6 +63,7 @@ class TitleState extends MusicBeatState
 	var curWacky:Array<String> = [];
 
 	var titleJSON:TitleData;
+	var mustUpdate:Bool = false;
 
 	public override function create():Void
 	{
@@ -102,9 +102,9 @@ class TitleState extends MusicBeatState
 			WeekData.weekCompleted = FlxG.save.data.weekCompleted;
 		}
 
-		#if sys
-		if (!FileSystem.exists(Sys.getCwd() + "\\assets\\replays")) {
-			FileSystem.createDirectory(Sys.getCwd() + "\\assets\\replays");
+		#if REPLAYS_ALLOWED
+		if (!FileSystem.exists('assets/replays')) {
+			FileSystem.createDirectory('assets/replays');
 		}
 		#end
 		
@@ -134,6 +134,10 @@ class TitleState extends MusicBeatState
 	
 				OutdatedState.newVersion = returnedData[0].trim();
 				OutdatedState.curChanges = returnedData[1];
+
+				if (OptionData.checkForUpdates && OutdatedState.newVersion.trim() != MainMenuState.engineVersion.trim() && !OutdatedState.leftState) {
+					mustUpdate = true;
+				}
 			}
 	
 			http.onError = function(error:String):Void {
@@ -315,7 +319,7 @@ class TitleState extends MusicBeatState
 			Conductor.songPosition = FlxG.sound.music.time;
 		}
 
-		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER || FlxG.mouse.justPressed;
+		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER;
 
 		#if mobile
 		for (touch in FlxG.touches.list)
@@ -398,15 +402,14 @@ class TitleState extends MusicBeatState
 					new FlxTimer().start(1, function(tmr:FlxTimer):Void
 					{
 						#if CHECK_FOR_UPDATES
-						if (OptionData.checkForUpdates && OutdatedState.newVersion.trim() != MainMenuState.engineVersion.trim() && !OutdatedState.leftState)
+						if (mustUpdate)
 						{
 							Debug.logInfo('There is a new version ' + OutdatedState.newVersion.trim() + '!');
 							FlxG.switchState(new OutdatedState());
 						}
 						else
 						{
-						#end
-							Debug.logInfo('You now have the latest version');
+							Debug.logInfo('You now have the latest version'); #end
 							FlxG.switchState(new MainMenuState());
 						#if CHECK_FOR_UPDATES } #end
 					});

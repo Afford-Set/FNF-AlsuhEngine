@@ -86,7 +86,7 @@ class DialogueCharacter extends FlxSprite
 
 		reloadAnimations();
 
-		antialiasing = jsonFile.no_antialiasing == true ? false : OptionData.globalAntialiasing;
+		antialiasing = jsonFile.no_antialiasing ? false : OptionData.globalAntialiasing;
 	}
 
 	public function reloadCharacterJson(character:String):Void

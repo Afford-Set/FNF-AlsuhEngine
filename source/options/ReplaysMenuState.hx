@@ -4,6 +4,8 @@ package options;
 import Discord.DiscordClient;
 #end
 
+import Replay;
+
 import flixel.FlxG;
 #if sys
 import sys.io.File;
@@ -15,6 +17,7 @@ import transition.TransitionableState;
 
 using StringTools;
 
+#if REPLAYS_ALLOWED
 class ReplaysMenuState extends TransitionableState
 {
 	var curSelected:Int = 0;
@@ -34,7 +37,7 @@ class ReplaysMenuState extends TransitionableState
 		DiscordClient.changePresence("In the Replays Menu", null); // Updating Discord Rich Presence
 		#end
 
-		if (FlxG.sound.music.playing == false || FlxG.sound.music.volume == 0) {
+		if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {
 			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 		}
 
@@ -51,7 +54,7 @@ class ReplaysMenuState extends TransitionableState
 		add(bg);
 
 		#if sys
-		replaysArray = FileSystem.readDirectory(Sys.getCwd() + "\\assets\\replays\\");
+		replaysArray = FileSystem.readDirectory('assets/replays');
 		#end
 		replaysArray.sort(Reflect.compare);
 
@@ -124,6 +127,10 @@ class ReplaysMenuState extends TransitionableState
 				changeSelection((checkNewHold - checkLastHold) * (controls.UI_UP ? -1 : 1));
 				FlxG.sound.play(Paths.getSound('scrollMenu'));
 			}
+
+			if (FlxG.mouse.wheel != 0) {
+				changeSelection(-1 * FlxG.mouse.wheel);
+			}
 		}
 
 		if (controls.ACCEPT || FlxG.mouse.justPressed)
@@ -132,31 +139,44 @@ class ReplaysMenuState extends TransitionableState
 			{
 				PlayState.rep = Replay.loadReplay(actualNames[curSelected]);
 
-				var diffic:String = CoolUtil.getDifficultySuffix(PlayState.rep.replay.songDiff, false, PlayState.rep.replay.difficulties);
+				var replay:ReplayJSON = PlayState.rep.replay;
 
-				if (Paths.fileExists('data/' + PlayState.rep.replay.songID + '/' + PlayState.rep.replay.songID + diffic + '.json', TEXT) == true)
+				var songID:String = replay.songID;
+
+				var diffic:String = CoolUtil.fromSuffixToID(CoolUtil.getDifficultySuffix(replay.songDiff, false, replay.difficulties));
+				var ourPath:String = CoolUtil.formatSong(songID, diffic);
+
+				if (Paths.fileExists('data/' + songID + '/' + ourPath + '.json', TEXT))
 				{
-					persistentUpdate = false;
+					try
+					{
+						persistentUpdate = false;
 
-					PlayState.SONG = Song.loadFromJson(PlayState.rep.replay.songID + diffic, PlayState.rep.replay.songID);
-					PlayState.gameMode = 'replay';
-					PlayState.isStoryMode = false;
-					PlayState.difficulties = PlayState.rep.replay.difficulties;
-					PlayState.lastDifficulty = PlayState.rep.replay.songDiff;
-					PlayState.storyDifficultyID = PlayState.rep.replay.songDiff;
-					PlayState.storyWeekText = PlayState.rep.replay.weekID;
-					PlayState.storyWeekName = PlayState.rep.replay.weekName;
+						PlayState.SONG = Song.loadFromJson(ourPath, songID);
+						PlayState.gameMode = 'replay';
+						PlayState.isStoryMode = false;
+						PlayState.difficulties = replay.difficulties;
+						PlayState.lastDifficulty = replay.songDiff;
+						PlayState.storyDifficultyID = replay.songDiff;
+						PlayState.storyWeekText = replay.weekID;
+						PlayState.storyWeekName = replay.weekName;
 
-					Debug.logInfo('Loading song ${PlayState.SONG.songName} from week ${PlayState.storyWeekName} into Replay...');
-	
-					if (!OptionData.loadingScreen) {
-						FreeplayMenuState.destroyFreeplayVocals();
+						PlayStateChangeables.botPlay = true;
+
+						Debug.logInfo('Loading song ${PlayState.SONG.songName} from week ${PlayState.storyWeekName} into Replay...');
+		
+						if (!OptionData.loadingScreen) {
+							FreeplayMenuState.destroyFreeplayVocals();
+						}
+
+						LoadingState.loadAndSwitchState(new PlayState(), true);
 					}
-	
-					LoadingState.loadAndSwitchState(new PlayState(), true);
+					catch (e:Dynamic) {
+						Debug.logError('Error on loading file "' + songID + '/' + ourPath + '.json' + '": ' + e);
+					}
 				}
 				else {
-					Debug.logError('File "data/' + PlayState.rep.replay.songID + '/' + PlayState.rep.replay.songID + diffic + '.json" does not exist!"');
+					Debug.logError('File "data/' + songID + '/' + ourPath + '.json" does not exist!"');
 				}
 			}
 			else {
@@ -184,3 +204,4 @@ class ReplaysMenuState extends TransitionableState
 		}
 	}
 }
+#end

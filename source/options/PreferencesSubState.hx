@@ -124,12 +124,12 @@ class PreferencesSubState extends MusicBeatSubState
 			{
 				FlxG.updateFramerate = OptionData.framerate;
 				FlxG.drawFramerate = OptionData.framerate;
+
+				return;
 			}
-			else
-			{
-				FlxG.drawFramerate = OptionData.framerate;
-				FlxG.updateFramerate = OptionData.framerate;
-			}
+
+			FlxG.drawFramerate = OptionData.framerate;
+			FlxG.updateFramerate = OptionData.framerate;
 		};
 		#end
 
@@ -431,7 +431,7 @@ class PreferencesSubState extends MusicBeatSubState
 			'cutscenesInType',
 			'string',
 			'Story',
-			['Story', 'Story and Freeplay', 'Freeplay', 'Freeplay and Replay', 'Replay', 'Replay and Story', 'Everywhere', 'Nowhere']);
+			['Story', #if REPLAYS_ALLOWED 'Story and Freeplay', #end 'Freeplay', #if REPLAYS_ALLOWED 'Freeplay and Replay', 'Replay', 'Replay and Story', #end 'Everywhere', 'Nowhere']);
 		addOption(option);
 
 		var option:Option = new Option('Skip Cutscene Replay',
@@ -1340,6 +1340,6 @@ class PreferencesSubState extends MusicBeatSubState
 			return checkDefaultValue;
 		}
 
-		return optionsArray[num].selected == false && optionsArray[num] != defaultValue;
+		return !optionsArray[num].selected && optionsArray[num] != defaultValue;
 	}
 }

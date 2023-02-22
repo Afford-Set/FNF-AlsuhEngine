@@ -57,7 +57,7 @@ class TankmenBG extends FlxSprite
 
 		visible = (x > -0.5 * FlxG.width && x < 1.2 * FlxG.width);
 
-		if (animation.curAnim.name == "run")
+		if (animation.curAnim.name == 'run')
 		{
 			var speed:Float = (Conductor.songPosition - strumTime) * tankSpeed;
 

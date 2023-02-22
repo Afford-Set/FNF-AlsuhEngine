@@ -4,7 +4,7 @@ package options;
 import Discord.DiscordClient;
 #end
 
-import shaders.ColorSwap;
+import shaderslmfao.ColorSwap;
 import options.OptionsMenuState;
 
 import flixel.FlxG;
@@ -143,10 +143,11 @@ class NotesSubState extends MusicBeatSubState
 			note.frames = Paths.getSparrowAtlas('notes/NOTE_assets');
 
 			var animations:Array<String> = Note.colArray.copy();
-			animations[i] = animations[i] + ' instance';
-			//trace(animations[i]);
-			//trace(animations[i] + ' 10000');
-			if (note.frames.getByName(animations[i] + ' 10000') == null) animations[i] = Note.colArray[i] + '0';
+			animations[i] += ' instance';
+
+			if (note.frames.getByName(animations[i] + ' 10000') == null) {
+				animations[i] = Note.colArray[i] + '0';
+			}
 
 			note.animation.addByPrefix('idle', animations[i]);
 			note.animation.play('idle');

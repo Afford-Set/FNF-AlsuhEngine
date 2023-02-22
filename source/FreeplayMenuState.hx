@@ -4,6 +4,8 @@ package;
 import Discord.DiscordClient;
 #end
 
+import Song;
+
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxSubState;
@@ -11,7 +13,6 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxEase;
 import flixel.group.FlxGroup;
-import transition.Transition;
 import flixel.system.FlxSound;
 import flixel.tweens.FlxTween;
 import transition.TransitionableState;
@@ -49,7 +50,7 @@ class FreeplayMenuState extends TransitionableState
 		DiscordClient.changePresence("In the Freeplay Menu", null); // Updating Discord Rich Presence
 		#end
 
-		if (FlxG.sound.music.playing == false || FlxG.sound.music.volume == 0) {
+		if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {
 			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 		}
 
@@ -241,7 +242,7 @@ class FreeplayMenuState extends TransitionableState
 			ratingSplit[1] += '0';
 		}
 
-		scoreText.text = "PERSONAL BEST:" + lerpScore + ' (' + ratingSplit.join('.') + '%)';
+		scoreText.text = 'PERSONAL BEST:' + lerpScore + ' (' + ratingSplit.join('.') + '%)';
 		positionHighscore();
 
 		if (controls.BACK || FlxG.mouse.justPressedRight)
@@ -327,33 +328,44 @@ class FreeplayMenuState extends TransitionableState
 		else if (FlxG.keys.justPressed.SPACE)
 		{
 			var diffic:String = CoolUtil.getDifficultySuffix(curDifficultyString, curSong.difficulties);
+			var ourPath:String = curSong.songID + diffic;
 
-			if (Paths.fileExists('data/' + curSong.songID + '/' + curSong.songID + diffic + '.json', TEXT) && instPlaying != curSelected)
+			if (Paths.fileExists('data/' + curSong.songID + '/' + ourPath + '.json', TEXT))
 			{
-				destroyFreeplayVocals();
+				if (instPlaying != curSelected)
+				{
+					try
+					{
+						destroyFreeplayVocals();
 
-				FlxG.sound.music.volume = 0;
-				Paths.currentModDirectory = curSong.folder;
+						FlxG.sound.music.volume = 0;
+						Paths.currentModDirectory = curSong.folder;
 
-				PlayState.SONG = Song.loadFromJson(curSong.songID + diffic, curSong.songID);
+						PlayState.SONG = Song.loadFromJson(ourPath, curSong.songID);
 
-				if (PlayState.SONG.needsVoices)
-					vocals = new FlxSound().loadEmbedded(Paths.getVoices(PlayState.SONG.songID, CoolUtil.getDifficultySuffix(curDifficultyString, curSong.difficulties), #if NO_PRELOAD_ALL true #else false #end));
-				else
-					vocals = new FlxSound();
+						vocals = new FlxSound();
 
-				FlxG.sound.list.add(vocals);
-				FlxG.sound.playMusic(Paths.getInst(PlayState.SONG.songID, CoolUtil.getDifficultySuffix(curDifficultyString, curSong.difficulties), #if NO_PRELOAD_ALL true #else false #end), 0.7);
+						if (PlayState.SONG.needsVoices) {
+							vocals.loadEmbedded(Paths.getVoices(PlayState.SONG.songID, curDifficultyString));
+						}
 
-				vocals.play();
-				vocals.persist = true;
-				vocals.looped = true;
-				vocals.volume = 0.7;
+						FlxG.sound.list.add(vocals);
+						FlxG.sound.playMusic(Paths.getInst(PlayState.SONG.songID, curDifficultyString), 0.7);
 
-				instPlaying = curSelected;
+						vocals.play();
+						vocals.persist = true;
+						vocals.looped = true;
+						vocals.volume = 0.7;
+
+						instPlaying = curSelected;
+					}
+					catch (e:Dynamic) {
+						Debug.logError('Error on loading file "' + curSong.songID + '/' + ourPath + '.json' + '": ' + e);
+					}
+				}
 			}
 			else {
-				Debug.logError('File "' + curSong.songID + '/' + curSong.songID + diffic + '.json' + '" does not exist!');
+				Debug.logError('File "' + curSong.songID + '/' + ourPath + '.json' + '" does not exist!');
 			}
 		}
 		#end
@@ -361,13 +373,14 @@ class FreeplayMenuState extends TransitionableState
 		{
 			persistentUpdate = false;
 
-			var diffic:String = CoolUtil.getDifficultySuffix(curDifficultyString, false, curSong.difficulties);
+			var diffic:String = CoolUtil.fromSuffixToID(CoolUtil.getDifficultySuffix(curDifficultyString, curSong.difficulties));
+			var ourPath:String = CoolUtil.formatSong(curSong.songID, diffic);
 
-			if (Paths.fileExists('data/' + curSong.songID + '/' + curSong.songID + diffic + '.json', TEXT))
+			if (Paths.fileExists('data/' + curSong.songID + '/' + ourPath + '.json', TEXT))
 			{
 				try
 				{
-					PlayState.SONG = Song.loadFromJson(curSong.songID + diffic, curSong.songID);
+					PlayState.SONG = Song.loadFromJson(ourPath, curSong.songID);
 					PlayState.gameMode = 'freeplay';
 					PlayState.isStoryMode = false;
 					PlayState.difficulties = curSong.difficulties;
@@ -394,11 +407,11 @@ class FreeplayMenuState extends TransitionableState
 					#if desktop } #end
 				}
 				catch (e:Dynamic) {
-					Debug.logError('Error on file "' + curSong.songID + '/' + curSong.songID + diffic + '.json' + '": ' + e);
+					Debug.logError('Error on file "' + curSong.songID + '/' + ourPath + '.json' + '": ' + e);
 				}
 			}
 			else {
-				Debug.logError('File "' + curSong.songID + '/' + curSong.songID + diffic + '.json' + '" does not exist!');
+				Debug.logError('File "' + curSong.songID + '/' + ourPath + '.json' + '" does not exist!');
 			}
 		}
 		else if (controls.RESET)

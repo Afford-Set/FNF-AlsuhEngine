@@ -25,6 +25,7 @@ and again also same goes for *.Webm Cutscenes*, comment out or delete the line w
 # Features
 
 It's the same as in the Psych Engine, only there are changes and additions shown below.
+The main feature is support for .MP3 audio files. .OGG audio files continue to be supported in this engine.
 
 ### Additions
 - Custom Inst and Voices on other difficulties

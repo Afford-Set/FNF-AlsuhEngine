@@ -1,10 +1,10 @@
-1.6.15;
-- New Loading Screen 3.0
-- Added Optimized PNGs
-- Added Random Notes
-- Added uploading custom files to assets/ support
-- Replaced some from Fanmade files to Vanilla files
-- Fixed crash on other weeks
-- Fixed some stuff on Week Editor, Menu Character Editor and Story Menu
-- Fixed texts/strings stuff
-- Removed typos on Week Editor
+1.7;
+- Added .MP3 files support
+- Added .WAV files support
+- Added crash prevention on loading song
+- Fixed Check to updates in case of connection problems with the server
+- Fixed combo offset menu on pressing left button of mouse
+- Fixed Master Editor Menu
+- Fixed Replays
+- Fixed loading of the next song
+- Fixed volume's save data

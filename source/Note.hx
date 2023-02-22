@@ -2,10 +2,10 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-import shaders.ColorSwap;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import editors.ChartingState;
+import shaderslmfao.ColorSwap;
 import flash.display.BitmapData;
 import flixel.graphics.FlxGraphic;
 
@@ -65,6 +65,7 @@ class Note extends FlxSprite
 	public static var swagWidth:Float = 160 * 0.7;
 	public static var pixelInt:Array<Int> = [0, 1, 2, 3];
 	public static var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
+	public static var pointers:Array<String> = ['LEFT', 'DOWN', 'UP', 'RIGHT'];
 
 	// Lua shit
 	public var quickNoteSplash:Bool = false;
@@ -247,7 +248,7 @@ class Note extends FlxSprite
 
 			hitsoundDisabled = true;
 
-			if (OptionData.downScroll == true) flipY = true;
+			if (OptionData.downScroll) flipY = true;
 
 			offsetX += width / 2;
 			copyAngle = false;

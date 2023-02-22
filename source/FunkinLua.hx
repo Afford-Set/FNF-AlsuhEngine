@@ -57,6 +57,7 @@ import openfl.utils.AssetType;
 import flixel.system.FlxSound;
 import openfl.display.BlendMode;
 import openfl.display.BitmapData;
+import flixel.graphics.FlxGraphic;
 import openfl.filters.BitmapFilter;
 import animateatlas.AtlasFrameMaker;
 import flixel.input.keyboard.FlxKey;
@@ -240,8 +241,9 @@ class FunkinLua
 		}
 
 		set('scrollSpeed', PlayState.SONG.speed);
-		set('opponentStrumsType', OptionData.opponentStrumsType);
+
 		set('scriptName', scriptName);
+		set('currentModDirectory', Paths.currentModDirectory);
 
 		#if windows
 		set('buildTarget', 'windows');
@@ -543,10 +545,9 @@ class FunkinLua
 		{
 			#if (!flash && MODS_ALLOWED && sys)
 			var shader:FlxRuntimeShader = getShader(obj);
-
 			if (shader == null) return;
 
-			var value = Paths.getImage(bitmapdataPath);
+			var value:FlxGraphic = Paths.getImage(bitmapdataPath);
 
 			if (value != null && value.bitmap != null) {
 				shader.setSampler2D(prop, value.bitmap);
@@ -644,7 +645,7 @@ class FunkinLua
 
 			cervix = Paths.getFile(cervix);
 
-			if (Paths.fileExists(cervix, TEXT)) {
+			if (Paths.fileExists(cervix, TEXT, true)) {
 				doPush = true;
 			}
 
@@ -1626,11 +1627,13 @@ class FunkinLua
 				{
 					FlxG.switchState(new FreeplayMenuState());
 				}
+				#if REPLAYS_ALLOWED
 				case 'replay':
 				{
 					Replay.resetVariables();
 					FlxG.switchState(new options.ReplaysMenuState());
 				}
+				#end
 				default:
 				{
 					FlxG.switchState(new MainMenuState());
@@ -1878,7 +1881,7 @@ class FunkinLua
 
 			cervix = Paths.getFile(cervix);
 
-			if (Paths.fileExists(cervix, TEXT)) {
+			if (Paths.fileExists(cervix, TEXT, true)) {
 				doPush = true;
 			}
 
@@ -1919,7 +1922,7 @@ class FunkinLua
 
 			cervix = Paths.getFile(cervix);
 
-			if (Paths.fileExists(cervix, TEXT)) {
+			if (Paths.fileExists(cervix, TEXT, true)) {
 				doPush = true;
 			}
 
@@ -1943,7 +1946,7 @@ class FunkinLua
 
 			cervix = Paths.getFile(cervix);
 
-			if (Paths.fileExists(cervix, TEXT)) {
+			if (Paths.fileExists(cervix, TEXT, true)) {
 				doPush = true;
 			}
 
@@ -1969,7 +1972,7 @@ class FunkinLua
 
 			cervix = Paths.getFile(cervix);
 
-			if (Paths.fileExists(cervix, TEXT)) {
+			if (Paths.fileExists(cervix, TEXT, true)) {
 				doPush = true;
 			}
 
@@ -2003,7 +2006,7 @@ class FunkinLua
 
 			cervix = Paths.getFile(cervix);
 
-			if (Paths.fileExists(cervix, TEXT)) {
+			if (Paths.fileExists(cervix, TEXT, true)) {
 				doPush = true;
 			}
 
@@ -2299,7 +2302,7 @@ class FunkinLua
 								behindWhom == '2' ||
 								behindWhom == 2;
 
-							if (blyad == true)
+							if (blyad)
 							{
 								if (PlayState.instance.isDead) {
 									GameOverSubState.instance.insert(PlayState.instance.members.indexOf(GameOverSubState.instance.boyfriend), sprite);
@@ -2686,7 +2689,7 @@ class FunkinLua
 
 			luaTrace('startDialogue: Trying to load dialogue: ' + path);
 
-			if (Paths.fileExists(path, TEXT))
+			if (Paths.fileExists(path, TEXT, true))
 			{
 				var dialogue:DialogueFile = DialogueBoxPsych.parseDialogue(path);
 
@@ -2723,7 +2726,7 @@ class FunkinLua
 				case 'webm':
 				{
 					#if WEBM_ALLOWED
-					if (Paths.fileExists(Paths.getWebm(videoFile), BINARY))
+					if (Paths.fileExists(Paths.getWebm(videoFile), BINARY, true))
 					{
 						PlayState.instance.startVideo(videoFile, type);
 						return;
@@ -2738,7 +2741,7 @@ class FunkinLua
 				default:
 				{
 					#if MP4_ALLOWED
-					if (Paths.fileExists(Paths.getVideo(videoFile), BINARY))
+					if (Paths.fileExists(Paths.getVideo(videoFile), BINARY, true))
 					{
 						PlayState.instance.startVideo(videoFile, type);
 						return;
@@ -3239,7 +3242,7 @@ class FunkinLua
 			{
 				var lePath:String = Paths.getFile(path, TEXT);
 
-				if (Paths.fileExists(lePath, TEXT))
+				if (Paths.fileExists(lePath, TEXT, true))
 				{
 					FileSystem.deleteFile(lePath);
 					return;
@@ -4028,7 +4031,7 @@ class FunkinLua
 			die.push(Std.parseInt(strIndices[i]));
 		}
 
-		if (PlayState.instance.getLuaObject(obj, false)!=null)
+		if (PlayState.instance.getLuaObject(obj, false) != null)
 		{
 			var pussy:FlxSprite = PlayState.instance.getLuaObject(obj, false);
 			pussy.animation.addByIndices(name, prefix, die, '', framerate, loop);

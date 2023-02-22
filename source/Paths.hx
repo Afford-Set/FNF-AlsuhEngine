@@ -4,21 +4,26 @@ package;
 import sys.io.File;
 import haxe.io.Path;
 import sys.FileSystem;
+import openfl.display.BitmapData;
+
+#if cpp
+import audio.MiniMP3;
+import lime.media.AudioBuffer;
+import openfl.utils.ByteArray;
+#end
+#else
+import openfl.utils.Assets as OpenFlAssets;
 #end
 
 import haxe.Json;
 import haxe.format.JsonParser;
 
 import flixel.FlxG;
-import openfl.text.Font;
 import lime.utils.Assets;
 import openfl.media.Sound;
 import openfl.system.System;
-import lime.media.AudioBuffer;
 import openfl.utils.AssetType;
-import openfl.display.BitmapData;
 import flixel.graphics.FlxGraphic;
-import openfl.utils.Assets as OpenFlAssets;
 import flixel.graphics.frames.FlxAtlasFrames;
 
 using StringTools;
@@ -27,7 +32,7 @@ class Paths
 {
 	public static var songLibrary:String = 'songs';
 
-	public static var SOUND_EXT:String = #if web 'mp3' #else 'ogg' #end;
+	public static var SOUND_EXT:String = #if MP3_ALLOWED 'mp3' #else 'ogg' #end;
 	public static var VIDEO_EXT:String = 'mp4';
 
 	public static var currentModDirectory:String = null;
@@ -92,7 +97,7 @@ class Paths
 
 	public static var localTrackedAssets:Array<String> = [];
 
-	public static function clearStoredMemory(?cleanUnused:Bool = false):Void
+	public static function clearStoredMemory():Void
 	{
 		@:privateAccess
 		for (key in FlxG.bitmap._cache.keys())
@@ -122,40 +127,35 @@ class Paths
 		#end
 	}
 
-	public static var currentLevel:String;
+	public static var currentLevel:String = null;
 
 	public static function setCurrentLevel(name:String):Void
 	{
-		currentLevel = name.toLowerCase();
+		currentLevel = formatToSongPath(name);
 	}
 
 	public static function getPath(file:String, type:AssetType = TEXT, ?library:Null<String> = null):String
 	{
-		if (library != null)
-		{
-			if (library == 'preload' || library == 'default') {
-				return getPreloadPath(file);
-			}
-
-			return getLibraryPathForce(file, library);
+		if (library != null && library.length > 0) {
+			return getLibraryPath(file, library);
 		}
 
-		if (currentLevel != null)
+		if (currentLevel != null && currentLevel.length > 0)
 		{
 			var levelPath:String = '';
 
 			if (currentLevel != 'shared')
 			{
-				levelPath = getLibraryPathForce(file, currentLevel);
+				levelPath = getLibraryPath(file, currentLevel);
 
-				if (fileExists(levelPath, type, currentLevel)) {
+				if (fileExists(levelPath, type, currentLevel, true)) {
 					return levelPath;
 				}
 			}
 
-			levelPath = getLibraryPathForce(file, 'shared');
+			levelPath = getLibraryPath(file, 'shared');
 
-			if (fileExists(levelPath, type, 'shared')) {
+			if (fileExists(levelPath, type, 'shared', true)) {
 				return levelPath;
 			}
 		}
@@ -163,9 +163,18 @@ class Paths
 		return getPreloadPath(file);
 	}
 
+	public static function getLibraryPath(file:String = '', library:String = 'shared'):String
+	{
+		if (library == 'preload' || library == 'default') {
+			return getPreloadPath(file);
+		}
+
+		return getLibraryPathForce(file, library);
+	}
+
 	public static function getLibraryPathForce(file:String = '', library:String = 'shared'):String
 	{
-		return #if !sys '$library:' + #end getPreloadPath('$library/$file');
+		return #if web '$library:' + #end getPreloadPath('$library/$file');
 	}
 
 	public static function getPreloadPath(file:String = ''):String
@@ -176,10 +185,28 @@ class Paths
 	public static function getFile(file:String, type:AssetType = TEXT, ?library:Null<String> = null):String
 	{
 		#if MODS_ALLOWED
-		var path:String = modFolders(file);
+		if (library != null && library.length > 0 && library != 'preload' && library != 'default')
+		{
+			var modLibraryPath:String = modFolders(library + '/' + file);
 
-		if (FileSystem.exists(path)) {
-			return path;
+			if (FileSystem.exists(modLibraryPath)) {
+				return modLibraryPath;
+			}
+		}
+
+		if (currentLevel != null && currentLevel.length > 0 && currentLevel != 'preload' && currentLevel != 'default')
+		{
+			var modLibraryPath:String = modFolders(currentLevel + '/' + file);
+
+			if (FileSystem.exists(modLibraryPath)) {
+				return modLibraryPath;
+			}
+		}
+
+		var modPath:String = modFolders(file);
+
+		if (FileSystem.exists(modPath)) {
+			return modPath;
 		}
 		#end
 
@@ -230,110 +257,114 @@ class Paths
 		return getFile('$key.lua', TEXT, library);
 	}
 
-	public static function getSound(key:String, ?library:String):Sound
+	public static function getSound(key:String, ?library:String, ?getId:Bool = false):Any
 	{
-		return getTrackedAudioFromFile('sounds', '$key', library);
+		return getTrackedAudioFromFile('sounds', '$key', library, getId);
 	}
 
 	@:deprecated("`Paths.sound()` is deprecated, use 'Paths.getSound()' instead")
-	public static function sound(key:String, ?library:String):Sound
+	public static function sound(key:String, ?library:String, ?getId:Bool = false):Any
 	{
 		Debug.logWarn("`Paths.sound()` is deprecated! use 'Paths.getSound()' instead");
 
-		return getSound(key, library);
+		return getSound(key, library, getId);
 	}
 
-	public static function getSoundRandom(key:String, min:Int, max:Int, ?library:String):Sound
+	public static function getSoundRandom(key:String, min:Int, max:Int, ?library:String, ?getId:Bool = false):Any
 	{
-		return getSound(key + FlxG.random.int(min, max), library);
+		return getSound(key + FlxG.random.int(min, max), library, getId);
 	}
 
 	@:deprecated("`Paths.soundRandom()` is deprecated, use 'Paths.getSoundRandom()' instead")
-	public static function soundRandom(key:String, min:Int, max:Int, ?library:String):Sound
+	public static function soundRandom(key:String, min:Int, max:Int, ?library:String, ?getId:Bool = false):Any
 	{
 		Debug.logWarn("`Paths.soundRandom()` is deprecated! use 'Paths.getSoundRandom()' instead");
 
-		return getSoundRandom(key, min, max, library);
+		return getSoundRandom(key, min, max, library, getId);
 	}
 
-	public static function getMusic(key:String, ?library:String):Sound
+	public static function getMusic(key:String, ?library:String, ?getId:Bool = false):Any
 	{
-		return getTrackedAudioFromFile('music', '$key', library);
+		return getTrackedAudioFromFile('music', '$key', library, getId);
 	}
 
 	@:deprecated("`Paths.music()` is deprecated, use 'Paths.getMusic()' instead")
-	public static function music(key:String, ?library:String):Sound
+	public static function music(key:String, ?library:String, ?getId:Bool = false):Any
 	{
 		Debug.logWarn("`Paths.music()` is deprecated! use 'Paths.getMusic()' instead");
 
-		return getMusic(key, library);
+		return getMusic(key, library, getId);
 	}
 
-	public static function getInst(song:String, ?diffPath:String = '', ?isString:Bool = false):Any
+	public static function getInst(song:String, ?diffPath:String = '', ?getId:Bool = false):Any
 	{
-		var songPath:String = Paths.formatToSongPath(song);
+		var songPath:String = formatToSongPath(song);
 
-		var path:String = '$songPath/Inst.$SOUND_EXT';
-		var diffPath:String = '$songPath/Inst-$diffPath.$SOUND_EXT';
+		var path:String = getTrackedAudioFromFile(songPath + '-' + diffPath, 'Inst', songLibrary, true);
 
-		if (fileExists(#if sys songLibrary + '/' + #end diffPath, SOUND #if web , songLibrary #end))
-		{
-			if (isString) {
-				return getFile(#if sys songLibrary + '/' + #end diffPath, SOUND #if web , songLibrary #end);
-			}
-
-			return getTrackedAudioFromFile(songLibrary, diffPath);
+		if (fileExists(path, SOUND, songLibrary, true)) {
+			return getTrackedAudioFromFile(null, path, null);
 		}
 
-		if (isString) {
-			return getFile(#if sys songLibrary + '/' + #end path, SOUND #if web , songLibrary #end);
+		var path:String = getTrackedAudioFromFile(songPath, 'Inst' + '-' + diffPath, songLibrary, true);
+
+		if (fileExists(path, SOUND, songLibrary, true)) {
+			return getTrackedAudioFromFile(null, path, null);
 		}
 
-		return getTrackedAudioFromFile(songLibrary, path);
+		var path:String = getTrackedAudioFromFile(songPath + '-' + diffPath, 'Inst' + '-' + diffPath, songLibrary, true);
+
+		if (fileExists(path, SOUND, songLibrary, true)) {
+			return getTrackedAudioFromFile(null, path, null);
+		}
+
+		return getTrackedAudioFromFile(songPath, 'Inst', songLibrary, getId);
 	}
 
 	@:deprecated("`Paths.inst()` is deprecated, use 'Paths.getInst()' instead")
-	public static function inst(song:String, ?diffPath:String = '', ?isString:Bool = false):Any
+	public static function inst(song:String, ?diffPath:String = '', ?getId:Bool = false):Any
 	{
 		Debug.logWarn("`Paths.inst()` is deprecated! use 'Paths.getInst()' instead");
 
-		return getInst(song, diffPath, isString);
+		return getInst(song, diffPath, getId);
 	}
 
-	public static function getVoices(song:String, ?diffPath:String = '', ?isString:Bool = false):Any
+	public static function getVoices(song:String, ?diffPath:String = '', ?getId:Bool = false):Any
 	{
-		var songPath:String = Paths.formatToSongPath(song);
+		var songPath:String = formatToSongPath(song);
 
-		var path:String = '$songPath/Voices.$SOUND_EXT';
-		var diffPath:String = '$songPath/Voices-$diffPath.$SOUND_EXT';
+		var path:String = getTrackedAudioFromFile(songPath + '-' + diffPath, 'Voices', songLibrary, true);
 
-		if (fileExists(#if sys songLibrary + '/' + #end diffPath, SOUND #if web , songLibrary #end))
-		{
-			if (isString) {
-				return getFile(#if sys songLibrary + '/' + #end diffPath, SOUND #if web , songLibrary #end);
-			}
-
-			return getTrackedAudioFromFile(songLibrary, diffPath);
+		if (fileExists(path, SOUND, songLibrary, true)) {
+			return getTrackedAudioFromFile(null, path, null);
 		}
 
-		if (isString) {
-			return getFile(#if sys songLibrary + '/' + #end path, SOUND #if web , songLibrary #end);
+		var path:String = getTrackedAudioFromFile(songPath, 'Voices' + '-' + diffPath, songLibrary, true);
+
+		if (fileExists(path, SOUND, songLibrary, true)) {
+			return getTrackedAudioFromFile(null, path, null);
 		}
 
-		return getTrackedAudioFromFile(songLibrary, path);
+		var path:String = getTrackedAudioFromFile(songPath + '-' + diffPath, 'Voices' + '-' + diffPath, songLibrary, true);
+
+		if (fileExists(path, SOUND, songLibrary, true)) {
+			return getTrackedAudioFromFile(null, path, null);
+		}
+
+		return getTrackedAudioFromFile(songPath, 'Voices', songLibrary, getId);
 	}
 
 	@:deprecated("`Paths.voices()` is deprecated, use 'Paths.getVoices()' instead")
-	public static function voices(song:String, ?diffPath:String = '', ?isString:Bool = false):Any
+	public static function voices(song:String, ?diffPath:String = '', ?getId:Bool = false):Any
 	{
 		Debug.logWarn("`Paths.voices()` is deprecated! use 'Paths.getVoices()' instead");
 
-		return getVoices(song, diffPath, isString);
+		return getVoices(song, diffPath, getId);
 	}
 
 	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
 
-	public static function getImage(key:String, ?library:String = null):FlxGraphic
+	public static function getImage(key:String, ?library:String, ?getId:Bool = false):Any
 	{
 		if (key.endsWith('.png')) {
 			key.replace('.png', '');
@@ -341,13 +372,20 @@ class Paths
 
 		var ourFile:String = getFile('images/$key.png', IMAGE, library);
 
-		if (fileExists(ourFile, IMAGE, library))
+		if (fileExists('$key.png', IMAGE, library, true)) {
+			ourFile = '$key.png';
+		}
+
+		if (getId) {
+			return ourFile;
+		}
+
+		if (fileExists(ourFile, IMAGE, library, true))
 		{
 			if (!currentTrackedAssets.exists(ourFile))
 			{
 				#if sys
-				var newBitmap:BitmapData = BitmapData.fromFile(ourFile);
-				var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(newBitmap, false, ourFile);
+				var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(BitmapData.fromFile(ourFile), false, ourFile);
 				#else
 				var newGraphic:FlxGraphic = FlxG.bitmap.add(ourFile, false, ourFile);
 				#end
@@ -405,24 +443,24 @@ class Paths
 		return getWebm(key, library);
 	}
 
-	public static function getWebmSound(key:String, ?library:String):Sound
+	public static function getWebmSound(key:String, ?library:String, ?getId:Bool = false):Any
 	{
-		return getTrackedAudioFromFile('videos', key, library);
+		return getTrackedAudioFromFile('videos', key, library, getId);
 	}
 
 	@:deprecated("`Paths.webmSound()` is deprecated, use 'Paths.getWebmSound()' instead")
-	public static function webmSound(key:String, ?library:String):Sound
+	public static function webmSound(key:String, ?library:String, ?getId:Bool = false):Any
 	{
 		Debug.logWarn("`Paths.webmSound()` is deprecated! use 'Paths.getWebmSound()' instead");
 
-		return getWebmSound(key, library);
+		return getWebmSound(key, library, getId);
 	}
 
 	public static function getTextFromFile(key:String, ?library:String = null):String
 	{
 		var ourPath:String = getFile(key, TEXT, library);
 
-		if (Paths.fileExists(ourPath, TEXT, library))
+		if (fileExists(ourPath, TEXT, library, true))
 		{
 			#if sys
 			return File.getContent(ourPath);
@@ -455,11 +493,17 @@ class Paths
 
 	public static var currentTrackedSounds:Map<String, Sound> = [];
 
-	public static function getTrackedAudioFromFile(path:String, key:String, ?library:String):Sound
+	public static function getTrackedAudioFromFile(path:String, key:String, ?library:String, ?getId:Bool = false):Any
 	{
 		if (key.endsWith('.$SOUND_EXT')) {
 			key = key.replace('.$SOUND_EXT', '');
 		}
+
+		#if cpp
+		if (key.endsWith('.ogg')) {
+			key = key.replace('.ogg', '');
+		}
+		#end
 
 		var gottenPath:String = getFile('$key.$SOUND_EXT', SOUND, library);
 
@@ -467,26 +511,71 @@ class Paths
 			gottenPath = getFile('$path/$key.$SOUND_EXT', SOUND, library);
 		}
 
-		#if web
-		if (path == songLibrary) {
-			gottenPath = '$songLibrary:$gottenPath';
+		#if cpp
+		var fileToCheckOgg:String = getFile('$key.ogg', SOUND, library);
+
+		if (path != null && path.length > 0) {
+			fileToCheckOgg = getFile('$path/$key.ogg', SOUND, library);
+		}
+
+		if (fileExists(fileToCheckOgg, SOUND, library, true)) {
+			gottenPath = fileToCheckOgg;
+		}
+
+		var fileToCheckWav:String = getFile('$key.wav', SOUND, library);
+
+		if (path != null && path.length > 0) {
+			fileToCheckWav = getFile('$path/$key.wav', SOUND, library);
+		}
+
+		if (fileExists(fileToCheckWav, SOUND, library, true)) {
+			gottenPath = fileToCheckWav;
 		}
 		#end
 
-		if (!currentTrackedSounds.exists(gottenPath))
+		if (fileExists(key + '.$SOUND_EXT', SOUND, library, true)) {
+			gottenPath = key + '.$SOUND_EXT';
+		}
+
+		#if cpp
+		if (fileExists(key + '.ogg', SOUND, library, true)) {
+			gottenPath = key + '.ogg';
+		}
+
+		if (fileExists(key + '.wav', SOUND, library, true)) {
+			gottenPath = key + '.wav';
+		}
+		#end
+
+		if (getId) {
+			return gottenPath;
+		}
+
+		if (fileExists(gottenPath, SOUND, library, true))
 		{
-			if (fileExists(gottenPath, SOUND, library))
+			if (!currentTrackedSounds.exists(gottenPath))
 			{
 				#if sys
-				currentTrackedSounds.set(gottenPath, Sound.fromFile(gottenPath));
+				#if cpp
+				if (gottenPath.endsWith('.$SOUND_EXT'))
+				{
+					var decoded = MiniMP3.decodeMP3(ByteArray.fromFile(gottenPath));
+					var encoded:ByteArray = MiniMP3.encodeWav(decoded.data, decoded.sampleCount, decoded.sampleRate, decoded.channels);
+	
+					var audioBuffer:AudioBuffer = AudioBuffer.fromBytes(encoded);
+					currentTrackedSounds.set(gottenPath, Sound.fromAudioBuffer(audioBuffer));
+				}
+				else #end currentTrackedSounds.set(gottenPath, Sound.fromFile(gottenPath));
 				#else
 				currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(gottenPath));
 				#end
 			}
+
+			localTrackedAssets.push(gottenPath);
+			return currentTrackedSounds.get(gottenPath);
 		}
 
-		localTrackedAssets.push(gottenPath);
-		return currentTrackedSounds.get(gottenPath);
+		return null;
 	}
 
 	public static function formatToSongPath(path:String):String
@@ -498,16 +587,29 @@ class Paths
 		return hideChars.split(path).join('').toLowerCase();
 	}
 
-	public static function fileExists(key:String, type:AssetType, ?library:String):Bool
+	public static function fileExists(key:String, type:AssetType, ?library:String, ?optimize:Bool = false):Bool
 	{
+		if (optimize)
+		{
+			#if sys
+			if (FileSystem.exists(key)) {
+				return true;
+			}
+			#else
+			if (OpenFlAssets.exists(key, type)) {
+				return true;
+			}
+			#end
+		}
+
 		var altPath:String = getFile(key, type, library);
 
 		#if sys
-		if (FileSystem.exists(key) || FileSystem.exists(altPath)) {
+		if (FileSystem.exists(altPath) || FileSystem.exists(key)) {
 			return true;
 		}
 		#else
-		if (OpenFlAssets.exists(key) || OpenFlAssets.exists(altPath)) {
+		if (OpenFlAssets.exists(altPath, type) || OpenFlAssets.exists(key, type)) {
 			return true;
 		}
 		#end
@@ -559,7 +661,7 @@ class Paths
 
 		if (FileSystem.exists(path))
 		{
-			var list:Array<String> = CoolUtil.coolTextFile(path);
+			var list:Array<String> = CoolUtil.coolTextFile(path, false, true);
 
 			for (i in list)
 			{

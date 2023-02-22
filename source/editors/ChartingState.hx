@@ -49,7 +49,6 @@ import flixel.addons.ui.FlxUITabMenu;
 import flixel.addons.ui.FlxUICheckBox;
 import flixel.addons.ui.FlxUIInputText;
 import flixel.addons.ui.FlxUIDropDownMenu;
-import openfl.utils.Assets as OpenFlAssets;
 import flixel.addons.ui.FlxUINumericStepper;
 import flixel.addons.display.FlxGridOverlay;
 
@@ -353,7 +352,7 @@ class ChartingState extends MusicBeatUIState
 
 		for (i in 0...8)
 		{
-			var note:StrumNote = new StrumNote(GRID_SIZE * (i + 1), strumLine.y, i % 4, 0);
+			var note:StrumNote = new StrumNote(GRID_SIZE * (i + 1), strumLine.y, i % Note.maxNote, 0);
 			note.setGraphicSize(GRID_SIZE, GRID_SIZE);
 			note.updateHitbox();
 			note.playAnim('static', true);
@@ -695,7 +694,7 @@ class ChartingState extends MusicBeatUIState
 			var songName:String = _song.songID;
 			var path:String = Paths.getJson('data/' + songName + '/events');
 
-			if (Paths.fileExists(path, TEXT))
+			if (Paths.fileExists(path, TEXT, true))
 			{
 				clearEvents();
 
@@ -1173,8 +1172,11 @@ class ChartingState extends MusicBeatUIState
 		}
 		#end
 
-		directories.push(Paths.getLibraryPathForce('custom_notetypes/', Paths.currentLevel));
-		directories.push(Paths.getLibraryPathForce('custom_notetypes/'));
+		if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared') {
+			directories.push(Paths.getLibraryPath('custom_notetypes/', Paths.currentLevel));
+		}
+
+		directories.push(Paths.getLibraryPath('custom_notetypes/', 'shared'));
 		directories.push(Paths.getPreloadPath('custom_notetypes/'));
 
 		for (i in 0...directories.length)
@@ -1256,8 +1258,11 @@ class ChartingState extends MusicBeatUIState
 		}
 		#end
 
-		directories.push(Paths.getLibraryPathForce('custom_events/', Paths.currentLevel));
-		directories.push(Paths.getLibraryPathForce('custom_events/'));
+		if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared') {
+			directories.push(Paths.getLibraryPath('custom_events/', Paths.currentLevel));
+		}
+
+		directories.push(Paths.getLibraryPath('custom_events/', 'shared'));
 		directories.push(Paths.getPreloadPath('custom_events/'));
 
 		for (i in 0...directories.length)
@@ -1640,14 +1645,11 @@ class ChartingState extends MusicBeatUIState
 			FlxG.sound.music.stop();
 		}
 
-		var file:Dynamic = Paths.getVoices(currentSongName, CoolUtil.getDifficultySuffix(PlayState.lastDifficulty), #if NO_PRELOAD_ALL true #else false #end);
-		vocals = new FlxSound();
+		var file:Sound = Paths.getVoices(currentSongName, PlayState.lastDifficulty);
 
-		if (Std.isOfType(file, Sound) || OpenFlAssets.exists(file))
-		{
-			vocals.loadEmbedded(file);
-			FlxG.sound.list.add(vocals);
-		}
+		vocals = new FlxSound();
+		vocals.loadEmbedded(file);
+		FlxG.sound.list.add(vocals);
 
 		generateSong();
 
@@ -1659,7 +1661,7 @@ class ChartingState extends MusicBeatUIState
 
 	function generateSong():Void
 	{
-		FlxG.sound.playMusic(Paths.getInst(currentSongName, CoolUtil.getDifficultySuffix(PlayState.lastDifficulty), #if NO_PRELOAD_ALL true #else false #end), 0.6);
+		FlxG.sound.playMusic(Paths.getInst(currentSongName, PlayState.lastDifficulty), 0.6);
 
 		if (instVolume != null) FlxG.sound.music.volume = instVolume.value;
 		if (check_mute_inst != null && check_mute_inst.checked) FlxG.sound.music.volume = 0;
@@ -1892,6 +1894,7 @@ class ChartingState extends MusicBeatUIState
 			}
 		}
 
+		FlxG.watch.addQuick('daSec', curSec);
 		FlxG.watch.addQuick('daBeat', curBeat);
 		FlxG.watch.addQuick('daStep', curStep);
 
@@ -2388,7 +2391,7 @@ class ChartingState extends MusicBeatUIState
 
 				if (note.strumTime > lastConductorPos && FlxG.sound.music.playing && note.noteData > -1)
 				{
-					var data:Int = note.noteData % 4;
+					var data:Int = note.noteData % Note.maxNote;
 
 					if (!playedSound[data])
 					{
@@ -3074,12 +3077,12 @@ class ChartingState extends MusicBeatUIState
 
 	function setupNoteData(i:Array<Dynamic>, isNextSection:Bool):Note
 	{
-		var daNoteInfo = i[1];
-		var daStrumTime = i[0];
+		var daNoteInfo:Int = i[1];
+		var daStrumTime:Float = i[0];
 
 		var daSus:Dynamic = i[2];
 
-		var note:Note = new Note(daStrumTime, daNoteInfo % 4, null, null, true, (i[1] > 3 ? !_song.notes[curSec].mustHitSection : _song.notes[curSec].mustHitSection));
+		var note:Note = new Note(daStrumTime, daNoteInfo % Note.maxNote, null, null, true, (i[1] > 3 ? !_song.notes[curSec].mustHitSection : _song.notes[curSec].mustHitSection));
 
 		if (daSus != null) // Common note
 		{

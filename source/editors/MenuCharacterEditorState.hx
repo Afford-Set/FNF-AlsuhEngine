@@ -344,7 +344,7 @@ class MenuCharacterEditorState extends MusicBeatUIState
 		}
 
 		char.animation.addByPrefix('confirm', characterFile.confirm_anim, characterFile.fpsConfirm, false);
-		char.flipX = (characterFile.flipX == true);
+		char.flipX = characterFile.flipX == true;
 		char.scale.set(characterFile.scale, characterFile.scale);
 		char.updateHitbox();
 		char.dance();

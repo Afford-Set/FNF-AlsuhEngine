@@ -61,7 +61,7 @@ class StoryMenuState extends MusicBeatState
 
 		persistentUpdate = persistentDraw = true;
 
-		if (FlxG.sound.music.playing == false || FlxG.sound.music.volume == 0) {
+		if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {
 			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 		}
 
@@ -342,71 +342,82 @@ class StoryMenuState extends MusicBeatState
 			}
 			else if (controls.ACCEPT || FlxG.mouse.justPressed)
 			{
-				var diffic:String = CoolUtil.getDifficultySuffix(curDifficultyString, curWeek.difficulties);
+				var songID:String = curWeek.songs[0].songID;
 
-				if (!WeekData.weekIsLocked(curWeek.weekID) && Paths.fileExists('data/' + curWeek.songs[0].songID + '/' + curWeek.songs[0].songID + diffic + '.json', TEXT))
+				var diffic:String = CoolUtil.fromSuffixToID(CoolUtil.getDifficultySuffix(curDifficultyString, curWeek.difficulties));
+				var ourPath:String = CoolUtil.formatSong(songID, diffic);
+
+				if (!WeekData.weekIsLocked(curWeek.weekID))
 				{
-					selectedWeek = true;
-
-					if (grpWeekCharacters.length > 0)
+					if (Paths.fileExists('data/' + songID + '/' + ourPath + '.json', TEXT))
 					{
-						for (i in 0...grpWeekCharacters.length)
+						try
 						{
-							var char:MenuCharacter = grpWeekCharacters.members[i];
-	
-							if (char.character != '' && char.hasConfirmAnimation) {
-								char.hey();
+							selectedWeek = true;
+
+							if (grpWeekCharacters.length > 0)
+							{
+								for (i in 0...grpWeekCharacters.length)
+								{
+									var char:MenuCharacter = grpWeekCharacters.members[i];
+
+									if (char.character != '' && char.hasConfirmAnimation) {
+										char.hey();
+									}
+								}
 							}
+
+							grpWeeks.members[curSelected].isFlashing = true;
+
+							PlayState.SONG = Song.loadFromJson(ourPath, songID);
+							PlayState.gameMode = 'story';
+							PlayState.isStoryMode = true;
+							PlayState.firstSong = songID;
+
+							var songArray:Array<String> = [];
+
+							for (i in 0...curWeek.songs.length) {
+								songArray.push(curWeek.songs[i].songID);
+							}
+
+							PlayState.storyPlaylist = songArray;
+							PlayState.weekLength = songArray.length;
+							PlayState.storyDifficultyID = curDifficultyString;
+							PlayState.lastDifficulty = curDifficultyString;
+							PlayState.storyWeekText = curWeek.weekID;
+							PlayState.storyWeekName = curWeek.weekName;
+							PlayState.difficulties = curWeek.difficulties;
+
+							PlayState.campaignScore = 0;
+							PlayState.campaignMisses = 0;
+							PlayState.campaignAccuracy = 0;
+
+							PlayState.seenCutscene = false;
+
+							FlxG.sound.play(Paths.getSound('confirmMenu'));
+
+							Debug.logInfo('Loading song ${PlayState.SONG.songName} and week "${PlayState.storyWeekName}" into Story...');
+
+							new FlxTimer().start(1, function(tmr:FlxTimer):Void
+							{
+								LoadingState.loadAndSwitchState(new PlayState(), true);
+
+								if (!OptionData.loadingScreen) {
+									FreeplayMenuState.destroyFreeplayVocals();
+								}
+							});
+						}
+						catch (e:Dynamic) {
+							Debug.logError('Error on loading file "' + songID + '/' + ourPath + '.json' + '": ' + e);
 						}
 					}
-
-					grpWeeks.members[curSelected].isFlashing = true;
-
-					PlayState.SONG = Song.loadFromJson(curWeek.songs[0].songID + diffic, curWeek.songs[0].songID);
-					PlayState.gameMode = 'story';
-					PlayState.isStoryMode = true;
-					PlayState.firstSong = curWeek.songs[0].songID;
-
-					var songArray:Array<String> = [];
-
-					for (i in 0...curWeek.songs.length) {
-						songArray.push(curWeek.songs[i].songID);
+					else {
+						Debug.logError('File "' + songID + '/' + ourPath + '.json' + '" does not exist!');
 					}
-
-					PlayState.storyPlaylist = songArray;
-					PlayState.weekLength = songArray.length;
-					PlayState.storyDifficultyID = curDifficultyString;
-					PlayState.lastDifficulty = curDifficultyString;
-					PlayState.storyWeekText = curWeek.weekID;
-					PlayState.storyWeekName = curWeek.weekName;
-					PlayState.difficulties = curWeek.difficulties;
-
-					PlayState.campaignScore = 0;
-					PlayState.campaignMisses = 0;
-					PlayState.campaignAccuracy = 0;
-
-					PlayState.seenCutscene = false;
-
-					FlxG.sound.play(Paths.getSound('confirmMenu'));
-
-					Debug.logInfo('Loading song ${PlayState.SONG.songName} and week "${PlayState.storyWeekName}" into Story...');
-
-					new FlxTimer().start(1, function(tmr:FlxTimer):Void
-					{
-						LoadingState.loadAndSwitchState(new PlayState(), true);
-
-						if (!OptionData.loadingScreen) {
-							FreeplayMenuState.destroyFreeplayVocals();
-						}
-					});
 				}
 				else
 				{
-					if (Paths.fileExists('data/' + curWeek.songs[0].songID + '/' + curWeek.songs[0].songID + diffic + '.json', TEXT) == false) {
-						Debug.logError('File "' + curWeek.songs[0].songID + '/' + curWeek.songs[0].songID + diffic + '.json' + '" does not exist!');
-					}
-
-					if (FlxG.random.bool(1) == true) {
+					if (FlxG.random.bool(1)) { // never gonna give you up never gonna let you down
 						CoolUtil.browserLoad('https://youtu.be/dQw4w9WgXcQ'); // lololololololol
 					}
 					else {

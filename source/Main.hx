@@ -13,7 +13,6 @@ import sys.io.File;
 import haxe.io.Path;
 import sys.FileSystem;
 import haxe.CallStack;
-import sys.io.Process;
 import openfl.events.UncaughtErrorEvent;
 #end
 
@@ -28,7 +27,6 @@ import counters.MemoryCounter;
 
 import openfl.Lib;
 import flixel.FlxGame;
-import flixel.FlxState;
 import openfl.events.Event;
 import openfl.display.Sprite;
 import openfl.display.StageScaleMode;
@@ -84,10 +82,6 @@ class Main extends Sprite
 
 	private function setupGame():Void
 	{
-		#if !cpp
-		gamePropeties.framerate = 60;
-		#end
-
 		Debug.onInitProgram();
 		OptionData.loadDefaultKeys();
 

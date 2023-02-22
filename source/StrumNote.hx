@@ -2,7 +2,7 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-import shaders.ColorSwap;
+import shaderslmfao.ColorSwap;
 import flixel.graphics.FlxGraphic;
 
 using StringTools;
@@ -20,11 +20,6 @@ class StrumNote extends FlxSprite
 
 	public var player:Int;
 
-	private var colors:Array<String> = ['purple', 'blue', 'green', 'red'];
-	private var colArray:Array<String> = ['LEFT', 'DOWN', 'UP', 'RIGHT'];
-	private var colArray2:Array<String> = [];
-	private var colArrayButVanilInt:Array<Int> = [1, 2, 4, 3];
-
 	public function new(x:Float, y:Float, leData:Int, player:Int):Void
 	{
 		colorSwap = new ColorSwap();
@@ -34,8 +29,6 @@ class StrumNote extends FlxSprite
 		this.noteData = leData;
 
 		super(x, y);
-
-		colArray2 = colArray.copy();
 
 		var skin:String = 'NOTE_assets';
 
@@ -54,7 +47,7 @@ class StrumNote extends FlxSprite
 
 		if (PlayState.isPixelStage)
 		{
-			var ourGraphic:FlxGraphic = Paths.getImage('notes/' + skin);
+			var ourGraphic:FlxGraphic = null;
 
 			if (Paths.fileExists('images/' + skin + '.png', IMAGE)) {
 				ourGraphic = Paths.getImage(skin);
@@ -64,6 +57,9 @@ class StrumNote extends FlxSprite
 			}
 			else if (Paths.fileExists('images/notes/pixel/' + skin + '.png', IMAGE)) {
 				ourGraphic = Paths.getImage('notes/pixel/' + skin);
+			}
+			else {
+				ourGraphic = Paths.getImage('notes/' + skin);
 			}
 
 			loadGraphic(ourGraphic);
@@ -98,18 +94,22 @@ class StrumNote extends FlxSprite
 
 	function loadNoteAnims():Void
 	{
-		var vanillaShit:String = ' static instance ' + colArrayButVanilInt[noteData];
+		var vanillaInt:Array<Int> = [1, 2, 4, 3];
+
+		var vanillaShit:String = ' static instance ' + vanillaInt[noteData];
 		var shitMyPants:String = 'arrow' + vanillaShit + '0000';
 		var vanillaAllowed:Bool = frames.getByName(shitMyPants) != null;
 
+		var pointers:Array<String> = Note.pointers.copy();
+
 		if (vanillaAllowed) {
-			colArray[noteData] = vanillaShit;
+			pointers[noteData] = vanillaShit;
 		}
 
-		animation.addByPrefix(colors[noteData], 'arrow' + colArray[noteData]);
-		animation.addByPrefix('static', 'arrow' + colArray[noteData]);
+		animation.addByPrefix(Note.colArray[noteData], 'arrow' + pointers[noteData]);
+		animation.addByPrefix('static', 'arrow' + pointers[noteData]);
 
-		var lowCol:String = colArray2[noteData].toLowerCase();
+		var lowCol:String = Note.pointers[noteData].toLowerCase();
 		animation.addByPrefix('pressed', lowCol + ' press', 24, false);
 		animation.addByPrefix('confirm', lowCol + ' confirm', 24, false);
 	}
@@ -117,7 +117,7 @@ class StrumNote extends FlxSprite
 	function loadPixelNoteAnims():Void
 	{
 		var pixelInt:Int = Note.pixelInt[noteData];
-		animation.add(colors[noteData], [pixelInt + Note.maxNote]);
+		animation.add(Note.colArray[noteData], [pixelInt + Note.maxNote]);
 
 		animation.add('static', [pixelInt]);
 		animation.add('pressed', [pixelInt + Note.maxNote, pixelInt + (Note.maxNote * 2)], 12, false);

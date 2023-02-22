@@ -1,5 +1,5 @@
 Drop you custom music here!
-It should be in .ogg otherwise it won't work!!!
+It should be in .mp3 otherwise it won't work!!!
 
 BEWARE!!!
 This is not about your Song's music (Instrumental or Voices),

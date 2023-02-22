@@ -16,6 +16,7 @@ import openfl.events.IOErrorEvent;
 
 using StringTools;
 
+#if REPLAYS_ALLOWED
 typedef KeyPress =
 {
 	public var time:Float;
@@ -47,7 +48,7 @@ typedef ReplayJSON =
 
 class Replay
 {
-	public var path:String = "";
+	public var path:String = '';
 	public var replay:ReplayJSON;
 
 	public function new(path:String):Void
@@ -65,7 +66,7 @@ class Replay
 			],
 			weekID: 'tutorial',
 			weekName: 'Tutorial',
-			noteSpeed: 1.5,
+			noteSpeed: 1,
 			isDownscroll: false,
 			keyPresses: [],
 			songNotes: [],
@@ -99,10 +100,10 @@ class Replay
 			"timestamp": Date.now()
 		};
 
-		var data:String = Json.stringify(json, 't');
+		var data:String = Json.stringify(json, '\t');
 
 		#if sys
-		File.saveContent("assets/replays/replay-" + PlayState.SONG.songID + '-' + PlayState.lastDifficulty + "-time-" + Date.now().getTime() + ".rep", data);
+		File.saveContent('assets/replays/replay-' + PlayState.SONG.songID + '-' + PlayState.lastDifficulty + '-time-' + Date.now().getTime() + '.json', data);
 		#end
 	}
 
@@ -111,7 +112,7 @@ class Replay
 		#if sys
 		try
 		{
-			var repl:ReplayJSON = cast Json.parse(File.getContent(Sys.getCwd() + "assets\\replays\\" + path));
+			var repl:ReplayJSON = cast Json.parse(File.getContent('assets/replays/' + path));
 			replay = repl;
 		}
 		catch (e:Dynamic) {
@@ -144,3 +145,4 @@ class Replay
 		}
 	}
 }
+#end

@@ -427,7 +427,7 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 		scaleStepper = new FlxUINumericStepper(imageInputText.x, xStepper.y + 50, 0.05, character.jsonFile.scale, 0.1, 10, 2);
 
 		var noAntialiasingCheckbox:FlxUICheckBox = new FlxUICheckBox(scaleStepper.x + 80, scaleStepper.y, null, null, "No Antialiasing", 100);
-		noAntialiasingCheckbox.checked = (character.jsonFile.no_antialiasing == true);
+		noAntialiasingCheckbox.checked = character.jsonFile.no_antialiasing;
 		noAntialiasingCheckbox.callback = function():Void
 		{
 			character.jsonFile.no_antialiasing = noAntialiasingCheckbox.checked;

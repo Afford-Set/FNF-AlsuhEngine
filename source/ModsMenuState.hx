@@ -97,7 +97,7 @@ class ModsMenuState extends TransitionableState
 
 		if (FileSystem.exists(path))
 		{
-			var leMods:Array<String> = CoolUtil.coolTextFile(path);
+			var leMods:Array<String> = CoolUtil.coolTextFile(path, false, true);
 
 			for (i in 0...leMods.length)
 			{

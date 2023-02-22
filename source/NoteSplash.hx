@@ -2,7 +2,7 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-import shaders.ColorSwap;
+import shaderslmfao.ColorSwap;
 
 using StringTools;
 
@@ -81,7 +81,7 @@ class NoteSplash extends FlxSprite
 			offset.set(-10, 0);
 		}
 		else {
-			offset.set(-15, -15);
+			offset.set(-25, -15);
 		}
 
 		var ourPrefix:String = 'note$note-$animNum';
@@ -113,8 +113,7 @@ class NoteSplash extends FlxSprite
 
 				var tempPsych:String = 'note splash ' + color + ' ' + j;
 				var animName:String = tempPsych + '0000';
-				var value:Bool = frames.getByName(animName) != null;
-				isPsychArray[i][j] = value;
+				isPsychArray[i][j] = frames.getByName(animName) != null;
 
 				if (isPsychArray[i][j]) {
 					animation.addByPrefix(ourPrefix, tempPsych, 24, false);

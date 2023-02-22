@@ -2,7 +2,7 @@ package;
 
 import Song;
 
-#if desktop
+#if (sys && desktop)
 import sys.io.File;
 import sys.FileSystem;
 import sys.io.FileOutput;
@@ -115,7 +115,7 @@ class Debug
 		#if debug
 		if (object == null)
 		{
-			Debug.logError("Tried to watch a variable on a null object!");
+			logError("Tried to watch a variable on a null object!");
 			return;
 		}
 
@@ -133,7 +133,7 @@ class Debug
 	public inline static function quickWatch(value:Dynamic, name:String):Void
 	{
 		#if debug
-		FlxG.watch.addQuick(name == null ? "QuickWatch" : name, value);
+		FlxG.watch.addQuick(name == null ? 'QuickWatch' : name, value);
 		#end // Else, do nothing outside of debug mode.
 	}
 
@@ -165,7 +165,7 @@ class Debug
 	{
 		if (obj == null)
 		{
-			Debug.logError("Tried to track a null object!");
+			logError("Tried to track a null object!");
 			return;
 		}
 
@@ -212,6 +212,8 @@ class Debug
 		logInfo('HaxeFlixel version: ${Std.string(FlxG.VERSION)}');
 		logInfo('Friday Night Funkin\' version: ${MainMenuState.gameVersion}');
 		logInfo('Alsuh Engine version: ${MainMenuState.engineVersion}');
+
+		logInfo(Paths.getFile('images/titlelogo.png', IMAGE));
 	}
 
 	/**
@@ -255,14 +257,17 @@ class Debug
 		FlxG.debugger.addTrackerProfile(new TrackerProfile(HealthIcon, ["char", "isPlayer", "isOldIcon"], [FlxSprite]));
 		FlxG.debugger.addTrackerProfile(new TrackerProfile(Note, ["x", "y", "strumTime", "mustPress", "rawNoteData", "sustainLength"], []));
 		FlxG.debugger.addTrackerProfile(new TrackerProfile(Song, [
-			"chartVersion",
-			"song",
+			"songID",
+			"songName",
 			"speed",
 			"player1",
 			"player2",
 			"gfVersion",
-			"noteStyle",
-			"stage"
+			"stage",
+			"arrowSkin",
+			"arrowSkin2",
+			"splashSkin",
+			"splashSkin2"
 		], []));
 	}
 
@@ -274,32 +279,50 @@ class Debug
 	{
 		addConsoleCommand("trackBoyfriend", function():Void // Example: This will display Boyfriend's sprite properties in a debug window.
 		{
-			Debug.logInfo("CONSOLE: Begin tracking Boyfriend...");
-			trackObject(PlayState.instance.boyfriend);
+			logInfo("CONSOLE: Begin tracking Boyfriend...");
+
+			try {
+				trackObject(PlayState.instance.boyfriend);
+			}
+			catch (e:Dynamic) {
+				logError('CONSOLE: Object cannot found!');
+			}
 		});
 
 		addConsoleCommand("trackGirlfriend", function():Void
 		{
-			Debug.logInfo("CONSOLE: Begin tracking Girlfriend...");
-			trackObject(PlayState.instance.gf);
+			logInfo("CONSOLE: Begin tracking Girlfriend...");
+
+			try {
+				trackObject(PlayState.instance.gf);
+			}
+			catch (e:Dynamic) {
+				logError('CONSOLE: Object cannot found!');
+			}
 		});
 
 		addConsoleCommand("trackDad", function():Void
 		{
-			Debug.logInfo("CONSOLE: Begin tracking Dad...");
-			trackObject(PlayState.instance.dad);
+			logInfo("CONSOLE: Begin tracking Dad...");
+
+			try {
+				trackObject(PlayState.instance.dad);
+			}
+			catch (e:Dynamic) {
+				logError('CONSOLE: Object cannot found!');
+			}
 		});
 
 		addConsoleCommand("setLogLevel", function(logLevel:String):Void
 		{
 			if (!DebugLogWriter.LOG_LEVELS.contains(logLevel))
 			{
-				Debug.logWarn('CONSOLE: Invalid log level $logLevel!');
-				Debug.logWarn('  Expected: ${DebugLogWriter.LOG_LEVELS.join(', ')}');
+				logWarn('CONSOLE: Invalid log level $logLevel!');
+				logWarn('  Expected: ${DebugLogWriter.LOG_LEVELS.join(', ')}');
 			}
 			else
 			{
-				Debug.logInfo('CONSOLE: Setting log level to $logLevel...');
+				logInfo('CONSOLE: Setting log level to $logLevel...');
 				logFileWriter.setLogLevel(logLevel);
 			}
 		});
@@ -332,16 +355,16 @@ class Debug
 			PlayState.seenCutscene = false;
 	
 			if (isCharting) {
-				Debug.logInfo('CONSOLE: Opening song $songName ($diffName) in Chart Editor...');
+				logInfo('CONSOLE: Opening song $songName ($diffName) in Chart Editor...');
 			}
 			else {
-				Debug.logInfo('CONSOLE: Opening song $songName ($diffName) in Free Play...');
+				logInfo('CONSOLE: Opening song $songName ($diffName) in Free Play...');
 			}
 	
 			LoadingState.loadAndSwitchState(isCharting ? new editors.ChartingState() : new PlayState(), true);
 		}
 		else {
-			Debug.logError('CONSOLE: File "' + 'data/' + songName + '/' + songName + (difficulty == 'normal' ? '' : ('-' + difficulty)) + '.json' + '" does not exist!');
+			logError('CONSOLE: File "' + 'data/' + songName + '/' + songName + (difficulty == 'normal' ? '' : ('-' + difficulty)) + '.json' + '" does not exist!');
 		}
 	}
 
@@ -378,7 +401,7 @@ class DebugLogWriter
 	var logLevel:Int;
 	var active:Bool = false;
 
-	#if desktop
+	#if (sys && desktop)
 	var file:FileOutput;
 	#end
 
@@ -386,7 +409,7 @@ class DebugLogWriter
 	{
 		logLevel = LOG_LEVELS.indexOf(logLevelParam);
 
-		#if desktop
+		#if (sys && desktop)
 		printDebug("Initializing log file...");
 
 		var logFilePath = '$LOG_FOLDER/${Sys.time()}.log';
@@ -397,12 +420,12 @@ class DebugLogWriter
 			var logFolderPath:String = logFilePath.substr(0, lastIndex);
 
 			printDebug('Creating log folder $logFolderPath');
-			sys.FileSystem.createDirectory(logFolderPath);
+			FileSystem.createDirectory(logFolderPath);
 		}
 		
 		printDebug('Creating log file $logFilePath'); // Open the file
 
-		file = sys.io.File.write(logFilePath, false);
+		file = File.write(logFilePath, false);
 		active = true;
 		#else
 		printDebug("Won't create log file; no file system access.");
@@ -456,7 +479,7 @@ class DebugLogWriter
 		var ts = FlxStringUtil.formatTime(getTime(), true);
 		var msg = '$ts [${logLevel.rpad(' ', 5)}] ${input.join('')}';
 
-		#if desktop
+		#if (sys && desktop)
 		if (active && file != null)
 		{
 			if (shouldLog(logLevel))

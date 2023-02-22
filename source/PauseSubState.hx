@@ -44,7 +44,7 @@ class PauseSubState extends BaseSubState
 	{
 		super.create();
 
-		if (PlayState.difficulties[1].length < 2 || PlayState.gameMode == 'replay') { // No need to change difficulty if there is only one!
+		if (PlayState.difficulties[1].length < 2 #if REPLAYS_ALLOWED || PlayState.gameMode == 'replay' #end) { // No need to change difficulty if there is only one!
 			menuItemsOG.remove('Change Difficulty');
 		}
 
@@ -64,9 +64,11 @@ class PauseSubState extends BaseSubState
 			menuItemsOG.insert(4 + num, 'Gameplay Changeables');
 		}
 
+		#if REPLAYS_ALLOWED
 		if (PlayState.gameMode == 'replay') {
 			menuItemsOG.remove('Gameplay Changeables');
 		}
+		#end
 
 		for (i in 0...PlayState.difficulties[1].length) {
 			difficultyChoices.push(CoolUtil.getDifficultyName(PlayState.difficulties[1][i]));
@@ -428,11 +430,13 @@ class PauseSubState extends BaseSubState
 						{
 							FlxG.switchState(new FreeplayMenuState());
 						}
+						#if REPLAYS_ALLOWED
 						case 'replay':
 						{
 							Replay.resetVariables();
 							FlxG.switchState(new options.ReplaysMenuState());
 						}
+						#end
 						default:
 						{
 							FlxG.switchState(new MainMenuState());

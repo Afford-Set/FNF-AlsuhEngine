@@ -3,6 +3,8 @@ package;
 class RatingData
 {
 	public var name:String = '';
+	public var defaultName:String = '';
+
 	public var image:String = '';
 	public var counter:String = '';
 
@@ -18,6 +20,8 @@ class RatingData
 		this.name = name;
 		this.image = name;
 		this.counter = name + 's';
+
+		this.defaultName = name;
 
 		if (hitWindow == null) {
 			hitWindow = 0;

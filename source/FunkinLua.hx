@@ -3940,7 +3940,13 @@ class FunkinLua
 			}
 
 			PlayState.instance.addTextToDebug(text, color);
-			Debug.logInfo(text);
+
+			if (deprecated) {
+				Debug.logWarn(text);
+			}
+			else {
+				Debug.logInfo(text);
+			}
 		}
 		#end
 	}

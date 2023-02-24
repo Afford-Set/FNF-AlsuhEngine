@@ -636,7 +636,7 @@ class PreferencesSubState extends MusicBeatSubState
 			'Check this if you like to enjoy loading.',
 			'loadingScreen',
 			'bool',
-			false);
+			true);
 		addOption(option);
 		#end
 

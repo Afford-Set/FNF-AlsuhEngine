@@ -1806,7 +1806,7 @@ class MiniMP3
 		return bo.getBytes();
 	}
 
-	static function rawBufferToBytes(raw:Star<Int8>,length:Int):Bytes
+	public static function rawBufferToBytes(raw:Star<Int8>,length:Int):Bytes
 	{
 		var data = new BytesData();
 		cpp.NativeArray.setUnmanagedData(data, cast raw, length);

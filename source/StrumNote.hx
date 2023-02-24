@@ -47,7 +47,7 @@ class StrumNote extends FlxSprite
 
 		if (PlayState.isPixelStage)
 		{
-			var ourGraphic:FlxGraphic = null;
+			var ourGraphic:FlxGraphic = Paths.getImage('notes/' + skin);
 
 			if (Paths.fileExists('images/' + skin + '.png', IMAGE)) {
 				ourGraphic = Paths.getImage(skin);
@@ -58,13 +58,10 @@ class StrumNote extends FlxSprite
 			else if (Paths.fileExists('images/notes/pixel/' + skin + '.png', IMAGE)) {
 				ourGraphic = Paths.getImage('notes/pixel/' + skin);
 			}
-			else {
-				ourGraphic = Paths.getImage('notes/' + skin);
-			}
 
 			loadGraphic(ourGraphic);
 
-			width = width / 4;
+			width = width / Note.maxNote;
 			height = height / 5;
 
 			loadGraphic(ourGraphic, true, Math.floor(width), Math.floor(height));

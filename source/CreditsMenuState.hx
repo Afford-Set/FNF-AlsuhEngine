@@ -83,7 +83,7 @@ class CreditsMenuState extends TransitionableState
 		var pisspoop:Array<Array<String>> =
 		[
 			['Alsuh Engine by'],
-			['AlanSurtaev2008 (Null)',	'assrj',			'Main Programmer of Alsuh Engine and General Director of Afford-Set, but left',		'',										'6300AF'],
+			['Null',					'assrj',			'Main Programmer of Alsuh Engine and General Director of Afford-Set',				'',										'6300AF'],
 			[''],
 			['Psych Engine Team'],
 			['Shadow Mario',			'shadowmario',		'Main Programmer of Psych Engine',													'https://twitter.com/Shadow_Mario_',	'444444'],

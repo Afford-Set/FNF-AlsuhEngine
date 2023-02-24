@@ -257,46 +257,46 @@ class Paths
 		return getFile('$key.lua', TEXT, library);
 	}
 
-	public static function getSound(key:String, ?library:String, ?getId:Bool = false):Any
+	public static function getSound(key:String, ?library:String, ?getId:Bool = false):Dynamic
 	{
 		return getTrackedAudioFromFile('sounds', '$key', library, getId);
 	}
 
 	@:deprecated("`Paths.sound()` is deprecated, use 'Paths.getSound()' instead")
-	public static function sound(key:String, ?library:String, ?getId:Bool = false):Any
+	public static function sound(key:String, ?library:String, ?getId:Bool = false):Dynamic
 	{
 		Debug.logWarn("`Paths.sound()` is deprecated! use 'Paths.getSound()' instead");
 
 		return getSound(key, library, getId);
 	}
 
-	public static function getSoundRandom(key:String, min:Int, max:Int, ?library:String, ?getId:Bool = false):Any
+	public static function getSoundRandom(key:String, min:Int, max:Int, ?library:String, ?getId:Bool = false):Dynamic
 	{
 		return getSound(key + FlxG.random.int(min, max), library, getId);
 	}
 
 	@:deprecated("`Paths.soundRandom()` is deprecated, use 'Paths.getSoundRandom()' instead")
-	public static function soundRandom(key:String, min:Int, max:Int, ?library:String, ?getId:Bool = false):Any
+	public static function soundRandom(key:String, min:Int, max:Int, ?library:String, ?getId:Bool = false):Dynamic
 	{
 		Debug.logWarn("`Paths.soundRandom()` is deprecated! use 'Paths.getSoundRandom()' instead");
 
 		return getSoundRandom(key, min, max, library, getId);
 	}
 
-	public static function getMusic(key:String, ?library:String, ?getId:Bool = false):Any
+	public static function getMusic(key:String, ?library:String, ?getId:Bool = false):Dynamic
 	{
 		return getTrackedAudioFromFile('music', '$key', library, getId);
 	}
 
 	@:deprecated("`Paths.music()` is deprecated, use 'Paths.getMusic()' instead")
-	public static function music(key:String, ?library:String, ?getId:Bool = false):Any
+	public static function music(key:String, ?library:String, ?getId:Bool = false):Dynamic
 	{
 		Debug.logWarn("`Paths.music()` is deprecated! use 'Paths.getMusic()' instead");
 
 		return getMusic(key, library, getId);
 	}
 
-	public static function getInst(song:String, ?diffPath:String = '', ?getId:Bool = false):Any
+	public static function getInst(song:String, ?diffPath:String = '', ?getId:Bool = false):Dynamic
 	{
 		var songPath:String = formatToSongPath(song);
 
@@ -322,14 +322,14 @@ class Paths
 	}
 
 	@:deprecated("`Paths.inst()` is deprecated, use 'Paths.getInst()' instead")
-	public static function inst(song:String, ?diffPath:String = '', ?getId:Bool = false):Any
+	public static function inst(song:String, ?diffPath:String = '', ?getId:Bool = false):Dynamic
 	{
 		Debug.logWarn("`Paths.inst()` is deprecated! use 'Paths.getInst()' instead");
 
 		return getInst(song, diffPath, getId);
 	}
 
-	public static function getVoices(song:String, ?diffPath:String = '', ?getId:Bool = false):Any
+	public static function getVoices(song:String, ?diffPath:String = '', ?getId:Bool = false):Dynamic
 	{
 		var songPath:String = formatToSongPath(song);
 
@@ -355,7 +355,7 @@ class Paths
 	}
 
 	@:deprecated("`Paths.voices()` is deprecated, use 'Paths.getVoices()' instead")
-	public static function voices(song:String, ?diffPath:String = '', ?getId:Bool = false):Any
+	public static function voices(song:String, ?diffPath:String = '', ?getId:Bool = false):Dynamic
 	{
 		Debug.logWarn("`Paths.voices()` is deprecated! use 'Paths.getVoices()' instead");
 
@@ -364,7 +364,7 @@ class Paths
 
 	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
 
-	public static function getImage(key:String, ?library:String, ?getId:Bool = false):Any
+	public static function getImage(key:String, ?library:String, ?getId:Bool = false):Dynamic
 	{
 		if (key.endsWith('.png')) {
 			key.replace('.png', '');
@@ -443,13 +443,13 @@ class Paths
 		return getWebm(key, library);
 	}
 
-	public static function getWebmSound(key:String, ?library:String, ?getId:Bool = false):Any
+	public static function getWebmSound(key:String, ?library:String, ?getId:Bool = false):Dynamic
 	{
 		return getTrackedAudioFromFile('videos', key, library, getId);
 	}
 
 	@:deprecated("`Paths.webmSound()` is deprecated, use 'Paths.getWebmSound()' instead")
-	public static function webmSound(key:String, ?library:String, ?getId:Bool = false):Any
+	public static function webmSound(key:String, ?library:String, ?getId:Bool = false):Dynamic
 	{
 		Debug.logWarn("`Paths.webmSound()` is deprecated! use 'Paths.getWebmSound()' instead");
 
@@ -493,7 +493,7 @@ class Paths
 
 	public static var currentTrackedSounds:Map<String, Sound> = [];
 
-	public static function getTrackedAudioFromFile(path:String, key:String, ?library:String, ?getId:Bool = false):Any
+	public static function getTrackedAudioFromFile(path:String, key:String, ?library:String, ?getId:Bool = false):Dynamic
 	{
 		if (key.endsWith('.$SOUND_EXT')) {
 			key = key.replace('.$SOUND_EXT', '');
@@ -551,9 +551,9 @@ class Paths
 			return gottenPath;
 		}
 
-		if (fileExists(gottenPath, SOUND, library, true))
+		if (!currentTrackedSounds.exists(gottenPath))
 		{
-			if (!currentTrackedSounds.exists(gottenPath))
+			if (fileExists(gottenPath, SOUND, library, true))
 			{
 				#if sys
 				#if cpp
@@ -570,12 +570,10 @@ class Paths
 				currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(gottenPath));
 				#end
 			}
-
-			localTrackedAssets.push(gottenPath);
-			return currentTrackedSounds.get(gottenPath);
 		}
 
-		return null;
+		localTrackedAssets.push(gottenPath);
+		return currentTrackedSounds.get(gottenPath);
 	}
 
 	public static function formatToSongPath(path:String):String

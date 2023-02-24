@@ -119,10 +119,10 @@ class OptionData
 			{
 				if (!importantMap.get('loadBlackList').contains(field))
 				{
-					var defaultValue:Dynamic = Reflect.field(OptionData, field);
-					var flxProp:Dynamic = Reflect.field(FlxG.save.data, field);
+					var defaultValue:Dynamic = Reflect.getProperty(OptionData, field);
+					var propFromSave:Dynamic = Reflect.field(FlxG.save.data, field);
 
-					Reflect.setField(OptionData, field, (flxProp != null ? flxProp : defaultValue));
+					Reflect.setProperty(OptionData, field, (propFromSave != null ? propFromSave : defaultValue));
 
 					switch (field)
 					{
@@ -237,10 +237,10 @@ class OptionData
 
 		for (flixelS in importantMap.get('flixelSound'))
 		{
-			var flxProp:Dynamic = Reflect.field(FlxG.save.data, flixelS);
+			var propFromSave:Dynamic = Reflect.field(FlxG.save.data, flixelS);
 
-			if (flxProp != null) {
-				Reflect.setProperty(FlxG.sound, flixelS, flxProp);
+			if (propFromSave != null) {
+				Reflect.setProperty(FlxG.sound, flixelS, propFromSave);
 			}
 		}
 	}

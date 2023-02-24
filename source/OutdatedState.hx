@@ -15,7 +15,7 @@ class OutdatedState extends TransitionableState
 	public static var leftState:Bool = false;
 
 	public static var newVersion:String = MainMenuState.gameVersion;
-	public static var curChanges:String = "dik";
+	public static var curChanges:String = 'dik';
 
 	var bg:FlxSprite;
 	var txt:FlxText;

@@ -889,10 +889,10 @@ class EditorPlayState extends MusicBeatState
 		{
 			var strum:StrumNote = null;
 
-			if (!note.noteSplashHitByOpponent)
-				strum = playerStrums.members[note.noteData];
-			else
+			if (note.noteSplashHitByOpponent)
 				strum = opponentStrums.members[note.noteData];
+			else
+				strum = playerStrums.members[note.noteData];
 
 			if (strum != null) {
 				spawnNoteSplash(strum.x, strum.y, note.noteData, note);

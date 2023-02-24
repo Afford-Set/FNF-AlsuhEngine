@@ -81,7 +81,7 @@ class MenuCharacter extends FlxSprite
 				}
 
 				rawJson = Paths.getTextFromFile(path);
-				
+
 				var charFile:MenuCharacterFile = cast Json.parse(rawJson);
 
 				if (Paths.fileExists('images/menucharacters/' + charFile.image + '.png', IMAGE)) {

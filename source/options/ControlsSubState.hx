@@ -219,12 +219,7 @@ class ControlsSubState extends BaseSubState
 
 			if (isPause)
 			{
-				PlayState.instance.keysArray = [
-					OptionData.copyKey(OptionData.keyBinds.get('note_left')),
-					OptionData.copyKey(OptionData.keyBinds.get('note_down')),
-					OptionData.copyKey(OptionData.keyBinds.get('note_up')),
-					OptionData.copyKey(OptionData.keyBinds.get('note_right'))
-				];
+				PlayState.instance.reloadControls();
 
 				PlayState.isNextSubState = true;
 

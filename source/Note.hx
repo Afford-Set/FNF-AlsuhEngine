@@ -160,7 +160,7 @@ class Note extends FlxSprite
 					ignoreNote = mustPress;
 					reloadNote('HURT');
 
-					noteSplashTexture = 'HURTNOTE_splashes';
+					noteSplashTexture = 'HURTnoteSplashes';
 
 					colorSwap.hue = 0;
 					colorSwap.saturation = 0;
@@ -337,7 +337,7 @@ class Note extends FlxSprite
 
 				loadGraphic(ourGraphic);
 
-				width = width / 4;
+				width = width / maxNote;
 				height = height / 2;
 
 				originalHeightForCalcs = height;
@@ -360,7 +360,7 @@ class Note extends FlxSprite
 
 				loadGraphic(ourGraphic);
 
-				width = width / 4;
+				width = width / maxNote;
 				height = height / 5;
 
 				loadGraphic(ourGraphic, true, Math.floor(width), Math.floor(height));
@@ -403,10 +403,10 @@ class Note extends FlxSprite
 	function loadNoteAnims():Void
 	{
 		var ourCol:String = colArray[noteData];
-		var blyad:String = ourCol + ' instance';
-		var fuck:String = blyad + ' 10000';
+		var blyad:String = ourCol + ' instance 1';
 
-		if (frames.getByName(fuck) == null) blyad = ourCol + '0';
+		if (frames.getByName(blyad + '0000') == null) blyad = ourCol + ' instance';
+		if (frames.getByName(blyad + '0000') == null) blyad = ourCol + '0';
 
 		animation.addByPrefix(ourCol + 'Scroll', blyad);
 

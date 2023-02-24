@@ -68,6 +68,7 @@ import flixel.tweens.FlxTween;
 import flixel.system.FlxSound;
 import flixel.util.FlxCollision;
 import flixel.util.FlxStringUtil;
+import openfl.display.BitmapData;
 import openfl.filters.ShaderFilter;
 import flixel.group.FlxSpriteGroup;
 import openfl.events.KeyboardEvent;
@@ -172,7 +173,7 @@ class PlayState extends MusicBeatState
 
 	public static var hasWebmCutscene:Bool = false;
 
-	var singAnimations:Array<String> = ['singLEFT', 'singDOWN', 'singUP', 'singRIGHT'];
+	var singAnimations:Array<String> = [];
 
 	public static var debugKeysChart:Array<FlxKey>;
 	public static var debugKeysCharacter:Array<FlxKey>;
@@ -1067,6 +1068,16 @@ class PlayState extends MusicBeatState
 	var boyfriendIdleTime:Float = 0.0;
 	var boyfriendIdled:Bool = false;
 
+	public function reloadControls():Void
+	{
+		keysArray = [
+			OptionData.copyKey(OptionData.keyBinds.get('note_left')),
+			OptionData.copyKey(OptionData.keyBinds.get('note_down')),
+			OptionData.copyKey(OptionData.keyBinds.get('note_up')),
+			OptionData.copyKey(OptionData.keyBinds.get('note_right'))
+		];
+	}
+
 	public override function create():Void
 	{
 		Paths.clearStoredMemory();
@@ -1077,13 +1088,6 @@ class PlayState extends MusicBeatState
 			FlxG.sound.music.stop();
 		}
 
-		keysArray = [
-			OptionData.copyKey(OptionData.keyBinds.get('note_left')),
-			OptionData.copyKey(OptionData.keyBinds.get('note_down')),
-			OptionData.copyKey(OptionData.keyBinds.get('note_up')),
-			OptionData.copyKey(OptionData.keyBinds.get('note_right'))
-		];
-
 		controlArray = [
 			'NOTE_LEFT',
 			'NOTE_DOWN',
@@ -1091,8 +1095,14 @@ class PlayState extends MusicBeatState
 			'NOTE_RIGHT'
 		];
 
+		reloadControls();
+
 		for (i in 0...keysArray.length) {
 			keysPressed.push(false);
+		}
+
+		for (i in 0...Note.maxNote) {
+			singAnimations[i] = 'sing' + Note.pointers[i];
 		}
 
 		debugKeysChart = OptionData.copyKey(OptionData.keyBinds.get('debug_1'));
@@ -5682,8 +5692,8 @@ class PlayState extends MusicBeatState
 		{
 			if (!daNote.isSustainNote)
 			{
-				if (Reflect.getProperty(Note, 'hithealth_' + daRating.name) != null) {
-					health += Reflect.getProperty(Note, 'hithealth_' + daRating.name) * healthGain;
+				if (Reflect.getProperty(Note, 'hithealth_' + daRating.defaultName) != null) {
+					health += Reflect.getProperty(Note, 'hithealth_' + daRating.defaultName) * healthGain;
 				}
 			}
 			else
@@ -6357,10 +6367,10 @@ class PlayState extends MusicBeatState
 		{
 			var strum:StrumNote = null;
 
-			if (!note.noteSplashHitByOpponent)
-				strum = playerStrums.members[note.noteData];
-			else
+			if (note.noteSplashHitByOpponent)
 				strum = opponentStrums.members[note.noteData];
+			else
+				strum = playerStrums.members[note.noteData];
 
 			if (strum != null) {
 				spawnNoteSplash(strum.x, strum.y, note.noteData, note);
@@ -6631,13 +6641,13 @@ class PlayState extends MusicBeatState
 			ourVideo.play();
 		}
 
-		var data = webmHandler.webm.bitmapData;
+		var data:BitmapData = webmHandler.webm.bitmapData;
 
 		videoSprite = new FlxSprite(0, 0);
 		videoSprite.loadGraphic(data);
 		videoSprite.scrollFactor.set();
 		videoSprite.cameras = [camHUD];
-		add(videoSprite);
+		insert(members.indexOf(notes), videoSprite);
 
 		if (startingSong)
 			webmHandler.pause();
@@ -6675,7 +6685,7 @@ class PlayState extends MusicBeatState
 			ourVideo.play();
 		}
 
-		var data = webmHandler.webm.bitmapData;
+		var data:BitmapData = webmHandler.webm.bitmapData;
 
 		videoSprite = new FlxSprite(0, 0);
 		videoSprite.loadGraphic(data);

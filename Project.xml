@@ -45,8 +45,8 @@
 
 	<define name="MP3_ALLOWED" if="web || flash || cpp"/>
 
-	<assets path="assets/preload" rename="assets" exclude="*.fla|*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/preload" rename="assets" exclude="*.fla|*.mp3" unless="MP3_ALLOWED"/>
+	<assets path="assets/preload" rename="assets" exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
+	<assets path="assets/preload" rename="assets" exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
 
 	<define name="ACHIEVEMENTS_ALLOWED"/>
 	<define name="REPLAYS_ALLOWED" if="desktop"/>
@@ -101,26 +101,26 @@
 	<assets path="assets/lua/custom_events"      rename="assets/custom_events"      if="LUA_ALLOWED"/>
 	<assets path="assets/lua/custom_notetypes"   rename="assets/custom_notetypes"   if="LUA_ALLOWED"/>
 
-	<assets path="assets/songs"    library="songs"    exclude="*.fla|*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/songs"    library="songs"    exclude="*.fla|*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/shared"   library="shared"   exclude="*.fla|*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/shared"   library="shared"   exclude="*.fla|*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/tutorial" library="tutorial" exclude="*.fla|*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/tutorial" library="tutorial" exclude="*.fla|*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/week1"    library="week1"    exclude="*.fla|*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/week1"    library="week1"    exclude="*.fla|*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/week2"    library="week2"    exclude="*.fla|*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/week2"    library="week2"    exclude="*.fla|*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/week3"    library="week3"    exclude="*.fla|*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/week3"    library="week3"    exclude="*.fla|*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/week4"    library="week4"    exclude="*.fla|*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/week4"    library="week4"    exclude="*.fla|*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/week5"    library="week5"    exclude="*.fla|*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/week5"    library="week5"    exclude="*.fla|*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/week6"    library="week6"    exclude="*.fla|*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/week6"    library="week6"    exclude="*.fla|*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/week7"    library="week7"    exclude="*.fla|*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/week7"    library="week7"    exclude="*.fla|*.mp3" unless="MP3_ALLOWED"/>
+	<assets path="assets/songs"    library="songs"    exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
+	<assets path="assets/songs"    library="songs"    exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
+	<assets path="assets/shared"   library="shared"   exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
+	<assets path="assets/shared"   library="shared"   exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
+	<assets path="assets/tutorial" library="tutorial" exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
+	<assets path="assets/tutorial" library="tutorial" exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
+	<assets path="assets/week1"    library="week1"    exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
+	<assets path="assets/week1"    library="week1"    exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
+	<assets path="assets/week2"    library="week2"    exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
+	<assets path="assets/week2"    library="week2"    exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
+	<assets path="assets/week3"    library="week3"    exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
+	<assets path="assets/week3"    library="week3"    exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
+	<assets path="assets/week4"    library="week4"    exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
+	<assets path="assets/week4"    library="week4"    exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
+	<assets path="assets/week5"    library="week5"    exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
+	<assets path="assets/week5"    library="week5"    exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
+	<assets path="assets/week6"    library="week6"    exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
+	<assets path="assets/week6"    library="week6"    exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
+	<assets path="assets/week7"    library="week7"    exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
+	<assets path="assets/week7"    library="week7"    exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
 
 	<section if="MODS_ALLOWED">
 		<assets path='example_mods' rename='mods' embed='false'/>

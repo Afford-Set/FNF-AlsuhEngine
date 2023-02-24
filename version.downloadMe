@@ -1,10 +1,10 @@
-1.7;
+1.7.1;
 - Added .MP3 files support
 - Added .WAV files support
+- Added Pixel Note Splashes
 - Added crash prevention on loading song
-- Fixed Check to updates in case of connection problems with the server
-- Fixed combo offset menu on pressing left button of mouse
+- Fixed Hurt Note Splashes
+- Fixed Custom Ratings Data when adding health
 - Fixed Master Editor Menu
 - Fixed Replays
-- Fixed loading of the next song
 - Fixed volume's save data

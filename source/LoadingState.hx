@@ -290,7 +290,6 @@ class LoadingState extends TransitionableState
 					Debug.logError('Error: ' + e);
 					onLoadComplete();
 				});
-				
 			}
 			else {
 				onLoadComplete();
@@ -298,7 +297,7 @@ class LoadingState extends TransitionableState
 		}
 
 		#if cpp
-		if (path.endsWith('.ogg'))
+		if (path.endsWith('.ogg') || path.endsWith('.wav'))
 		{
 			if (!Paths.currentTrackedSounds.exists(path) && !loadedPaths.exists(path))
 			{

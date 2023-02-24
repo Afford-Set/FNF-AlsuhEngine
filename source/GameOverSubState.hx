@@ -117,7 +117,7 @@ class GameOverSubState extends MusicBeatSubState
 	{
 		super.update(elapsed);
 
-		bg.alpha = CoolUtil.coolLerp(bg.alpha, 0, 0.04);
+		bg.alpha = CoolUtil.coolLerp(bg.alpha, 0, 0.01);
 
 		if (updateCamera) {
 			camFollowPos.setPosition(CoolUtil.coolLerp(camFollowPos.x, camFollow.x, 0.025), CoolUtil.coolLerp(camFollowPos.y, camFollow.y, 0.025));

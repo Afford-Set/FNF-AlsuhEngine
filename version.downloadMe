@@ -3,6 +3,7 @@
 - Added .WAV files support
 - Added Pixel Note Splashes
 - Added crash prevention on loading song
+- Fixed Hurt Notes
 - Fixed Hurt Note Splashes
 - Fixed Custom Ratings Data when adding health
 - Fixed Master Editor Menu

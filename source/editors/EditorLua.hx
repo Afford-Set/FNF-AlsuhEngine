@@ -206,6 +206,35 @@ class EditorLua
 			Reflect.getProperty(EditorPlayState.instance, obj).remove(Reflect.getProperty(EditorPlayState.instance, obj)[index]);
 		});
 
+		Lua_helper.add_callback(lua, "callFromGroup", function(obj:String, index:Int, variable:Dynamic, ?arguments:Array<Dynamic>):Dynamic
+		{
+			var group:Dynamic = Reflect.getProperty(EditorPlayState.instance, obj);
+
+			if (Std.isOfType(group, FlxTypedGroup))
+			{
+				var result:Dynamic = Reflect.getProperty(group.members[index], variable);
+				return Reflect.callMethod(null, result, arguments);
+			}
+
+			var leArray:Dynamic = group[index];
+
+			if (leArray != null)
+			{
+				var result:Dynamic = null;
+
+				if (Type.typeof(variable) == ValueType.TInt) {
+					result = leArray[variable];
+				}
+				else {
+					result = Reflect.getProperty(leArray, variable);
+				}
+
+				return Reflect.callMethod(null, result, arguments);
+			}
+
+			return null;
+		});
+
 		Lua_helper.add_callback(lua, "getColorFromHex", function(color:String):Int
 		{
 			if (!color.startsWith('0x')) color = '0xff' + color;

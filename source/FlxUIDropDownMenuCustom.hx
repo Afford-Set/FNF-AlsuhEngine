@@ -69,8 +69,8 @@ class FlxUIDropDownMenuCustom extends FlxUIGroup implements IFlxUIWidget impleme
 				}
 				else
 				{
-					_selectedLabel = "";
-					header.text.text = "";
+					_selectedLabel = '';
+					header.text.text = '';
 				}
 
 				return str;

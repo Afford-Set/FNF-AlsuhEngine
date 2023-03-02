@@ -206,7 +206,7 @@ function goodNoteHit(id, direction, noteType, isSustainNote)
 end
 
 function onHitCauses(id, direction, noteType, isSustainNote)
-	-- this is a function like "goodNoteHit", only enabled when an hit ignored note
+	-- this is a function like "goodNoteHit", only enabled when an hit note, while its "hitCausesMiss" variable's value is true
 end
 
 function opponentNoteHit(id, direction, noteType, isSustainNote)
@@ -242,7 +242,6 @@ function onMoveCamera(focus)
 	end
 end
 
-
 -- Event notes hooks
 function onEvent(name, value1, value2)
 	-- event note triggered
@@ -264,8 +263,11 @@ function eventEarlyTrigger(name)
 	-- write your shit under this line, the new return value will override the ones hardcoded on the engine
 end
 
+-- Tween/Timer/Sound/Animation hooks
+function onTweenUpdate(tag, elapsed)
+	-- A tween you called has been updated, value "tag" is it's tag
+end
 
--- Tween/Timer hooks
 function onTweenCompleted(tag)
 	-- A tween you called has been completed, value "tag" is it's tag
 end
@@ -280,4 +282,34 @@ function onTimerCompleted(tag, loops, loopsLeft)
 	-- 		if tag == 'startDialogue' then -- Timer completed, play dialogue
 	--			startDialogue('dialogue', '');
 	--		end
+end
+
+function onSoundFinished(tag)
+	-- A sound you called has been finished, value "tag" is it's tag
+	-- WARNING: your sound needs a tag, without it this function will not be called
+end
+
+function onAnimationProgress(obj, name, frameNumber, frameIndex)
+	-- A animation you played on progress
+end
+
+function onAnimationFinished(obj, name)
+	-- A animation you played has been finished
+end
+
+function onFinishBGVideo(path)
+	-- A current video you played has been finished, value "path" is it's current video's path
+end
+
+-- Any other shit
+function onOpenChartEditor()
+	-- Called when you press Debug Key 1 while not on a cutscene/etc
+	-- return Function_Stop if you want to stop the player to go chart editor
+	return Function_Continue;
+end
+
+function onOpenCharacterEditor()
+	-- Called when you press Debug Key 2 while not on a cutscene/etc
+	-- return Function_Stop if you want to stop the player to go character editor
+	return Function_Continue;
 end

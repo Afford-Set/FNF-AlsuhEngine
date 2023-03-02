@@ -128,6 +128,24 @@ class EditorLua
 			return Reflect.setProperty(EditorPlayState.instance, variable, value);
 		});
 
+		Lua_helper.add_callback(lua, "callFromObject", function(variable:String, ?arguments:Array<Dynamic>):Dynamic
+		{
+			var fieldArray:Array<String> = variable.split('.');
+
+			if (fieldArray.length > 1)
+			{
+				var fieldArrayFromInstance:Dynamic = Reflect.getProperty(EditorPlayState.instance, fieldArray[0]);
+
+				for (i in 1...fieldArray.length - 1) {
+					fieldArrayFromInstance = Reflect.getProperty(fieldArrayFromInstance, fieldArray[i]);
+				}
+
+				return Reflect.callMethod(null, Reflect.getProperty(fieldArrayFromInstance, fieldArray[fieldArray.length - 1]), arguments);
+			}
+
+			return Reflect.callMethod(null, Reflect.getProperty(EditorPlayState.instance, variable), arguments);
+		});
+
 		Lua_helper.add_callback(lua, "getPropertyFromGroup", function(obj:String, index:Int, variable:Dynamic):Dynamic
 		{
 			if (Std.isOfType(Reflect.getProperty(EditorPlayState.instance, obj), FlxTypedGroup)) {
@@ -304,6 +322,7 @@ class EditorLua
 		var result:String = null;
 
 		Lua.getglobal(lua, variable);
+
 		result = Convert.fromLua(lua, -1);
 		Lua.pop(lua, 1);
 

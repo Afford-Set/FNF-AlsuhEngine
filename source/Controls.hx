@@ -159,89 +159,40 @@ class Controls extends FlxActionSet
 	public var gamepadsAdded:Array<Int> = [];
 	public var keyboardScheme = KeyboardScheme.None;
 
-	public var UI_UP(get, never):Bool;
-	inline function get_UI_UP():Bool return _ui_up.check();
+	public var UI_UP(get, never):Bool;			inline function get_UI_UP():Bool return _ui_up.check();
+	public var UI_LEFT(get, never):Bool;		inline function get_UI_LEFT():Bool return _ui_left.check();
+	public var UI_RIGHT(get, never):Bool;		inline function get_UI_RIGHT():Bool return _ui_right.check();
+	public var UI_DOWN(get, never):Bool;		inline function get_UI_DOWN():Bool return _ui_down.check();
 
-	public var UI_LEFT(get, never):Bool;
-	inline function get_UI_LEFT():Bool return _ui_left.check();
+	public var UI_UP_P(get, never):Bool;		inline function get_UI_UP_P():Bool return _ui_upP.check();
+	public var UI_LEFT_P(get, never):Bool;		inline function get_UI_LEFT_P():Bool return _ui_leftP.check();
+	public var UI_RIGHT_P(get, never):Bool;		inline function get_UI_RIGHT_P():Bool return _ui_rightP.check();
+	public var UI_DOWN_P(get, never):Bool;		inline function get_UI_DOWN_P():Bool return _ui_downP.check();
 
-	public var UI_RIGHT(get, never):Bool;
-	inline function get_UI_RIGHT():Bool return _ui_right.check();
+	public var UI_UP_R(get, never):Bool;		inline function get_UI_UP_R():Bool return _ui_upR.check();
+	public var UI_LEFT_R(get, never):Bool;		inline function get_UI_LEFT_R():Bool return _ui_leftR.check();
+	public var UI_RIGHT_R(get, never):Bool;		inline function get_UI_RIGHT_R():Bool return _ui_rightR.check();
+	public var UI_DOWN_R(get, never):Bool;		inline function get_UI_DOWN_R():Bool return _ui_downR.check();
 
-	public var UI_DOWN(get, never):Bool;
-	inline function get_UI_DOWN():Bool return _ui_down.check();
+	public var NOTE_UP(get, never):Bool;		inline function get_NOTE_UP():Bool return _note_up.check();
+	public var NOTE_LEFT(get, never):Bool;		inline function get_NOTE_LEFT():Bool return _note_left.check();
+	public var NOTE_RIGHT(get, never):Bool;		inline function get_NOTE_RIGHT():Bool return _note_right.check();
+	public var NOTE_DOWN(get, never):Bool;		inline function get_NOTE_DOWN():Bool return _note_down.check();
 
-	public var UI_UP_P(get, never):Bool;
-	inline function get_UI_UP_P():Bool return _ui_upP.check();
+	public var NOTE_UP_P(get, never):Bool;		inline function get_NOTE_UP_P():Bool return _note_upP.check();
+	public var NOTE_LEFT_P(get, never):Bool;	inline function get_NOTE_LEFT_P():Bool return _note_leftP.check();
+	public var NOTE_RIGHT_P(get, never):Bool;	inline function get_NOTE_RIGHT_P():Bool return _note_rightP.check();
+	public var NOTE_DOWN_P(get, never):Bool;	inline function get_NOTE_DOWN_P():Bool return _note_downP.check();
 
-	public var UI_LEFT_P(get, never):Bool;
-	inline function get_UI_LEFT_P():Bool return _ui_leftP.check();
+	public var NOTE_UP_R(get, never):Bool;		inline function get_NOTE_UP_R():Bool return _note_upR.check();
+	public var NOTE_LEFT_R(get, never):Bool;	inline function get_NOTE_LEFT_R():Bool return _note_leftR.check();
+	public var NOTE_RIGHT_R(get, never):Bool;	inline function get_NOTE_RIGHT_R():Bool return _note_rightR.check();
+	public var NOTE_DOWN_R(get, never):Bool;	inline function get_NOTE_DOWN_R():Bool return _note_downR.check();
 
-	public var UI_RIGHT_P(get, never):Bool;
-	inline function get_UI_RIGHT_P():Bool return _ui_rightP.check();
-
-	public var UI_DOWN_P(get, never):Bool;
-	inline function get_UI_DOWN_P():Bool return _ui_downP.check();
-
-	public var UI_UP_R(get, never):Bool;
-	inline function get_UI_UP_R():Bool return _ui_upR.check();
-
-	public var UI_LEFT_R(get, never):Bool;
-	inline function get_UI_LEFT_R():Bool return _ui_leftR.check();
-
-	public var UI_RIGHT_R(get, never):Bool;
-	inline function get_UI_RIGHT_R():Bool return _ui_rightR.check();
-
-	public var UI_DOWN_R(get, never):Bool;
-	inline function get_UI_DOWN_R():Bool return _ui_downR.check();
-
-	public var NOTE_UP(get, never):Bool;
-	inline function get_NOTE_UP():Bool return _note_up.check();
-
-	public var NOTE_LEFT(get, never):Bool;
-	inline function get_NOTE_LEFT():Bool return _note_left.check();
-
-	public var NOTE_RIGHT(get, never):Bool;
-	inline function get_NOTE_RIGHT():Bool return _note_right.check();
-
-	public var NOTE_DOWN(get, never):Bool;
-	inline function get_NOTE_DOWN():Bool return _note_down.check();
-
-	public var NOTE_UP_P(get, never):Bool;
-	inline function get_NOTE_UP_P():Bool return _note_upP.check();
-
-	public var NOTE_LEFT_P(get, never):Bool;
-	inline function get_NOTE_LEFT_P():Bool return _note_leftP.check();
-
-	public var NOTE_RIGHT_P(get, never):Bool;
-	inline function get_NOTE_RIGHT_P():Bool return _note_rightP.check();
-
-	public var NOTE_DOWN_P(get, never):Bool;
-	inline function get_NOTE_DOWN_P():Bool return _note_downP.check();
-
-	public var NOTE_UP_R(get, never):Bool;
-	inline function get_NOTE_UP_R():Bool return _note_upR.check();
-
-	public var NOTE_LEFT_R(get, never):Bool;
-	inline function get_NOTE_LEFT_R():Bool return _note_leftR.check();
-
-	public var NOTE_RIGHT_R(get, never):Bool;
-	inline function get_NOTE_RIGHT_R():Bool return _note_rightR.check();
-
-	public var NOTE_DOWN_R(get, never):Bool;
-	inline function get_NOTE_DOWN_R():Bool return _note_downR.check();
-
-	public var ACCEPT(get, never):Bool;
-	inline function get_ACCEPT():Bool return _accept.check();
-
-	public var BACK(get, never):Bool;
-	inline function get_BACK():Bool return _back.check();
-
-	public var PAUSE(get, never):Bool;
-	inline function get_PAUSE():Bool return _pause.check();
-
-	public var RESET(get, never):Bool;
-	inline function get_RESET():Bool return _reset.check();
+	public var ACCEPT(get, never):Bool;			inline function get_ACCEPT():Bool return _accept.check();
+	public var BACK(get, never):Bool;			inline function get_BACK():Bool return _back.check();
+	public var PAUSE(get, never):Bool;			inline function get_PAUSE():Bool return _pause.check();
+	public var RESET(get, never):Bool;			inline function get_RESET():Bool return _reset.check();
 
 	#if (haxe >= "4.0.0")
 	public function new(name:String, scheme:KeyboardScheme = None):Void
@@ -277,8 +228,9 @@ class Controls extends FlxActionSet
 		add(_pause);
 		add(_reset);
 
-		for (action in digitalActions)
+		for (action in digitalActions) {
 			byName[action.name] = action;
+		}
 
 		setKeyboardScheme(scheme, false);
 	}
@@ -316,11 +268,14 @@ class Controls extends FlxActionSet
 		add(_pause);
 		add(_reset);
 
-		for (action in digitalActions)
+		for (action in digitalActions) {
 			byName[action.name] = action;
-			
-		if (scheme == null)
+		}
+
+		if (scheme == null) {
 			scheme = None;
+		}
+
 		setKeyboardScheme(scheme, false);
 	}
 	#end

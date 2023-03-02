@@ -10,6 +10,7 @@ import WeekData;
 
 #if sys
 import sys.io.File;
+import haxe.io.Path;
 import sys.FileSystem;
 #end
 
@@ -23,7 +24,6 @@ import flixel.util.FlxColor;
 import lime.system.Clipboard;
 import flixel.group.FlxGroup;
 import openfl.net.FileFilter;
-import transition.Transition;
 import flixel.addons.ui.FlxUI;
 import openfl.net.FileReference;
 import openfl.events.IOErrorEvent;
@@ -828,10 +828,15 @@ class WeekEditorState extends MusicBeatUIState
 			_file.addEventListener(Event.COMPLETE, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data, weekFile.weekID + ".json");
+
+			#if MODS_ALLOWED
+			_file.save(data.trim(), #if sys CoolUtil.convPathShit(Paths.modFolders('weeks/' + #end weekFile.weekID + '.json' #if sys )) #end);
+			#else
+			_file.save(data.trim(), #if sys CoolUtil.convPathShit(Paths.getJson('weeks/' + #end weekFile.weekID + '.json' #if sys )) #end);
+			#end
 		}
 	}
-	
+
 	private static function onSaveComplete(event:Event):Void
 	{
 		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
@@ -840,7 +845,7 @@ class WeekEditorState extends MusicBeatUIState
 
 		_file = null;
 
-		FlxG.log.notice("Successfully saved file.");
+		Debug.logInfo("Successfully saved file.");
 	}
 
 	/**
@@ -866,7 +871,7 @@ class WeekEditorState extends MusicBeatUIState
 
 		_file = null;
 
-		FlxG.log.error("Problem saving file");
+		Debug.logError("Problem saving file");
 	}
 }
 
@@ -879,7 +884,6 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 		super();
 
 		this.weekFile = WeekData.createWeekFile();
-
 		if (weekFile != null) this.weekFile = weekFile;
 	}
 
@@ -1263,8 +1267,7 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 			difficultiesSuffixesInputText.text = diffSuffixes;
 		}
 
-		if (weekFile.songs[curSelected].defaultDifficulty != null)
-		{
+		if (weekFile.songs[curSelected].defaultDifficulty != null) {
 			defaultDiffInputText.text = weekFile.songs[curSelected].defaultDifficulty;
 		}
 
@@ -1283,8 +1286,8 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 		{
 			super.update(elapsed);
 
-			Transition.skipNextTransIn = true;
-			Transition.skipNextTransOut = true;
+			CustomFadeTransition.skipNextTransIn = true;
+			CustomFadeTransition.skipNextTransOut = true;
 
 			FlxG.switchState(new WeekEditorFreeplayState(WeekEditorState.loadedWeek));
 			WeekEditorState.loadedWeek = null;
@@ -1354,7 +1357,6 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 				if (FlxG.mouse.wheel != 0)
 				{
 					FlxG.sound.play(Paths.getSound('scrollMenu'));
-
 					changeSelection(-1 * FlxG.mouse.wheel);
 				}
 			}

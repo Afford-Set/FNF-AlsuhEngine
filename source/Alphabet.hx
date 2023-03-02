@@ -36,7 +36,7 @@ class Alphabet extends FlxSpriteGroup
 	public var distancePerItem:FlxPoint = new FlxPoint(20, 120);
 	public var startPosition:FlxPoint = new FlxPoint(0, 0); //for the calculations
 
-	public function new(x:Float, y:Float, text:String = "", ?bold:Bool = true):Void
+	public function new(x:Float, y:Float, text:String = '', ?bold:Bool = true):Void
 	{
 		super(x, y);
 
@@ -172,12 +172,14 @@ class Alphabet extends FlxSpriteGroup
 	{
 		if (isMenuItem)
 		{
+			var lerpVal:Float = CoolUtil.boundTo(elapsed * (lerpMult * 54.5), 0, 1);
+
 			if (changeX) {
-				x = CoolUtil.coolLerp(x, (targetY * distancePerItem.x) + startPosition.x, lerpMult);
+				x = FlxMath.lerp(x, (targetY * distancePerItem.x) + startPosition.x, lerpVal);
 			}
 
 			if (changeY) {
-				y = CoolUtil.coolLerp(y, (targetY * 1.3 * distancePerItem.y) + startPosition.y, lerpMult);
+				y = FlxMath.lerp(y, (targetY * 1.3 * distancePerItem.y) + startPosition.y, lerpVal);
 			}
 		}
 

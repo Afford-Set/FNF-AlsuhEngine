@@ -233,7 +233,7 @@ class StoryMenuState extends MusicBeatState
 			Conductor.songPosition = FlxG.sound.music.time;
 		}
 
-		lerpScore = Math.floor(CoolUtil.coolLerp(lerpScore, intendedScore, 0.5));
+		lerpScore = Math.floor(FlxMath.lerp(lerpScore, intendedScore, CoolUtil.boundTo(elapsed * 30, 0, 1)));
 		if (Math.abs(intendedScore - lerpScore) < 10) lerpScore = intendedScore;
 
 		scoreText.text = "WEEK SCORE:" + lerpScore;
@@ -292,8 +292,13 @@ class StoryMenuState extends MusicBeatState
 				}
 			}
 
-			if (curWeek.difficulties[1].length > 1 && !WeekData.weekIsLocked(curWeek.weekID))
+			var diffUnlocked:Bool = curWeek.difficulties[1].length > 1 && !WeekData.weekIsLocked(curWeek.weekID);
+
+			if (diffUnlocked)
 			{
+				leftArrow.visible = diffUnlocked;
+				rightArrow.visible = diffUnlocked;
+
 				if (controls.UI_LEFT_P)
 				{
 					leftArrow.animation.play('press');
@@ -396,7 +401,7 @@ class StoryMenuState extends MusicBeatState
 
 							FlxG.sound.play(Paths.getSound('confirmMenu'));
 
-							Debug.logInfo('Loading song ${PlayState.SONG.songName} and week "${PlayState.storyWeekName}" into Story...');
+							Debug.logInfo('Loading song "${PlayState.SONG.songName}" and week "${PlayState.storyWeekName}" into Story...');
 
 							new FlxTimer().start(1, function(tmr:FlxTimer):Void
 							{
@@ -417,7 +422,7 @@ class StoryMenuState extends MusicBeatState
 				}
 				else
 				{
-					if (FlxG.random.bool(1)) { // never gonna give you up never gonna let you down
+					if (FlxG.random.bool(0.00001)) { // never gonna give you up never gonna let you down
 						CoolUtil.browserLoad('https://youtu.be/dQw4w9WgXcQ'); // lololololololol
 					}
 					else {

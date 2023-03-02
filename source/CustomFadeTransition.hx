@@ -1,4 +1,4 @@
-package transition;
+package;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -10,13 +10,13 @@ import flixel.util.FlxGradient;
 
 using StringTools;
 
-class Transition extends BaseSubState
+class CustomFadeTransition extends MusicBeatSubState
 {
 	public static var skipNextTransIn:Bool = false;
 	public static var skipNextTransOut:Bool = false;
 
 	public static var nextCamera:FlxCamera;
-	public var finishCallback:Void->Void;
+	public static var finishCallback:Void->Void;
 
 	private var leTween:FlxTween = null;
 

@@ -1,4 +1,4 @@
-package audio;
+package openfl.media;
 
 import cpp.Int8;
 import cpp.Char;

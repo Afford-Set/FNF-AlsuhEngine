@@ -8,6 +8,9 @@ import Discord.DiscordClient;
 import lime.app.Application;
 #end
 
+import haxe.EnumFlags;
+import haxe.Exception;
+
 #if CRASH_HANDLER
 import sys.io.File;
 import haxe.io.Path;
@@ -21,8 +24,8 @@ import webmlmfao.*;
 #end
 
 #if !mobile
-import counters.FPSCounter;
-import counters.MemoryCounter;
+import openfl.display.FPS;
+import openfl.display.Memory;
 #end
 
 import openfl.Lib;
@@ -48,8 +51,10 @@ class Main extends Sprite
 	public var game:FlxGame;
 
 	#if !mobile
-	public static var fpsCounter:FPSCounter;
-	public static var memoryCounter:MemoryCounter;
+	public static var fpsCounter:FPS;
+	#if !hl
+	public static var memoryCounter:Memory;
+	#end
 	#end
 
 	// You can pretty much ignore everything from here on - your code should go in your states.
@@ -95,18 +100,8 @@ class Main extends Sprite
 		gamePropeties.startFullscreen);
 		addChild(game);
 
-		#if WEBM_ALLOWED
-		var str1:String = "WEBM SHIT";
-		var webmHandle = new WebmHandler();
-		webmHandle.source(Paths.getWebm("DO NOT DELETE OR GAME WILL CRASH/dontDelete"));
-		webmHandle.makePlayer();
-		webmHandle.webm.name = str1;
-		addChild(webmHandle.webm);
-		GlobalVideo.setWebm(webmHandle);
-		#end
-
 		#if !mobile
-		fpsCounter = new FPSCounter(10, 3, 0xFFFFFF);
+		fpsCounter = new FPS(10, 3, 0xFFFFFF);
 		addChild(fpsCounter);
 
 		if (fpsCounter != null) {
@@ -116,12 +111,14 @@ class Main extends Sprite
 		Lib.current.stage.align = "tl";
 		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
 
-		memoryCounter = new MemoryCounter(10, 3, 0xFFFFFF);
+		#if !hl
+		memoryCounter = new Memory(10, 3, 0xFFFFFF);
 		addChild(memoryCounter);
 
 		if (memoryCounter != null) {
 			memoryCounter.visible = OptionData.memoryCounter;
 		}
+		#end
 		#end
 
 		Debug.onGameStart();
@@ -137,15 +134,19 @@ class Main extends Sprite
 		}
 		#end
 		
-		#if CRASH_HANDLER
+		#if (CRASH_HANDLER && !hl)
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
+		#end
+		
+		#if (CRASH_HANDLER && hl)
+		hl.Api.setErrorHandler(onCrash);
 		#end
 	}
 
 	#if CRASH_HANDLER
 	function onCrash(e:UncaughtErrorEvent):Void
 	{
-		var errMsg:String = "";
+		var errMsg:String = '';
 		var path:String;
 
 		var callStack:Array<StackItem> = CallStack.exceptionStack(true);
@@ -178,8 +179,17 @@ class Main extends Sprite
 		Sys.println(errMsg);
 		Sys.println("Crash dump saved in " + Path.normalize(path));
 
+		#if hl
+		var flags:EnumFlags<hl.UI.DialogFlags> = new EnumFlags<hl.UI.DialogFlags>();
+		flags.set(IsError);
+		hl.UI.dialog("Error!", errMsg, flags);
+		#else
 		Application.current.window.alert(errMsg, "Error!");
+		#end
+
+		#if DISCORD_ALLOWED
 		DiscordClient.shutdown();
+		#end
 
 		Sys.exit(1);
 	}

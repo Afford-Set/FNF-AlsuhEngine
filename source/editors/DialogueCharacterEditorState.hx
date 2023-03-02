@@ -1,7 +1,6 @@
 package editors;
 
 import haxe.Json;
-import haxe.format.JsonParser;
 
 #if DISCORD_ALLOWED
 import Discord.DiscordClient;
@@ -11,6 +10,7 @@ import DialogueBoxPsych;
 
 #if sys
 import sys.io.File;
+import haxe.io.Path;
 import sys.FileSystem;
 #end
 
@@ -399,8 +399,7 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 	{
 		animationArray = [];
 
-		for (anim in character.jsonFile.animations)
-		{
+		for (anim in character.jsonFile.animations) {
 			animationArray.push(anim.anim);
 		}
 
@@ -600,13 +599,11 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 		{
 			if (daText.finishedText)
 			{
-				if (character.animationIsLoop())
-				{
+				if (character.animationIsLoop()) {
 					character.playAnim(character.animation.curAnim.name, true);
 				}
 			}
-			else if (character.animation.curAnim.finished)
-			{
+			else if (character.animation.curAnim.finished) {
 				character.animation.curAnim.restart();
 			}
 		}
@@ -943,7 +940,11 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 
-			_file.save(data, characterName + ".json");
+			#if MODS_ALLOWED
+			_file.save(data, #if sys CoolUtil.convPathShit(Paths.modFolders('portraits/' + #end characterName + ".json" #if sys )) #end);
+			#else
+			_file.save(data, #if sys CoolUtil.convPathShit(Paths.getJson('portraits/' + #end characterName + ".json" #if sys )) #end);
+			#end
 		}
 	}
 
@@ -955,7 +956,7 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 
 		_file = null;
 
-		FlxG.log.notice("Successfully saved file.");
+		Debug.logInfo("Successfully saved file.");
 	}
 
 	/**
@@ -981,6 +982,6 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 
 		_file = null;
 
-		FlxG.log.error("Problem saving file");
+		Debug.logError("Problem saving file");
 	}
 }

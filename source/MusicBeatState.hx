@@ -1,12 +1,13 @@
 package;
 
 import Conductor;
+
 import flixel.FlxG;
-import transition.TransitionableState;
+import flixel.FlxState;
 
 using StringTools;
 
-class MusicBeatState extends TransitionableState
+class MusicBeatState extends FlxState
 {
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;
@@ -17,14 +18,35 @@ class MusicBeatState extends TransitionableState
 	private var curDecStep:Float = 0;
 	private var curDecBeat:Float = 0;
 
+	private var controls(get, never):Controls;
+
+	inline function get_controls():Controls {
+		return PlayerSettings.player1.controls;
+	}
+
 	public override function create():Void
 	{
 		super.create();
+
+		if (!CustomFadeTransition.skipNextTransOut) {
+			openSubState(new CustomFadeTransition(0.7, true));
+		}
+
+		CustomFadeTransition.skipNextTransOut = false;
 	}
+
+	#if !mobile
+	var skippedFrames:Int = 0;
+	var skippedFrames2:Int = 0;
+	#end
 
 	public override function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
+
+		#if !mobile
+		CoolUtil.recolorCounters(skippedFrames, skippedFrames2);
+		#end
 
 		var oldStep:Int = curStep;
 
@@ -98,6 +120,29 @@ class MusicBeatState extends TransitionableState
 		var shit:Float = ((Conductor.songPosition - OptionData.noteOffset) - lastChange.songTime) / lastChange.stepCrochet;
 		curDecStep = lastChange.stepTime + shit;
 		curStep = lastChange.stepTime + Math.floor(shit);
+	}
+
+	var exiting:Bool = false;
+
+	public override function switchTo(nextState:FlxState):Bool
+	{
+		if (!CustomFadeTransition.skipNextTransIn)
+		{
+			if (!exiting)
+			{
+				CustomFadeTransition.finishCallback = function():Void
+				{
+					exiting = true;
+					FlxG.switchState(nextState);
+				}
+				openSubState(new CustomFadeTransition(0.6, false));
+			}
+
+			return exiting;
+		}
+
+		CustomFadeTransition.skipNextTransIn = false;
+		return true;
 	}
 
 	public function stepHit():Void

@@ -233,7 +233,7 @@ class FlxInputText extends FlxText
 
 		if (Text == null)
 		{
-			Text = "";
+			Text = '';
 		}
 
 		text = Text; // ensure set_text is called to avoid bugs (like not preparing _charBoundaries on sys target, making it impossible to click)
@@ -548,7 +548,7 @@ class FlxInputText extends FlxText
 
 		var numChars:Int = Text.length;
 		prepareCharBoundaries(numChars);
-		textField.text = "";
+		textField.text = '';
 		var textH:Float = 0;
 		var textW:Float = 0;
 		var lastW:Float = 0;

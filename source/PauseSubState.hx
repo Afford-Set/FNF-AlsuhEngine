@@ -6,7 +6,6 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxEase;
-import transition.Transition;
 import flixel.system.FlxSound;
 import flixel.tweens.FlxTween;
 import options.OptionsMenuState;
@@ -14,7 +13,7 @@ import flixel.util.FlxStringUtil;
 
 using StringTools;
 
-class PauseSubState extends BaseSubState
+class PauseSubState extends MusicBeatSubState
 {
 	public static var pauseMusic:FlxSound = null;
 	static var goToOptions:Bool = false;
@@ -381,6 +380,7 @@ class PauseSubState extends BaseSubState
 				}
 				case "End Song":
 				{
+					PlayState.instance.resume();
 					close();
 					PlayState.instance.finishSong(true);
 				}
@@ -452,16 +452,15 @@ class PauseSubState extends BaseSubState
 		PlayState.instance.paused = true; // For lua
 
 		FlxG.sound.music.volume = 0;
-		PlayState.instance.vocals.volume = 0;
 
-		if (noTrans)
-		{
-			Transition.skipNextTransOut = true;
-			FlxG.resetState();
+		if (PlayState.instance.vocals != null) {
+			PlayState.instance.vocals.volume = 0;
 		}
-		else {
-			FlxG.resetState();
-		}
+
+		CustomFadeTransition.skipNextTransOut = noTrans;
+
+		StageData.loadDirectory(PlayState.SONG);
+		LoadingState.loadAndSwitchState(new PlayState(), true);
 	}
 
 	public override function destroy():Void

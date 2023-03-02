@@ -1,10 +1,10 @@
 package;
 
+import haxe.Json;
+
 #if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
-
-import haxe.Json;
 
 #if sys
 import sys.io.File;
@@ -14,18 +14,17 @@ import sys.FileSystem;
 import flixel.FlxG;
 import flixel.FlxBasic;
 import flixel.FlxSprite;
-import flixel.math.FlxMath;
 import flixel.ui.FlxButton;
 import flixel.text.FlxText;
+import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import openfl.geom.Rectangle;
 import flixel.tweens.FlxTween;
 import openfl.display.BitmapData;
-import transition.TransitionableState;
 
 using StringTools;
 
-class ModsMenuState extends TransitionableState
+class ModsMenuState extends MusicBeatState
 {
 	#if MODS_ALLOWED
 	private static var curSelected:Int = 0;
@@ -97,7 +96,7 @@ class ModsMenuState extends TransitionableState
 
 		if (FileSystem.exists(path))
 		{
-			var leMods:Array<String> = CoolUtil.coolTextFile(path, false, true);
+			var leMods:Array<String> = CoolUtil.listFromString(File.getContent(path));
 
 			for (i in 0...leMods.length)
 			{
@@ -518,7 +517,6 @@ class ModsMenuState extends TransitionableState
 			if (FlxG.mouse.wheel != 0)
 			{
 				FlxG.sound.play(Paths.getSound('scrollMenu'));
-
 				changeSelection(-1 * FlxG.mouse.wheel);
 			}
 		}
@@ -618,7 +616,7 @@ class ModsMenuState extends TransitionableState
 				mod.alphabet.y = intendedPos;
 			}
 			else {
-				mod.alphabet.y = CoolUtil.coolLerp(mod.alphabet.y, intendedPos, 0.2);
+				mod.alphabet.y = FlxMath.lerp(mod.alphabet.y, intendedPos, CoolUtil.boundTo(elapsed * 12, 0, 1));
 			}
 
 			if (i == curSelected)

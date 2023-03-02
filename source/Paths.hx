@@ -4,25 +4,18 @@ package;
 import sys.io.File;
 import haxe.io.Path;
 import sys.FileSystem;
-import openfl.display.BitmapData;
-
-#if cpp
-import audio.MiniMP3;
-import lime.media.AudioBuffer;
-import openfl.utils.ByteArray;
-#end
 #else
 import openfl.utils.Assets as OpenFlAssets;
 #end
 
 import haxe.Json;
-import haxe.format.JsonParser;
 
 import flixel.FlxG;
 import lime.utils.Assets;
-import openfl.media.Sound;
+import flash.media.Sound;
 import openfl.system.System;
 import openfl.utils.AssetType;
+import flash.display.BitmapData;
 import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxAtlasFrames;
 
@@ -385,11 +378,12 @@ class Paths
 			if (!currentTrackedAssets.exists(ourFile))
 			{
 				#if sys
-				var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(BitmapData.fromFile(ourFile), false, ourFile);
+				var newBitmap:BitmapData = BitmapData.fromFile(ourFile);
 				#else
-				var newGraphic:FlxGraphic = FlxG.bitmap.add(ourFile, false, ourFile);
+				var newBitmap:BitmapData = OpenFlAssets.getBitmapData(ourFile);
 				#end
 
+				var newGraphic:FlxGraphic = FlxG.bitmap.add(newBitmap, false, ourFile);
 				newGraphic.persist = true;
 				currentTrackedAssets.set(ourFile, newGraphic);
 			}
@@ -398,11 +392,12 @@ class Paths
 			return currentTrackedAssets.get(ourFile);
 		}
 
+		Debug.logError('Could not find a image asset with path "$ourFile".');
 		return null;
 	}
 
 	@:deprecated("`Paths.image()` is deprecated, use 'Paths.getImage()' instead")
-	public static function image(key:String, ?library:String = null):FlxGraphic
+	public static function image(key:String, ?library:String = null):Dynamic
 	{
 		Debug.logWarn("`Paths.image()` is deprecated! use 'Paths.getImage()' instead");
 
@@ -415,6 +410,20 @@ class Paths
 			key = key.replace('.$VIDEO_EXT', '');
 		}
 
+		#if WEBM_ALLOWED
+		if (key.endsWith('.webm')) {
+			key = key.replace('.webm', '');
+		}
+
+		var fileToCheckWebm:String = getFile('videos/$key.webm', BINARY, library);
+
+		if (fileExists(fileToCheckWebm, BINARY, null, true))
+		{
+			Debug.logWarn('Warning: .WEBM files is deprecated. Use .MP4 files instead');
+			return fileToCheckWebm;
+		}
+		#end
+
 		return getFile('videos/$key.$VIDEO_EXT', BINARY, library);
 	}
 
@@ -424,36 +433,6 @@ class Paths
 		Debug.logWarn("`Paths.video()` is deprecated! use 'Paths.getVideo()' instead");
 
 		return getVideo(key, library);
-	}
-
-	public static function getWebm(key:String, ?library:String):String
-	{
-		if (key.endsWith('.webm')) {
-			key = key.replace('.webm', '');
-		}
-
-		return getFile('videos/$key.webm', BINARY, library);
-	}
-
-	@:deprecated("`Paths.webm()` is deprecated, use 'Paths.getWebm()' instead")
-	public static function webm(key:String, ?library:String):String
-	{
-		Debug.logWarn("`Paths.webm()` is deprecated! use 'Paths.getWebm()' instead");
-
-		return getWebm(key, library);
-	}
-
-	public static function getWebmSound(key:String, ?library:String, ?getId:Bool = false):Dynamic
-	{
-		return getTrackedAudioFromFile('videos', key, library, getId);
-	}
-
-	@:deprecated("`Paths.webmSound()` is deprecated, use 'Paths.getWebmSound()' instead")
-	public static function webmSound(key:String, ?library:String, ?getId:Bool = false):Dynamic
-	{
-		Debug.logWarn("`Paths.webmSound()` is deprecated! use 'Paths.getWebmSound()' instead");
-
-		return getWebmSound(key, library, getId);
 	}
 
 	public static function getTextFromFile(key:String, ?library:String = null):String
@@ -499,9 +478,21 @@ class Paths
 			key = key.replace('.$SOUND_EXT', '');
 		}
 
-		#if cpp
-		if (key.endsWith('.ogg')) {
-			key = key.replace('.ogg', '');
+		#if FEATURE_OGG
+		if (OptionData.loadingOggFiles)
+		{
+			if (key.endsWith('.ogg')) {
+				key = key.replace('.ogg', '');
+			}
+		}
+		#end
+
+		#if FEATURE_WAV
+		if (OptionData.loadingWavFiles)
+		{
+			if (key.endsWith('.wav')) {
+				key = key.replace('.wav', '');
+			}
 		}
 		#end
 
@@ -511,39 +502,49 @@ class Paths
 			gottenPath = getFile('$path/$key.$SOUND_EXT', SOUND, library);
 		}
 
-		#if cpp
-		var fileToCheckOgg:String = getFile('$key.ogg', SOUND, library);
-
-		if (path != null && path.length > 0) {
-			fileToCheckOgg = getFile('$path/$key.ogg', SOUND, library);
-		}
-
-		if (fileExists(fileToCheckOgg, SOUND, library, true)) {
-			gottenPath = fileToCheckOgg;
-		}
-
-		var fileToCheckWav:String = getFile('$key.wav', SOUND, library);
-
-		if (path != null && path.length > 0) {
-			fileToCheckWav = getFile('$path/$key.wav', SOUND, library);
-		}
-
-		if (fileExists(fileToCheckWav, SOUND, library, true)) {
-			gottenPath = fileToCheckWav;
-		}
-		#end
-
 		if (fileExists(key + '.$SOUND_EXT', SOUND, library, true)) {
 			gottenPath = key + '.$SOUND_EXT';
 		}
 
-		#if cpp
-		if (fileExists(key + '.ogg', SOUND, library, true)) {
-			gottenPath = key + '.ogg';
-		}
+		#if FEATURE_OGG
+		if (OptionData.loadingOggFiles)
+		{
+			var fileToCheckOgg:String = getFile('$key.ogg', SOUND, library);
 
-		if (fileExists(key + '.wav', SOUND, library, true)) {
-			gottenPath = key + '.wav';
+			if (path != null && path.length > 0) {
+				fileToCheckOgg = getFile('$path/$key.ogg', SOUND, library);
+			}
+
+			if (fileExists(key + '.ogg', SOUND, library, true)) {
+				gottenPath = key + '.ogg';
+			}
+
+			if (fileExists(fileToCheckOgg, SOUND, library, true))
+			{
+				Debug.logWarn('Warning: .OGG files is deprecated. Use .MP3 files instead');
+				gottenPath = fileToCheckOgg;
+			}
+		}
+		#end
+
+		#if FEATURE_WAV
+		if (OptionData.loadingWavFiles)
+		{
+			var fileToCheckWav:String = getFile('$key.wav', SOUND, library);
+
+			if (path != null && path.length > 0) {
+				fileToCheckWav = getFile('$path/$key.wav', SOUND, library);
+			}
+
+			if (fileExists(key + '.wav', SOUND, library, true)) {
+				gottenPath = key + '.wav';
+			}
+
+			if (fileExists(fileToCheckWav, SOUND, library, true))
+			{
+				Debug.logWarn('Warning: .WAV files is deprecated. Use .MP3 files instead');
+				gottenPath = fileToCheckWav;
+			}
 		}
 		#end
 
@@ -551,29 +552,23 @@ class Paths
 			return gottenPath;
 		}
 
-		if (!currentTrackedSounds.exists(gottenPath))
+		if (fileExists(gottenPath, SOUND, library, true))
 		{
-			if (fileExists(gottenPath, SOUND, library, true))
+			if (!currentTrackedSounds.exists(gottenPath))
 			{
 				#if sys
-				#if cpp
-				if (gottenPath.endsWith('.$SOUND_EXT'))
-				{
-					var decoded = MiniMP3.decodeMP3(ByteArray.fromFile(gottenPath));
-					var encoded:ByteArray = MiniMP3.encodeWav(decoded.data, decoded.sampleCount, decoded.sampleRate, decoded.channels);
-	
-					var audioBuffer:AudioBuffer = AudioBuffer.fromBytes(encoded);
-					currentTrackedSounds.set(gottenPath, Sound.fromAudioBuffer(audioBuffer));
-				}
-				else #end currentTrackedSounds.set(gottenPath, Sound.fromFile(gottenPath));
+				currentTrackedSounds.set(gottenPath, Sound.fromFile(gottenPath));
 				#else
 				currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(gottenPath));
 				#end
 			}
+
+			localTrackedAssets.push(gottenPath);
+			return currentTrackedSounds.get(gottenPath);
 		}
 
-		localTrackedAssets.push(gottenPath);
-		return currentTrackedSounds.get(gottenPath);
+		Debug.logError('Could not find a sound asset with path "$gottenPath".');
+		return null;
 	}
 
 	public static function formatToSongPath(path:String):String
@@ -659,7 +654,7 @@ class Paths
 
 		if (FileSystem.exists(path))
 		{
-			var list:Array<String> = CoolUtil.coolTextFile(path, false, true);
+			var list:Array<String> = CoolUtil.listFromString(File.getContent(path));
 
 			for (i in list)
 			{

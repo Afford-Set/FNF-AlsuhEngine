@@ -1,18 +1,11 @@
 package;
 
-#if sys
-import sys.io.File;
-import sys.FileSystem;
-#end
-
 import haxe.Json;
-import haxe.format.JsonParser;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
 import openfl.utils.Assets;
 import flixel.util.FlxColor;
-import haxe.format.JsonParser;
 import flixel.group.FlxSpriteGroup;
 
 using StringTools;
@@ -92,16 +85,16 @@ class DialogueCharacter extends FlxSprite
 	public function reloadCharacterJson(character:String):Void
 	{
 		var rawJson:String = null;
-		var path:String = Paths.getFile('portraits/$DEFAULT_CHARACTER.json', IMAGE);
+		var path:String = Paths.getJson('portraits/$DEFAULT_CHARACTER.json');
 
 		if (Paths.fileExists('images/dialogue/$character.json', TEXT)) {
-			path = Paths.getFile('images/dialogue/$character.json', TEXT);
+			path = Paths.getJson('images/dialogue/$character');
 		}
 		else if (Paths.fileExists('images/dialogue/$character.json', TEXT)) {
-			path = Paths.getFile('images/dialogue/$character.json', TEXT);
+			path = Paths.getJson('images/dialogue/$character');
 		}
 		else if (Paths.fileExists('portraits/$character.json', TEXT)) {
-			path = Paths.getFile('portraits/$character.json', TEXT);
+			path = Paths.getJson('portraits/$character');
 		}
 
 		rawJson = Paths.getTextFromFile(path);
@@ -175,7 +168,6 @@ class DialogueCharacter extends FlxSprite
 
 class DialogueBoxPsych extends FlxSpriteGroup
 {
-	var dialogue:TypedAlphabet;
 	var dialogueList:DialogueFile = null;
 
 	public var finishThing:Void->Void;
@@ -194,7 +186,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 
 	var textBoxTypes:Array<String> = ['normal', 'angry'];
 	
-	var curCharacter:String = "";
+	var curCharacter:String = '';
 
 	public function new(dialogueList:DialogueFile, ?song:String = null):Void
 	{
@@ -317,8 +309,9 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		}
 	}
 
-	public static var DEFAULT_TEXT_X = 175;
-	public static var DEFAULT_TEXT_Y = 432;
+	public static var DEFAULT_TEXT_X:Float = 175;
+	public static var DEFAULT_TEXT_Y:Float = 432;
+	public static var LONG_TEXT_ADD:Float = 24;
 
 	var scrollSpeed = 4000;
 	var daText:TypedAlphabet = null;
@@ -612,12 +605,11 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		lastBoxType = boxType;
 
 		daText.text = curDialogue.text;
-		daText.delay = curDialogue.speed;
 		daText.sound = curDialogue.sound;
-
 		if (daText.sound == null || daText.sound.trim() == '') daText.sound = 'dialogue';
-
+		
 		daText.y = DEFAULT_TEXT_Y;
+		if (daText.rows > 2) daText.y -= LONG_TEXT_ADD;
 
 		var char:DialogueCharacter = arrayCharacters[character];
 

@@ -2,7 +2,7 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-import shaderslmfao.ColorSwap;
+import shaders.ColorSwap;
 import flixel.graphics.FlxGraphic;
 
 using StringTools;
@@ -36,13 +36,7 @@ class NoteSplash extends FlxSprite
 		antialiasing = OptionData.globalAntialiasing;
 	}
 
-	private var isPsychArray:Array<Array<Bool>> =
-	[
-		[false, false],
-		[false, false],
-		[false, false],
-		[false, false]
-	];
+	private var isPsychArray:Array<Array<Bool>> = [for (i in 0...Note.maxNote) [for (j in 0...amountOfSparePerson) false]];
 
 	public function setupNoteSplash(x:Float, y:Float, note:Int = 0, texture:String = null, mustPress:Bool = true, hueColor:Float = 0, satColor:Float = 0, brtColor:Float = 0):Void
 	{
@@ -89,7 +83,7 @@ class NoteSplash extends FlxSprite
 		colorSwap.saturation = satColor;
 		colorSwap.brightness = brtColor;
 
-		var animNum:Int = FlxG.random.int(1, 2);
+		var animNum:Int = FlxG.random.int(1, amountOfSparePerson);
 
 		if (isPsychArray[note][animNum]) {
 			offset.set(-10, 0);
@@ -100,7 +94,7 @@ class NoteSplash extends FlxSprite
 				offset.set(10, 10);
 			}
 			else {
-				offset.set(-25, -15);
+				offset.set(-30, -15);
 			}
 		}
 
@@ -158,7 +152,7 @@ class NoteSplash extends FlxSprite
 
 	function loadPixelAnims(skin:String):Void
 	{
-		var graphic:FlxGraphic = Paths.getImage('notes/' + skin);
+		var graphic:FlxGraphic = null;
 
 		if (Paths.fileExists('images/' + skin + '.png', IMAGE)) {
 			graphic = Paths.getImage(skin);
@@ -168,6 +162,9 @@ class NoteSplash extends FlxSprite
 		}
 		else if (Paths.fileExists('images/notes/pixel/' + skin + '.png', IMAGE)) {
 			graphic = Paths.getImage('notes/pixel/' + skin);
+		}
+		else {
+			graphic = Paths.getImage('notes/' + skin);
 		}
 
 		loadGraphic(graphic);

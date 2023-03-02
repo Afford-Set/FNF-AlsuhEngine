@@ -36,7 +36,6 @@ import flixel.tweens.FlxEase;
 import flixel.group.FlxGroup;
 import flixel.system.FlxSound;
 import flixel.tweens.FlxTween;
-import haxe.format.JsonParser;
 import flixel.addons.ui.FlxUI;
 import lime.media.AudioBuffer;
 import openfl.utils.ByteArray;
@@ -89,21 +88,38 @@ class ChartingState extends MusicBeatUIState
 		['Change Character', "Value 1: Character to change (Dad, BF, GF)\nValue 2: New character's name"],
 		['Change Scroll Speed', "Value 1: Scroll Speed Multiplier (1 is default)\nValue 2: Time it takes to change fully in seconds."],
 		['Set Property', "Value 1: Variable name\nValue 2: New value"],
+		['Call From Object', "Value 1: Function name\nValue 2: Arguments of function (with a ', ' between\nthe values)"],
+		#if LUA_ALLOWED
+		['Call on Luas', "Calls callback from lua scripts.\nValue 1: Function name\nValue 2: Arguments of function (with a ', ' between\nthe values)"],
+		['Sets on Luas', "Sets new value for variable on lua scripts.\nValue 1: Variable name\nValue 2: New value"],
+		#end
+		#if VIDEOS_ALLOWED
+		['Start Video on HUD', "Starts the video in the HUD during the song.\n\nValue 1: Video name\nValue 2: Is looped? (true - yes, false - no)"],
+		['Start BG Video', "Starts the video in the background during the song.\n\nValue 1: Video name\nValue 2: Arguments: (with a ', ' between the values)\n1 argument - Is looped? (true - yes, false - no)\n2 argument - Position to insert (BF, GF, Dad)"],
+		['End Video', "Ends the current video during a song."],
+		#end
 		['Play Sound', "Plays a sound from the sounds folder\n\nValue 1: Sound name\nValue 2: Sound Volume"],
+		['Stop Sound', "Stops a sound.\n\nValue 1: Sound name"],
+		['Pause Sound', "Pauses a sound.\n\nValue 1: Sound name"],
+		['Resume Sound', "Resumes a sound.\n\nValue 1: Sound name"],
+		['Sound Fade In', "Sound fades in.\n\nValue 1: Sound name\nValue 2: Arguments: (with a ', ' between the values)\n1 argument - duration\n2 argument - from value\n3 argument - to value"],
+		['Sound Fade Out', "Sound fades out.\n\nValue 1: Sound name\nValue 2: Arguments: (with a ', ' between the values)\n1 argument - duration\n2 argument - to value"],
+		['Cancel Sound Fade', "Cancels Sound's Fade.\nValue 1: Sound name"],
 		['Fade Event', "Value 1: Duration to fade (in seconds).\nValue 2: Color in hex (Example: 9DCFED)"],
 		['Flash Event', "Value 1: Duration of flash in seconds.\nValue 2: Color in hex (Example: 9DCFED)"],
-		['Object X Tween', "Value 1: Object name\nValue 2: Arguments:\n1 argument - Tag of tween\n2 argument - New value\n3 argument - Duration of tween\n4 argument - Ease name"],
-		['Object Y Tween', "Value 1: Object name\nValue 2: Arguments:\n1 argument - Tag of tween\n2 argument - New value\n3 argument - Duration of tween\n4 argument - Ease name"],
-		['Object XY Tween', "Value 1: Object name\nValue 2: Arguments:\n1 argument - Tag of tween\n2 argument - New X value\n3 argument - New Y value\n4 argument - Duration of tween\n5 argument - Ease name"],
-		['Object Angle Tween', "Value 1: Object name\nValue 2: Arguments:\n1 argument - Tag of tween\n2 argument - New value\n3 argument - Duration of tween\n4 argument - Ease name"],
-		['Object Zoom Tween', "Value 1: Object name\nValue 2: Arguments:\n1 argument - Tag of tween\n2 argument - New value\n3 argument - Duration of tween\n4 argument - Ease name"],
-		['Run Timer', "Value 1: Tag of timer\nValue 2: Arguments:\n1 argument - Time Duration\n2 argument - Quantity of loops"],
-		['Object Play Animation', "Value 1: Object name\nValue 2: Arguments:\n1 argument - Animation name\n2 argument - Is forced?\n3 argument - Is reverse?\n4 argument - Start Frame Number"],
+		['Object X Tween', "Value 1: Object name\nValue 2: Arguments: (with a ', ' between the values)\n1 argument - Tag of tween\n2 argument - New value\n3 argument - Duration of tween\n4 argument - Ease name"],
+		['Object Y Tween', "Value 1: Object name\nValue 2: Arguments: (with a ', ' between the values)\n1 argument - Tag of tween\n2 argument - New value\n3 argument - Duration of tween\n4 argument - Ease name"],
+		['Object XY Tween', "Value 1: Object name\nValue 2: Arguments: (with a ', ' between the values)\n1 argument - Tag of tween\n2 argument - New X value\n3 argument - New Y value\n4 argument - Duration of tween\n5 argument - Ease name"],
+		['Object Alpha Tween', "Value 1: Object name\nValue 2: Arguments: (with a ', ' between the values)\n1 argument - Tag of tween\n2 argument - New value\n3 argument - Duration of tween\n4 argument - Ease name"],
+		['Object Angle Tween', "Value 1: Object name\nValue 2: Arguments: (with a ', ' between the values)\n1 argument - Tag of tween\n2 argument - New value\n3 argument - Duration of tween\n4 argument - Ease name"],
+		['Object Zoom Tween', "Value 1: Object name\nValue 2: Arguments: (with a ', ' between the values)\n1 argument - Tag of tween\n2 argument - New value\n3 argument - Duration of tween\n4 argument - Ease name"],
+		['Run Timer', "Value 1: Tag of timer\nValue 2: Arguments: (with a ', ' between the values)\n1 argument - Time Duration\n2 argument - Quantity of loops"],
+		['Object Play Animation', "Value 1: Object name\nValue 2: Arguments: (with a ', ' between the values)\n1 argument - Animation name\n2 argument - Is forced?\n3 argument - Is reverse?\n4 argument - Start Frame Number"],
 		['Set Health Bar Colors', "Value 1: Left Color\nValue 2: Right Color"],
 		['Set Music Volume', "Sets the music volume.\n\nValue 1: Volume number"],
 		['Set Vocals Volume', "Sets the vocals volume.\n\nValue 1: Volume number"],
 		['Change Icon', "Changes specificed icon to new icon.\n\nValue 1: Which player to change icon (P1, P2).\nValue 2: Icon name."],
-		['Camera Tween Pos', "Tweens the position of the GAME CAMERA and LOCKS it.\nYou can use this event and the \"Camera Follow Pos\"\none after another respectively.\n\nValue 1: x, y, Duration (with a ', ' between the values)\nValue 2: Ease name"],
+		['Camera Tween Pos', "Tweens the position of the GAME CAMERA and LOCKS it.\nYou can use this event and the \"Camera Follow Pos\"\none after another respectively.\n\nValue 1: x, y, Duration, Start Delay (with a ', ' between the values)\nValue 2: Ease name"],
 		['Camera Tween Zoom', "Tweens the game camera's zoom to a specific value in a specific duration in a specific ease\n\nValue 1: TargetZoom, Duration (with a ', ' between the values)\nValue 2: Ease name"],
 		['Set Cam Zoom', "Sets Camera Zoom\n\nValue 1: Cam zoom\nValue 2: if blank, it will smoothly zoom regularly,\notherwise it will do an instant zoom"],
 		['Cam Boom Speed', "Value 1: Speed\nValue 2: Intensity"],
@@ -315,13 +331,12 @@ class ChartingState extends MusicBeatUIState
 		FlxG.mouse.visible = true;
 
 		tempBpm = _song.bpm;
+		addSection();
 
 		currentSongName = Paths.formatToSongPath(_song.songID);
 
-		reloadGridLayer();
-
 		loadSong();
-		addSection();
+		reloadGridLayer();
 
 		Conductor.changeBPM(_song.bpm);
 		Conductor.mapBPMChanges(_song);
@@ -798,7 +813,7 @@ class ChartingState extends MusicBeatUIState
 		stepperShiftNoteDialms.name = 'song_shiftnotems';
 
 		var shiftNoteButton:FlxButton = new FlxButton(10, 350, "Shift", function():Void {
-			shiftNotes(Std.int(stepperShiftNoteDial.value),Std.int(stepperShiftNoteDialstep.value),Std.int(stepperShiftNoteDialms.value));
+			shiftNotes(Std.int(stepperShiftNoteDial.value), Std.int(stepperShiftNoteDialstep.value), Std.int(stepperShiftNoteDialms.value));
 		});
 
 		var tab_group_song = new FlxUI(null, UI_box);
@@ -1026,7 +1041,7 @@ class ChartingState extends MusicBeatUIState
 
 			for (note in _song.notes[daSec - value].sectionNotes)
 			{
-				var strum = note[0] + Conductor.stepCrochet * (getSectionBeats(daSec) * 4 * value);
+				var strum:Float = note[0] + Conductor.stepCrochet * (getSectionBeats(daSec) * 4 * value);
 
 				var copiedNote:Array<Dynamic> = [strum, note[1], note[2], note[3]];
 				_song.notes[daSec].sectionNotes.push(copiedNote);
@@ -1610,7 +1625,7 @@ class ChartingState extends MusicBeatUIState
 		voicesVolume.name = 'voices_volume';
 		blockPressWhileTypingOnStepper.push(voicesVolume);
 
-		sliderRate = new FlxUISlider(this, 'playbackSpeed', 120, 120, 0.5, 3, 150, null, 5, FlxColor.WHITE, FlxColor.BLACK);
+		sliderRate = new FlxUISlider(this, 'playbackSpeed', 120, 120, 0.5, 3, 150, #if hl 15 #else null #end, 5, FlxColor.WHITE, FlxColor.BLACK);
 		sliderRate.nameLabel.text = 'Playback Rate';
 		tab_group_chart.add(sliderRate);
 
@@ -1730,6 +1745,11 @@ class ChartingState extends MusicBeatUIState
 
 			switch (wname)
 			{
+				case 'section_beats':
+				{
+					_song.notes[curSec].sectionBeats = nums.value;
+					reloadGridLayer();
+				}
 				case 'song_speed': {
 					_song.speed = nums.value;
 				}
@@ -2013,11 +2033,10 @@ class ChartingState extends MusicBeatUIState
 				lastSection = curSec;
 
 				PlayState.SONG = _song;
-				PlayState.seenCutscene = false;
-		
+
 				FlxG.sound.music.stop();
 				if (vocals != null) vocals.stop();
-		
+
 				StageData.loadDirectory(_song);
 				LoadingState.loadAndSwitchState(new PlayState(), true);
 			}
@@ -2463,10 +2482,12 @@ class ChartingState extends MusicBeatUIState
 		reloadGridLayer();
 	}
 
+	var lastSecBeats:Float = 0;
+	var lastSecBeatsNext:Float = 0;
+
 	function reloadGridLayer():Void
 	{
 		gridLayer.clear();
-
 		gridBG = FlxGridOverlay.create(GRID_SIZE, GRID_SIZE, GRID_SIZE * 9, Std.int(GRID_SIZE * getSectionBeats() * 4 * zoomList[curZoom]));
 
 		#if desktop
@@ -2830,9 +2851,6 @@ class ChartingState extends MusicBeatUIState
 
 		updateWaveform();
 	}
-
-	var lastSecBeats:Float = 0;
-	var lastSecBeatsNext:Float = 0;
 
 	function changeSection(sec:Int = 0, ?updateMusic:Bool = true):Void
 	{
@@ -3314,11 +3332,10 @@ class ChartingState extends MusicBeatUIState
 
 	private function addNote(strum:Null<Float> = null, data:Null<Int> = null, type:Null<Int> = null):Void
 	{
-		var noteStrum = getStrumTime(dummyArrow.y * (getSectionBeats() / 4), false) + sectionStartTime();
-		var noteData = Math.floor((FlxG.mouse.x - GRID_SIZE) / GRID_SIZE);
-		var noteSus = 0;
-		var daAlt = false;
-		var daType = currentType;
+		var noteStrum:Float = getStrumTime(dummyArrow.y * (getSectionBeats() / 4), false) + sectionStartTime();
+		var noteData:Int = Math.floor((FlxG.mouse.x - GRID_SIZE) / GRID_SIZE);
+		var noteSus:Int = 0;
+		var daType:Dynamic = currentType;
 
 		if (strum != null) noteStrum = strum;
 		if (data != null) noteData = data;
@@ -3372,27 +3389,29 @@ class ChartingState extends MusicBeatUIState
 		return GRID_SIZE * beats * 4 * zoomList[curZoom] * value + gridBG.y;
 	}
 
-	private var daSpacing:Float = 0.3;
-
-	function loadLevel():Void {
-		Debug.logInfo(_song.notes);
-	}
-
-	function getNotes():Array<Dynamic>
-	{
-		var noteData:Array<Dynamic> = [];
-
-		for (i in _song.notes) {
-			noteData.push(i.sectionNotes);
-		}
-
-		return noteData;
+	function getNotes():Array<Dynamic> {
+		return [for (i in _song.notes) i.sectionNotes];
 	}
 
 	function loadJson(song:String):Void
 	{
-		PlayState.SONG = Song.loadFromJson(song.toLowerCase() + CoolUtil.getDifficultySuffix(PlayState.lastDifficulty, PlayState.difficulties), song.toLowerCase());
-		LoadingState.loadAndSwitchState(new ChartingState(), true);
+		var songPath:String = Paths.formatToSongPath(song);
+		var diffPath:String = CoolUtil.fromSuffixToID(CoolUtil.getDifficultySuffix(PlayState.lastDifficulty, PlayState.difficulties));
+		var songFile:String = CoolUtil.formatSong(songPath, diffPath);
+
+		if (Paths.fileExists('data/' + songPath + '/' + songFile + '.json', TEXT))
+		{
+			PlayState.SONG = Song.loadFromJson(songFile, songPath);
+			LoadingState.loadAndSwitchState(new ChartingState(), true);
+		}
+		else if (Paths.fileExists('data/' + songPath + '/' + songPath + '.json', TEXT))
+		{
+			PlayState.SONG = Song.loadFromJson(songPath, songPath);
+			LoadingState.loadAndSwitchState(new ChartingState(), true);
+		}
+		else {
+			Debug.logWarn('File not found!');
+		}
 	}
 
 	function loadAutosave():Void
@@ -3420,7 +3439,7 @@ class ChartingState extends MusicBeatUIState
 
 	private function saveLevel():Void
 	{
-		var json = {
+		var json:{song:SwagSong} = {
 			"song": _song
 		};
 
@@ -3432,7 +3451,15 @@ class ChartingState extends MusicBeatUIState
 			_file.addEventListener(Event.COMPLETE, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data.trim(), _song.songID.toLowerCase() + CoolUtil.getDifficultySuffix(PlayState.lastDifficulty, PlayState.difficulties) + ".json");
+
+			var diffPath:String = CoolUtil.fromSuffixToID(CoolUtil.getDifficultySuffix(PlayState.lastDifficulty, PlayState.difficulties));
+			var songFile:String = CoolUtil.formatSong(_song.songID, diffPath);
+
+			#if MODS_ALLOWED
+			_file.save(data.trim(), #if sys CoolUtil.convPathShit(Paths.modFolders('data/' + _song.songID + '/' + #end songFile + '.json' #if sys )) #end);
+			#else
+			_file.save(data.trim(), #if sys CoolUtil.convPathShit(Paths.getJson('data/' + _song.songID + '/' + #end songFile + '.json' #if sys )) #end);
+			#end
 		}
 	}
 
@@ -3444,8 +3471,8 @@ class ChartingState extends MusicBeatUIState
 	{
 		var newSong:Array<SwagSection> = [];
 		
-		var millisecadd:Float = (((measure * 4) + step / 4) * (60000 / _song.bpm)) + ms;
-		var totaladdsection:Int = Std.int((millisecadd/ (60000 / _song.bpm) / 4));
+		var millisecadd:Float = (((measure * _song.notes[curSec].sectionBeats) + step / 4) * (60000 / _song.bpm)) + ms;
+		var totaladdsection:Int = Std.int((millisecadd / (60000 / _song.bpm) / 4));
 
 		if (millisecadd > 0)
 		{
@@ -3474,7 +3501,7 @@ class ChartingState extends MusicBeatUIState
 					newtiming = 0;
 				}
 
-				var futureSection = Math.floor(newtiming/4/(60000/_song.bpm));
+				var futureSection = Math.floor(newtiming / 4 / (60000 / _song.bpm));
 				_song.notes[daSection].sectionNotes[daNote][0] = newtiming;
 				newSong[futureSection].sectionNotes.push(_song.notes[daSection].sectionNotes[daNote]);
 			}
@@ -3510,7 +3537,8 @@ class ChartingState extends MusicBeatUIState
 			gfVersion: _song.gfVersion,
 			stage: _song.stage
 		};
-		var json = {
+
+		var json:{song:SwagSong} = {
 			"song": eventsSong
 		}
 
@@ -3522,7 +3550,7 @@ class ChartingState extends MusicBeatUIState
 			_file.addEventListener(Event.COMPLETE, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data.trim(), "events.json");
+			_file.save(data.trim(), #if sys CoolUtil.convPathShit(Paths.getJson('data/' + _song.songID + '/' + #end "events.json" #if sys )) #end);
 		}
 	}
 
@@ -3533,7 +3561,7 @@ class ChartingState extends MusicBeatUIState
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 		_file = null;
 
-		FlxG.log.notice("Successfully saved LEVEL DATA.");
+		Debug.logInfo("Successfully saved LEVEL DATA.");
 	}
 
 	/**
@@ -3557,17 +3585,30 @@ class ChartingState extends MusicBeatUIState
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 		_file = null;
 
-		FlxG.log.error("Problem saving Level data");
+		Debug.logError("Problem saving Level data");
 	}
 
 	function getSectionBeats(?section:Null<Int> = null)
 	{
-		if (section == null) section = curSec;
 		var val:Null<Float> = null;
-		
-		if (_song.notes[section] != null) val = _song.notes[section].sectionBeats;
 
-		return val != null ? val : 4;
+		if (section == null) {
+			section = curSec;
+		}
+
+		#if hl // Stupid Fucking Hashlink
+		if (_song.notes[section] == null || _song.notes[section].sectionBeats == 0) {
+			val = 4;
+		}
+		else {
+			val = _song.notes[section].sectionBeats;
+		}
+
+		return val;
+		#else
+		if (_song.notes[section] != null) val = _song.notes[section].sectionBeats;
+		return val #if !hl != null ? val : 4 #end;
+		#end
 	}
 }
 

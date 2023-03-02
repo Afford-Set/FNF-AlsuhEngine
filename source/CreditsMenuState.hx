@@ -13,15 +13,15 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxSubState;
 import flixel.text.FlxText;
+import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxTween;
 import flixel.effects.FlxFlicker;
-import transition.TransitionableState;
 
 using StringTools;
 
-class CreditsMenuState extends TransitionableState
+class CreditsMenuState extends MusicBeatState
 {
 	private static var curSelected:Int = -1;
 
@@ -53,7 +53,7 @@ class CreditsMenuState extends TransitionableState
 
 		if (FileSystem.exists(path))
 		{
-			var leMods:Array<String> = CoolUtil.coolTextFile(path, false, true);
+			var leMods:Array<String> = CoolUtil.listFromString(File.getContent(path));
 		
 			for (i in 0...leMods.length)
 			{
@@ -270,15 +270,17 @@ class CreditsMenuState extends TransitionableState
 		{
 			if (!item.bold)
 			{
+				var lerpVal:Float = CoolUtil.boundTo(elapsed * 12, 0, 1);
+
 				if (item.targetY == 0)
 				{
 					var lastX:Float = item.x;
 				
 					item.screenCenter(X);
-					item.x = CoolUtil.coolLerp(lastX, item.x - 70, 0.2);
+					item.x = FlxMath.lerp(lastX, item.x - 70, lerpVal);
 				}
 				else {
-					item.x = CoolUtil.coolLerp(item.x, 200 + -40 * Math.abs(item.targetY), 0.2);
+					item.x = FlxMath.lerp(item.x, 200 + -40 * Math.abs(item.targetY), lerpVal);
 				}
 			}
 		}

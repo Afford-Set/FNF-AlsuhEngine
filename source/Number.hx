@@ -16,16 +16,31 @@ class Number extends FlxSprite
 
 		this.number = number;
 
-		var ourPath:String = 'num' + number + suffix;
+		var ourPath:String = 'num' + number;
 
 		if (Paths.fileExists('images/' + ourPath + '.png', IMAGE)) {
 			loadGraphic(Paths.getImage(ourPath));
 		}
-		else if (Paths.fileExists('pixelUI/' + ourPath + '.png', IMAGE)) {
+		else if (Paths.fileExists('images/pixelUI/' + ourPath + '.png', IMAGE)) {
 			loadGraphic(Paths.getImage('pixelUI/' + ourPath));
 		}
-		else {
+		else if (Paths.fileExists('images/numbers/' + ourPath + '.png', IMAGE)) {
 			loadGraphic(Paths.getImage('numbers/' + ourPath));
+		}
+
+		if (suffix != null && suffix.length > 0)
+		{
+			var ourPath:String = 'num' + number + suffix;
+
+			if (Paths.fileExists('images/' + ourPath + '.png', IMAGE)) {
+				loadGraphic(Paths.getImage(ourPath));
+			}
+			else if (Paths.fileExists('images/pixelUI/' + ourPath + '.png', IMAGE)) {
+				loadGraphic(Paths.getImage('pixelUI/' + ourPath));
+			}
+			else if (Paths.fileExists('images/numbers/' + ourPath + '.png', IMAGE)) {
+				loadGraphic(Paths.getImage('numbers/' + ourPath));
+			}
 		}
 
 		screenCenter();

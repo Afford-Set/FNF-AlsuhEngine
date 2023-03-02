@@ -129,7 +129,7 @@ class Channel {
 }
 
 class ChannelEventInstance extends Channel {//basically a sound instance
-	public static var EMPTY_STRING = "";
+	public static var EMPTY_STRING = '';
 	public var data : FmodStudioEventInstanceRef = null;
 	
 	function new(?name:String){
@@ -288,7 +288,7 @@ class ChannelEventInstance extends Channel {//basically a sound instance
 
 class ChannelLowLevel extends Channel{
 	
-	public static var EMPTY_STRING = "";
+	public static var EMPTY_STRING = '';
 	public var 		data : FmodChannelRef 	= null;
 	
 	function new( data : FmodChannelRef, ?name:String ){
@@ -454,7 +454,7 @@ class Sound {
 	/**
 	 * length is in seconds
 	 */
-	public var name = "";
+	public var name = '';
 	public var length(get, null) 						: Float;
 	public var id3 	: Dynamic							= null;
 	public var isDebug = false;
@@ -620,7 +620,7 @@ class SoundEvent extends Sound{
 }
 
 class Snd {
-	public static var EMPTY_STRING = "";
+	public static var EMPTY_STRING = '';
 	public static var 	PLAYING 		: hxd.Stack<Snd> 	= new hxd.Stack();
 	static var 	MUTED 									= false;
 	static var 	DISABLED		 						= false;
@@ -829,7 +829,7 @@ class Snd {
 		var v0p : cpp.Pointer<Int> = Cpp.addr(v0);
 		var v1p : cpp.Pointer<Int> = Cpp.addr(v1);
 		var v2p : cpp.Pointer<Int> = Cpp.addr(v2);
-		var str = "";
+		var str = '';
 		var res = fmodSystem.getSoundRAM( v0p, v1p, v2p );
 		if ( res != FMOD_OK){
 			//#if debug

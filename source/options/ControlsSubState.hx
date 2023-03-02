@@ -18,7 +18,7 @@ import flixel.input.keyboard.FlxKey;
 
 using StringTools;
 
-class ControlsSubState extends BaseSubState
+class ControlsSubState extends MusicBeatSubState
 {
 	private static var curSelected:Int = 1;
 	private static var curAlt:Bool = false;
@@ -219,7 +219,7 @@ class ControlsSubState extends BaseSubState
 
 			if (isPause)
 			{
-				PlayState.instance.reloadControls();
+				PlayState.reloadControls(PlayState.instance);
 
 				PlayState.isNextSubState = true;
 

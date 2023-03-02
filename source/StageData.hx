@@ -1,7 +1,6 @@
 package;
 
 import haxe.Json;
-import haxe.format.JsonParser;
 
 import Song;
 
@@ -77,7 +76,6 @@ class StageData
 
 	public static function getStageFile(stage:String):StageFile
 	{
-		var rawJson:String = Paths.getTextFromFile('stages/' + stage + '.json');
-		return cast Json.parse(rawJson);
+		return cast Json.parse(Paths.getTextFromFile('stages/' + stage + '.json'));
 	}
 }

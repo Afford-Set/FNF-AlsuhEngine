@@ -1,15 +1,8 @@
 package;
 
-#if sys
-import sys.io.File;
-import sys.FileSystem;
-#end
-
 import haxe.Json;
-import haxe.format.JsonParser;
 
-import lime.utils.Assets;
-import Section.SwagSection;
+import Section;
 
 using StringTools;
 
@@ -108,22 +101,31 @@ class Song
 
 	public static function loadFromJson(jsonInput:String, ?folder:Null<String> = null):Null<SwagSong>
 	{
-		var rawJson:String = Paths.getTextFromFile('data/${Paths.formatToSongPath(folder)}/${Paths.formatToSongPath(jsonInput)}.json');
+		var formattedFolder:String = Paths.formatToSongPath(folder);
+		var formattedSong:String = Paths.formatToSongPath(jsonInput);
+
+		var rawJson:String = Paths.getTextFromFile('data/$formattedFolder/$formattedSong.json');
 
 		while (!rawJson.endsWith('}')) {
 			rawJson = rawJson.substr(0, rawJson.length - 1);
 		}
 
-		var songJson:SwagSong = parseJSONshit(rawJson);
-
-		if (songJson != null)
+		try
 		{
-			if (jsonInput != 'events') {
-				StageData.loadDirectory(songJson);
+			var songJson:SwagSong = parseJSONshit(rawJson);
+
+			if (songJson != null)
+			{
+				if (jsonInput != 'events') {
+					StageData.loadDirectory(songJson);
+				}
+
+				onLoadJson(songJson);
+				return songJson;
 			}
-	
-			onLoadJson(songJson);
-			return songJson;
+		}
+		catch (e:Dynamic) {
+			Debug.logError('Cannot load level file "' + 'data/$formattedFolder/$formattedSong.json' + '" because of: ' + e);
 		}
 
 		return null;
@@ -131,16 +133,6 @@ class Song
 
 	public static function parseJSONshit(rawJson:String):SwagSong
 	{
-		if (rawJson != null)
-		{
-			try {
-				return cast Json.parse(rawJson).song;
-			}
-			catch (e:Dynamic) {
-				Debug.logError(e);
-			}
-		}
-
-		return null;
+		return cast Json.parse(rawJson).song;
 	}
 }

@@ -14,7 +14,6 @@ import haxe.xml.Access;
 #else
 import haxe.xml.Fast as Access;
 #end
-import transition.TransitionableState;
 
 /**
  * This is a simple extension of FlxState that does two things:
@@ -29,7 +28,7 @@ import transition.TransitionableState;
  * @author Lars Doucet
  */
 
-class FlxUIState extends TransitionableState implements IEventGetter implements IFlxUIState
+class FlxUIState extends FlxState implements IEventGetter implements IFlxUIState
 {
 	public var destroyed:Bool;
 	#if FLX_MOUSE
@@ -41,14 +40,14 @@ class FlxUIState extends TransitionableState implements IEventGetter implements 
 	 * frontend for adding tooltips to things
 	 */
 	public var tooltips(default, null):FlxUITooltipManager;
-	private var _xml_id:String = ""; // the xml file to load from assets
+	private var _xml_id:String = ''; // the xml file to load from assets
 	#if (debug && sys)
 	// If you want to do live reloading, set the path to your assets directory on your local disk here,
 	// and it will load that instead of loading the xml specification from embedded assets
 	// (only works on cpp/neko targets)
 	// this should serve as a PREFIX to the _xml_id:
 	// if full path="path/to/assets/xml/ui/foo.xml" and _xml_id="ui/foo.xml", then liveFilePath="path/to/assets/xml/"
-	private var _liveFilePath:String = "";
+	private var _liveFilePath:String = '';
 	#end
 	private var _makeCursor:Bool; // whether to auto-construct a cursor and load default widgets into it
 	private var _ui_vars:Map<String, String>;
@@ -58,7 +57,7 @@ class FlxUIState extends TransitionableState implements IEventGetter implements 
 	// if this is not null, each state will grab this auto-magically
 	// otherwise it's up to you to set _tongue before the UI stuff loads.
 	#if (debug && sys)
-	public static var static_liveFilePath:String = "";
+	public static var static_liveFilePath:String = '';
 	// if this is not "", each state will grab this auto-magically
 	// otherwise it's up to you to set _liveFilePath before the UI stuff loads.
 	#end
@@ -139,7 +138,7 @@ class FlxUIState extends TransitionableState implements IEventGetter implements 
 		if (_xml_id != null && _xml_id != "")
 		{
 			var data:Access = null;
-			var errorMsg:String = "";
+			var errorMsg:String = '';
 
 			if (liveFile == null)
 			{
@@ -381,7 +380,7 @@ class FlxUIState extends TransitionableState implements IEventGetter implements 
 	// this makes it easy to override this function in your own FlxUIState,
 	// in case you want to instantiate a custom class that extends FlxUI instead
 	private function createUI(data:Access = null, ptr:IEventGetter = null, superIndex_:FlxUI = null, tongue_:IFireTongue = null,
-			liveFilePath_:String = ""):FlxUI
+			liveFilePath_:String = ''):FlxUI
 	{
 		var flxui = new FlxUI(data, ptr, superIndex_, tongue_, liveFilePath_, _ui_vars);
 		_cleanupUIVars(); // clear out temporary _ui_vars variable if it was set

@@ -13,12 +13,11 @@ import sys.FileSystem;
 #end
 import flixel.FlxSprite;
 import flixel.group.FlxGroup;
-import transition.TransitionableState;
 
 using StringTools;
 
 #if REPLAYS_ALLOWED
-class ReplaysMenuState extends TransitionableState
+class ReplaysMenuState extends MusicBeatState
 {
 	var curSelected:Int = 0;
 

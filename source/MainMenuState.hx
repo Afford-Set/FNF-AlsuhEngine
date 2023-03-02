@@ -21,11 +21,10 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.effects.FlxFlicker;
 import flixel.input.keyboard.FlxKey;
-import transition.TransitionableState;
 
 using StringTools;
 
-class MainMenuState extends TransitionableState
+class MainMenuState extends MusicBeatState
 {
 	private static var curSelected:Int = 0;
 
@@ -50,7 +49,7 @@ class MainMenuState extends TransitionableState
 	var camFollowPos:FlxObject;
 	var camFollow:FlxPoint;
 
-	public static var engineVersion:String = '1.7.1';
+	public static var engineVersion:String = '1.7.2'; // This is also used for Discord RPC
 	public static var psychEngineVersion:String = '0.6.4';
 
 	public static var gameVersion(get, never):String;
@@ -171,7 +170,7 @@ class MainMenuState extends TransitionableState
 
 		FlxG.camera.follow(camFollowPos, null, 1);
 
-		var text:String = 'v ' + gameVersion + (OptionData.watermarks ? ' - FNF | v ' + engineVersion.trim() + ' - Alsuh Engine' : '');
+		var text:String = 'v ' + gameVersion + #if ALSUH_WATERMARKS (OptionData.watermarks ? ' - FNF | v ' + engineVersion.trim() + ' - Alsuh Engine' : '') #end;
 
 		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, text, 12);
 		versionShit.setFormat(Paths.getFont('vcr.ttf'), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -221,7 +220,8 @@ class MainMenuState extends TransitionableState
 			if (FreeplayMenuState.vocals != null) FreeplayMenuState.vocals.volume += 0.5 * elapsed;
 		}
 
-		camFollowPos.setPosition(CoolUtil.coolLerp(camFollowPos.x, camFollow.x, 0.13), CoolUtil.coolLerp(camFollowPos.y, camFollow.y, 0.13));
+		var lerpVal:Float = CoolUtil.boundTo(elapsed * 7.5, 0, 1);
+		camFollowPos.setPosition(FlxMath.lerp(camFollowPos.x, camFollow.x, lerpVal), FlxMath.lerp(camFollowPos.y, camFollow.y, lerpVal));
 
 		if (!selectedSomethin)
 		{
@@ -350,7 +350,7 @@ class MainMenuState extends TransitionableState
 			case 'credits':
 				FlxG.switchState(new CreditsMenuState());
 			case 'options':
-				LoadingState.loadAndSwitchState(new options.OptionsMenuState(), false, true);
+				LoadingState.loadAndSwitchState(new options.OptionsMenuState(), false #if PRELOAD_ALL , true #end);
 		}
 	}
 

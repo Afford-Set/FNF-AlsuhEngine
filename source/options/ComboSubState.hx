@@ -16,7 +16,7 @@ import flixel.group.FlxSpriteGroup;
 
 using StringTools;
 
-class ComboSubState extends BaseSubState
+class ComboSubState extends MusicBeatSubState
 {
 	var rating:FlxSprite;
 	var comboNums:FlxSpriteGroup;

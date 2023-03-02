@@ -10,16 +10,16 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxSubState;
 import flixel.text.FlxText;
+import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxEase;
 import flixel.group.FlxGroup;
 import flixel.system.FlxSound;
 import flixel.tweens.FlxTween;
-import transition.TransitionableState;
 
 using StringTools;
 
-class FreeplayMenuState extends TransitionableState
+class FreeplayMenuState extends MusicBeatState
 {
 	private static var curSelected:Int = -1;
 	private static var curDifficultyString:String = '';
@@ -143,9 +143,8 @@ class FreeplayMenuState extends TransitionableState
 		add(scoreText);
 
 		scoreBG = new FlxSprite(scoreText.x - 6, 0);
-		scoreBG.makeGraphic(1, 66, 0xFF000000);
+		scoreBG.makeGraphic(1, 66, 0x99000000);
 		scoreBG.antialiasing = false;
-		scoreBG.alpha = 0.6;
 		insert(members.indexOf(scoreText), scoreBG);
 
 		diffText = new FlxText(scoreText.x, scoreText.y + 36, 0, "", 24);
@@ -221,8 +220,8 @@ class FreeplayMenuState extends TransitionableState
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
 		}
 
-		lerpScore = Math.floor(CoolUtil.coolLerp(lerpScore, intendedScore, 0.4));
-		lerpAccuracy = CoolUtil.coolLerp(lerpAccuracy, intendedAccuracy, 0.2);
+		lerpScore = Math.floor(FlxMath.lerp(lerpScore, intendedScore, CoolUtil.boundTo(elapsed * 24, 0, 1)));
+		lerpAccuracy = FlxMath.lerp(lerpAccuracy, intendedAccuracy, CoolUtil.boundTo(elapsed * 12, 0, 1));
 
 		if (Math.abs(lerpScore - intendedScore) <= 10) {
 			lerpScore = intendedScore;
@@ -390,7 +389,7 @@ class FreeplayMenuState extends TransitionableState
 					PlayState.storyWeekName = curSong.weekName;
 					PlayState.seenCutscene = false;
 
-					Debug.logInfo('Loading song ${PlayState.SONG.songName} from week ${PlayState.storyWeekName} into Free Play...');
+					Debug.logInfo('Loading song "${PlayState.SONG.songName}" from week "${PlayState.storyWeekName}" into Free Play...');
 
 					if (!OptionData.loadingScreen)
 					{
@@ -564,8 +563,8 @@ class FreeplayMenuState extends TransitionableState
 		scoreBG.scale.x = FlxG.width - scoreText.x + 6;
 		scoreBG.x = FlxG.width - scoreBG.scale.x / 2;
 
-		diffText.x = scoreBG.x + scoreBG.width / 2;
-		diffText.x -= diffText.width / 2;
+		diffText.x = Std.int(scoreBG.x + scoreBG.width / 2);
+		diffText.x -= (diffText.width / 2);
 	}
 }
 
@@ -587,7 +586,7 @@ class SongMetaData
 		['-easy',	'',			'hard']
 	];
 
-	public var folder:String = "";
+	public var folder:String = '';
 
 	public function new(songID:String = '', songName:String = '', songCharacter:String = '', color:FlxColor = 0xFFFFFFFF):Void
 	{

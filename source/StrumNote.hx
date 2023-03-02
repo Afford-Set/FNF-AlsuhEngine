@@ -2,7 +2,7 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-import shaderslmfao.ColorSwap;
+import shaders.ColorSwap;
 import flixel.graphics.FlxGraphic;
 
 using StringTools;
@@ -19,6 +19,19 @@ class StrumNote extends FlxSprite
 	public var sustainReduce:Bool = true;
 
 	public var player:Int;
+
+	public var texture(default, set):String = null;
+
+	private function set_texture(value:String):String
+	{
+		if (texture != value)
+		{
+			texture = value;
+			reloadNote();
+		}
+
+		return value;
+	}
 
 	public function new(x:Float, y:Float, leData:Int, player:Int):Void
 	{
@@ -45,18 +58,30 @@ class StrumNote extends FlxSprite
 			}
 		}
 
+		texture = skin;
+		scrollFactor.set();
+	}
+
+	public function reloadNote():Void
+	{
+		var lastAnim:String = null;
+		if (animation.curAnim != null) lastAnim = animation.curAnim.name;
+
 		if (PlayState.isPixelStage)
 		{
-			var ourGraphic:FlxGraphic = Paths.getImage('notes/' + skin);
+			var ourGraphic:FlxGraphic = null;
 
-			if (Paths.fileExists('images/' + skin + '.png', IMAGE)) {
-				ourGraphic = Paths.getImage(skin);
+			if (Paths.fileExists('images/' + texture + '.png', IMAGE)) {
+				ourGraphic = Paths.getImage(texture);
 			}
-			else if (Paths.fileExists('images/pixelUI/' + skin + '.png', IMAGE)) {
-				ourGraphic = Paths.getImage('pixelUI/' + skin);
+			else if (Paths.fileExists('images/pixelUI/' + texture + '.png', IMAGE)) {
+				ourGraphic = Paths.getImage('pixelUI/' + texture);
 			}
-			else if (Paths.fileExists('images/notes/pixel/' + skin + '.png', IMAGE)) {
-				ourGraphic = Paths.getImage('notes/pixel/' + skin);
+			else if (Paths.fileExists('images/notes/pixel/' + texture + '.png', IMAGE)) {
+				ourGraphic = Paths.getImage('notes/pixel/' + texture);
+			}
+			else {
+				ourGraphic = Paths.getImage('notes/' + texture);
 			}
 
 			loadGraphic(ourGraphic);
@@ -72,11 +97,11 @@ class StrumNote extends FlxSprite
 		}
 		else
 		{
-			if (Paths.fileExists('images/' + skin + '.png', IMAGE)) {
-				frames = Paths.getSparrowAtlas(skin);
+			if (Paths.fileExists('images/' + texture + '.png', IMAGE)) {
+				frames = Paths.getSparrowAtlas(texture);
 			}
 			else {
-				frames = Paths.getSparrowAtlas('notes/' + skin);
+				frames = Paths.getSparrowAtlas('notes/' + texture);
 			}
 
 			loadNoteAnims();
@@ -86,7 +111,10 @@ class StrumNote extends FlxSprite
 		}
 
 		updateHitbox();
-		scrollFactor.set();
+
+		if (lastAnim != null) {
+			playAnim(lastAnim, true);
+		}
 	}
 
 	function loadNoteAnims():Void
@@ -134,8 +162,6 @@ class StrumNote extends FlxSprite
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
 		if (resetAnim > 0)
 		{
 			resetAnim -= elapsed;
@@ -150,6 +176,8 @@ class StrumNote extends FlxSprite
 		if (animation.curAnim.name == 'confirm' && !PlayState.isPixelStage) {
 			centerOrigin();
 		}
+
+		super.update(elapsed);
 	}
 
 	public function playAnim(anim:String, ?force:Bool = false, ?finishCallback:Null<(name:String)->Void>):Void
@@ -182,13 +210,5 @@ class StrumNote extends FlxSprite
 				centerOrigin();
 			}
 		}
-	}
-
-	function updateConfirmOffset():Void // TO DO: Find a calc to make the offset work fine on other angles
-	{
-		centerOffsets();
-
-		offset.x -= 13;
-		offset.y -= 13;
 	}
 }

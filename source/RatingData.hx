@@ -18,10 +18,10 @@ class RatingData
 	public function new(name:String):Void
 	{
 		this.name = name;
-		this.image = name;
-		this.counter = name + 's';
+		this.defaultName = this.name;
 
-		this.defaultName = name;
+		this.image = name;
+		this.counter = defaultName + 's';
 
 		if (hitWindow == null) {
 			hitWindow = 0;
@@ -30,11 +30,11 @@ class RatingData
 
 	public function get_hitWindow():Null<Int>
 	{
-		return Reflect.getProperty(OptionData, name + 'Window');
+		return Reflect.getProperty(OptionData, defaultName + 'Window');
 	}
 
 	public function increase(blah:Int = 1):Void
 	{
-		Reflect.setProperty(PlayState.instance, counter, Reflect.field(PlayState.instance, counter) + blah);
+		Reflect.setProperty(PlayState.instance, counter, Reflect.getProperty(PlayState.instance, counter) + blah);
 	}
 }

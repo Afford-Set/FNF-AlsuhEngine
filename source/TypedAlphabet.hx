@@ -13,7 +13,7 @@ class TypedAlphabet extends Alphabet
 	public var sound:String = 'dialogue';
 	public var volume:Float = 1;
 
-	public function new(x:Float, y:Float, text:String = "", ?delay:Float = 0.05, ?bold:Bool = false):Void
+	public function new(x:Float, y:Float, text:String = '', ?delay:Float = 0.05, ?bold:Bool = false):Void
 	{
 		super(x, y, text, bold);
 

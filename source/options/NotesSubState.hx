@@ -4,7 +4,7 @@ package options;
 import Discord.DiscordClient;
 #end
 
-import shaderslmfao.ColorSwap;
+import shaders.ColorSwap;
 import options.OptionsMenuState;
 
 import flixel.FlxG;

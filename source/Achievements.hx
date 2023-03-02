@@ -1,7 +1,6 @@
 package;
 
 import haxe.Json;
-import haxe.format.JsonParser;
 
 #if MODS_ALLOWED
 import sys.io.File;

@@ -5,7 +5,6 @@ import Discord.DiscordClient;
 #end
 
 import haxe.Json;
-import haxe.format.JsonParser;
 
 #if sys
 import sys.io.File;
@@ -670,7 +669,12 @@ class MenuCharacterEditorState extends MusicBeatUIState
 			_file.addEventListener(Event.COMPLETE, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data, characterName + ".json");
+
+			#if MODS_ALLOWED
+			_file.save(data.trim(), #if sys CoolUtil.convPathShit(Paths.modFolders('menucharacters/' + #end characterName + '.json' #if sys )) #end);
+			#else
+			_file.save(data.trim(), #if sys CoolUtil.convPathShit(Paths.getJson('menucharacters/' + #end characterName + '.json' #if sys )) #end);
+			#end
 		}
 	}
 
@@ -682,7 +686,7 @@ class MenuCharacterEditorState extends MusicBeatUIState
 
 		_file = null;
 
-		FlxG.log.notice("Successfully saved file.");
+		Debug.logInfo("Successfully saved file.");
 	}
 
 	/**
@@ -708,6 +712,6 @@ class MenuCharacterEditorState extends MusicBeatUIState
 
 		_file = null;
 
-		FlxG.log.error("Problem saving file");
+		Debug.logError("Problem saving file");
 	}
 }

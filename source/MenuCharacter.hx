@@ -1,8 +1,6 @@
 package;
 
 import haxe.Json;
-import haxe.format.JsonParser;
-
 import flixel.FlxSprite;
 
 using StringTools;
@@ -68,16 +66,16 @@ class MenuCharacter extends FlxSprite
 			default:
 			{
 				var rawJson:String = null;
-				var path:String = Paths.getFile('menucharacters/$DEFAULT_CHARACTER.json', TEXT);
+				var path:String = Paths.getJson('menucharacters/$DEFAULT_CHARACTER');
 
 				if (Paths.fileExists('images/menucharacters/$character.json', TEXT)) {
-					path = Paths.getFile('images/menucharacters/$character.json', TEXT);
+					path = Paths.getJson('images/menucharacters/$character');
 				}
 				else if (Paths.fileExists('images/storymenu/menucharacters/$character.json', TEXT)) {
-					path = Paths.getFile('images/storymenu/menucharacters/$character.json', TEXT);
+					path = Paths.getJson('images/storymenu/menucharacters/$character');
 				}
 				else if (Paths.fileExists('menucharacters/$character.json', TEXT)) {
-					path = Paths.getFile('menucharacters/$character.json', TEXT);
+					path = Paths.getJson('menucharacters/$character');
 				}
 
 				rawJson = Paths.getTextFromFile(path);

@@ -212,8 +212,6 @@ class Debug
 		logInfo('HaxeFlixel version: ${Std.string(FlxG.VERSION)}');
 		logInfo('Friday Night Funkin\' version: ${MainMenuState.gameVersion}');
 		logInfo('Alsuh Engine version: ${MainMenuState.engineVersion}');
-
-		logInfo(Paths.getFile('images/titlelogo.png', IMAGE));
 	}
 
 	/**

@@ -1,12 +1,9 @@
 package;
 
-import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.math.FlxMath;
-import flixel.util.FlxColor;
 import editors.ChartingState;
-import shaderslmfao.ColorSwap;
-import flash.display.BitmapData;
+import shaders.ColorSwap;
+import editors.EditorPlayState;
 import flixel.graphics.FlxGraphic;
 
 using StringTools;
@@ -21,20 +18,9 @@ typedef EventNote =
 
 class Note extends FlxSprite
 {
+	public var extraData:Map<String, Dynamic> = [];
+
 	public var strumTime:Float = 0;
-
-	public var spawned:Bool = false;
-
-	public var rating:String = 'unknown';
-	public var ratingSus:String = 'shit';
-	public var ratingMod:Float = 0; // 9 = unknown, 0.25 = shit, 0.5 = bad, 0.75 = good, 1 = sick
-	public var ratingDisabled:Bool = false;
-
-	public var parent:Note;
-
-	public var blockHit:Bool = false; // only works for player
-
-	public var tail:Array<Note> = []; // for sustains lol
 	public var mustPress:Bool = false;
 	public var noteData:Int = 0;
 	public var canBeHit:Bool = false;
@@ -43,7 +29,14 @@ class Note extends FlxSprite
 	public var ignoreNote:Bool = false;
 	public var hitByOpponent:Bool = false;
 	public var noteWasHit:Bool = false;
-	public var prevNote:Note;
+	public var prevNote:Note = null;
+	public var nextNote:Note = null;
+	
+	public var spawned:Bool = false;
+
+	public var parent:Note;
+	public var tail:Array<Note> = []; // for sustains lol
+	public var blockHit:Bool = false; // only works for player
 
 	public var sustainLength:Float = 0;
 	public var isSustainNote:Bool = false;
@@ -54,12 +47,17 @@ class Note extends FlxSprite
 	public var eventVal1:String = '';
 	public var eventVal2:String = '';
 
-	public var scoreDisabled:Bool = false;
-	public var healthDisabled:Bool = false;
-
 	public var colorSwap:ColorSwap;
 	public var inEditor:Bool = false;
-	private var earlyHitMult:Float = 0.5;
+
+	public var animSuffix:String = '';
+	public var gfNote:Bool = false;
+	public var earlyHitMult:Float = 0.5;
+	public var lateHitMult:Float = 1;
+	public var lowPriority:Bool = false;
+
+	public var scoreDisabled:Bool = false;
+	public var healthDisabled:Bool = false;
 
 	public static var maxNote:Int = 4;
 	public static var swagWidth:Float = 160 * 0.7;
@@ -72,7 +70,6 @@ class Note extends FlxSprite
 	public var noteSplashHitByOpponent:Bool = false;
 	public var noteSplashDisabled:Bool = false;
 	public var noteSplashTexture:String = null;
-
 	public var noteSplashHue:Float = 0;
 	public var noteSplashSat:Float = 0;
 	public var noteSplashBrt:Float = 0;
@@ -80,10 +77,8 @@ class Note extends FlxSprite
 	public var offsetX:Float = 0;
 	public var offsetY:Float = 0;
 	public var offsetAngle:Float = 0;
-
 	public var multAlpha:Float = 1;
 	public var multSpeed(default, set):Float = 1;
-	public var distance:Float = 2000; //plan on doing scroll directions soon -bb
 
 	public var copyX:Bool = true;
 	public var copyY:Bool = true;
@@ -92,23 +87,29 @@ class Note extends FlxSprite
 	public var copyAlpha:Bool = true;
 
 	public static var hithealth_sick:Float = 0.025;
-	public static var hithealth_sick_sus:Float = 0.0125;
-	public static var hithealth_good:Float = 0.020;
-	public static var hithealth_good_sus:Float = 0.010;
-	public static var hithealth_bad:Float = 0.010;
-	public static var hithealth_bad_sus:Float = 0.005;
+	public static var hithealth_sick_sus:Float = 0.025;
+	public static var hithealth_good:Float = 0.02;
+	public static var hithealth_good_sus:Float = 0.02;
+	public static var hithealth_bad:Float = 0.01;
+	public static var hithealth_bad_sus:Float = 0.01;
 	public static var hithealth_shit:Float = 0;
 	public static var hithealth_shit_sus:Float = 0;
 
+	public var healthDisabledOnGoodNoteHit:Bool = true;
+	public var hitHealth:Float = 0.025;
 	public var missHealth:Float = 0.0475;
+	public var rating:String = 'unknown';
+	public var ratingSus:String = 'shit';
+	public var ratingMod:Float = 0; // 9 = unknown, 0.25 = shit, 0.5 = bad, 0.75 = good, 1 = sick
+	public var ratingDisabled:Bool = false;
 
-	public var animSuffix:String = '';
-	public var gfNote:Bool = false;
+	public var texture(default, set):String = null;
+
 	public var noAnimation:Bool = false;
 	public var noMissAnimation:Bool = false;
+	public var hitCausesMiss:Bool = false;
+	public var distance:Float = 2000;//plan on doing scroll directions soon -bb
 
-	public var lowPriority:Bool = false;
-	public var texture(default, set):String = null;
 	public var hitsoundDisabled:Bool = false;
 
 	private function set_multSpeed(value:Float):Float
@@ -127,8 +128,6 @@ class Note extends FlxSprite
 			updateHitbox();
 		}
 	}
-
-	public var hitCausesMiss:Bool = false;
 
 	private function set_texture(value:String):String
 	{
@@ -232,13 +231,18 @@ class Note extends FlxSprite
 
 			x += swagWidth * (noteData % maxNote);
 
-			if (!isSustainNote) // Doing this 'if' check to fix the warnings on Senpai songs
+			if (!isSustainNote && noteData > -1 && noteData < Note.maxNote)  // Doing this 'if' check to fix the warnings on Senpai songs
 			{
-				var animToPlay:String = '';
+				var animToPlay:String = colArray[noteData % maxNote] + 'Scroll';
 
-				animToPlay = colArray[noteData % maxNote];
-				animation.play(animToPlay + 'Scroll');
+				if (animation.getByName(animToPlay) != null) {
+					animation.play(animToPlay);
+				}
 			}
+		}
+
+		if (prevNote != null) {
+			prevNote.nextNote = this;
 		}
 
 		if (isSustainNote && prevNote != null)
@@ -248,12 +252,16 @@ class Note extends FlxSprite
 
 			hitsoundDisabled = true;
 
-			if (OptionData.downScroll) flipY = true;
+			flipY = OptionData.downScroll;
 
 			offsetX += width / 2;
 			copyAngle = false;
 
-			animation.play(colArray[noteData % maxNote] + 'holdend');
+			var animToPlay:String = colArray[noteData % maxNote] + 'holdend';
+
+			if (animation.getByName(animToPlay) != null) {
+				animation.play(animToPlay);
+			}
 
 			updateHitbox();
 
@@ -265,8 +273,19 @@ class Note extends FlxSprite
 
 			if (prevNote.isSustainNote)
 			{
-				prevNote.animation.play(colArray[prevNote.noteData % maxNote] + 'hold');
-				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.05 * PlayState.SONG.speed;
+				var animToPlay:String = colArray[prevNote.noteData % maxNote] + 'hold';
+
+				if (prevNote.animation.getByName(animToPlay) != null) {
+					prevNote.animation.play(animToPlay);
+				}
+
+				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.05;
+
+				var instance:Dynamic = PlayState.instance != null ? PlayState.instance : EditorPlayState.instance;
+
+				if (instance != null) {
+					prevNote.scale.y *= instance.songSpeed;
+				}
 
 				if (PlayState.isPixelStage) {
 					prevNote.scale.y *= 1.19;
@@ -288,9 +307,12 @@ class Note extends FlxSprite
 		x += offsetX;
 	}
 
+	var lastNoteOffsetXForPixelAutoAdjusting:Float = 0;
+	var lastNoteScaleToo:Float = 1;
+
 	public var originalHeightForCalcs:Float = 6;
 
-	function reloadNote(?prefix:String = '', ?texture:String = '', ?suffix:String = ''):Void
+	public function reloadNote(?prefix:String = '', ?texture:String = '', ?suffix:String = ''):Void
 	{
 		if (prefix == null) prefix = '';
 		if (texture == null) texture = '';
@@ -323,7 +345,7 @@ class Note extends FlxSprite
 		{
 			if (isSustainNote)
 			{
-				var ourGraphic:FlxGraphic = Paths.getImage('notes/' + blahblah + 'ENDS');
+				var ourGraphic:FlxGraphic = null;
 
 				if (Paths.fileExists('images/' + blahblah + 'ENDS' + '.png', IMAGE)) {
 					ourGraphic = Paths.getImage(blahblah + 'ENDS');
@@ -333,6 +355,9 @@ class Note extends FlxSprite
 				}
 				else if (Paths.fileExists('images/notes/pixel/' + blahblah + 'ENDS' + '.png', IMAGE)) {
 					ourGraphic = Paths.getImage('notes/pixel/' + blahblah + 'ENDS');
+				}
+				else {
+					ourGraphic = Paths.getImage('notes/' + blahblah + 'ENDS');
 				}
 
 				loadGraphic(ourGraphic);
@@ -346,7 +371,7 @@ class Note extends FlxSprite
 			}
 			else
 			{
-				var ourGraphic:FlxGraphic = Paths.getImage('notes/' + blahblah);
+				var ourGraphic:FlxGraphic = null;
 
 				if (Paths.fileExists('images/' + blahblah + '.png', IMAGE)) {
 					ourGraphic = Paths.getImage(blahblah);
@@ -356,6 +381,9 @@ class Note extends FlxSprite
 				}
 				else if (Paths.fileExists('images/notes/pixel/' + blahblah + '.png', IMAGE)) {
 					ourGraphic = Paths.getImage('notes/pixel/' + blahblah);
+				}
+				else {
+					ourGraphic = Paths.getImage('notes/' + blahblah);
 				}
 
 				loadGraphic(ourGraphic);
@@ -369,17 +397,47 @@ class Note extends FlxSprite
 			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
 			loadPixelNoteAnims();
 			antialiasing = false;
+
+			if (isSustainNote)
+			{
+				offsetX += lastNoteOffsetXForPixelAutoAdjusting;
+				lastNoteOffsetXForPixelAutoAdjusting = (width - 7) * (PlayState.daPixelZoom / 2);
+				offsetX -= lastNoteOffsetXForPixelAutoAdjusting;
+			}
 		}
 		else
 		{
-			if (Paths.fileExists('images/' + blahblah + '.png', IMAGE)) {
-				frames = Paths.getSparrowAtlas(blahblah);
+			if (Paths.fileExists('images/' + blahblah + '.png', IMAGE))
+			{
+				if (Paths.fileExists('images/' + blahblah + '.xml', TEXT))
+				{
+					frames = Paths.getSparrowAtlas(blahblah);
+					loadNoteAnims();
+				}
+				else
+				{
+					loadGraphic(Paths.getImage(blahblah));
+
+					setGraphicSize(Std.int(width * 0.7));
+					updateHitbox();
+				}
 			}
-			else {
-				frames = Paths.getSparrowAtlas('notes/' + blahblah);
+			else
+			{
+				if (Paths.fileExists('images/notes/' + blahblah + '.xml', TEXT))
+				{
+					frames = Paths.getSparrowAtlas('notes/' + blahblah);
+					loadNoteAnims();
+				}
+				else
+				{
+					loadGraphic(Paths.getImage('notes/' + blahblah));
+
+					setGraphicSize(Std.int(width * 0.7));
+					updateHitbox();
+				}
 			}
 
-			loadNoteAnims();
 			antialiasing = OptionData.globalAntialiasing;
 		}
 
@@ -424,16 +482,16 @@ class Note extends FlxSprite
 
 	function loadPixelNoteAnims():Void
 	{
-		var ourCol:String = colArray[noteData];
 		var pixelInt:Int = pixelInt[noteData];
+		var color:String = colArray[noteData];
 
 		if (isSustainNote)
 		{
-			animation.add(ourCol + 'holdend', [pixelInt + maxNote]);
-			animation.add(ourCol + 'hold', [pixelInt]);
+			animation.add(color + 'holdend', [pixelInt + 4]);
+			animation.add(color + 'hold', [pixelInt]);
 		}
 		else {
-			animation.add(ourCol + 'Scroll', [pixelInt + maxNote]);
+			animation.add(color + 'Scroll', [pixelInt + 4]);
 		}
 	}
 
@@ -441,16 +499,9 @@ class Note extends FlxSprite
 	{
 		super.update(elapsed);
 
-		if (noteData > -1)
-		{
-			colorSwap.hue = OptionData.arrowHSV[noteData % maxNote][0] / 360;
-			colorSwap.saturation = OptionData.arrowHSV[noteData % maxNote][1] / 100;
-			colorSwap.brightness = OptionData.arrowHSV[noteData % maxNote][2] / 100;
-		}
-
 		if (mustPress)
 		{
-			if (strumTime > Conductor.songPosition - Conductor.safeZoneOffset && strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * earlyHitMult)) {
+			if (strumTime > Conductor.songPosition - (Conductor.safeZoneOffset * lateHitMult) && strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * earlyHitMult)) {
 				canBeHit = true;
 			}
 			else {
@@ -465,8 +516,11 @@ class Note extends FlxSprite
 		{
 			canBeHit = false;
 
-			if (strumTime <= Conductor.songPosition) {
-				wasGoodHit = true;
+			if (strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * earlyHitMult))
+			{
+				if ((isSustainNote && prevNote.wasGoodHit) || strumTime <= Conductor.songPosition) {
+					wasGoodHit = true;
+				}
 			}
 		}
 

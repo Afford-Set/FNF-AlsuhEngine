@@ -133,6 +133,39 @@ class PreferencesSubState extends MusicBeatSubState
 		};
 		#end
 
+		var loadingOldFiles:Array<Option> = [];
+
+		#if FEATURE_OGG
+		var option:Option = new Option('.OGG Files',
+			true,
+			'If unchecked, loading .MP3 audio files will become faster.',
+			'loadingOggFiles',
+			'bool',
+			false);
+		option.blockedOnPause = isPause;
+		loadingOldFiles.push(option);
+		#end
+
+		#if FEATURE_WAV
+		var option:Option = new Option('.WAV Files',
+			true,
+			'If unchecked, loading .MP3 audio files will become faster.',
+			'loadingWavFiles',
+			'bool',
+			false);
+		option.blockedOnPause = isPause;
+		loadingOldFiles.push(option);
+		#end
+
+		if (loadingOldFiles.length > 0)
+		{
+			addOption(new Option('Loading old formats', false));
+
+			for (pisspoop in loadingOldFiles) {
+				addOption(pisspoop);
+			}
+		}
+
 		addOption(new Option('Gameplay', false));
 
 		var option:Option = new Option('Ghost Tapping',
@@ -342,7 +375,7 @@ class PreferencesSubState extends MusicBeatSubState
 			"Set the alpha for the Note Splashes, shown when hitting \"Sick!\" notes.",
 			'splashOpacity',
 			'percent',
-			1);
+			0.6);
 		option.scrollSpeed = 1.6;
 		option.minValue = 0.0;
 		option.maxValue = 1;
@@ -492,6 +525,14 @@ class PreferencesSubState extends MusicBeatSubState
 		};
 		addOption(option);
 
+		var option:Option = new Option('Icon Colored Health Bar',
+			true,
+			"If unchecked, the health bar will have set colors\nrather than colors based on the icons.",
+			'coloredHealthBar',
+			'bool',
+			true);
+		addOption(option);
+
 		var option:Option = new Option('Health Bar Transparency',
 			true,
 			'How much transparent should the health bar and icons be.',
@@ -576,6 +617,7 @@ class PreferencesSubState extends MusicBeatSubState
 			false);
 		addOption(option);
 
+		#if !hl
 		var option:Option = new Option('Memory Counter',
 			true,
 			'If unchecked, hides Memory Counter.',
@@ -583,12 +625,6 @@ class PreferencesSubState extends MusicBeatSubState
 			'bool',
 			false);
 		addOption(option);
-		option.onChange = function():Void
-		{
-			if (Main.memoryCounter != null) {
-				Main.memoryCounter.visible = OptionData.memoryCounter;
-			}
-		};
 
 		var option:Option = new Option('Rainbow Memory Counter',
 			true,
@@ -597,6 +633,7 @@ class PreferencesSubState extends MusicBeatSubState
 			'bool',
 			false);
 		addOption(option);
+		#end
 		#end
 
 		#if CHECK_FOR_UPDATES

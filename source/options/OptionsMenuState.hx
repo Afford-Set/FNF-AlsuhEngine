@@ -9,14 +9,12 @@ import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
-import transition.Transition;
 import flixel.system.FlxSound;
 import flixel.effects.FlxFlicker;
-import transition.TransitionableState;
 
 using StringTools;
 
-class OptionsMenuState extends TransitionableState
+class OptionsMenuState extends MusicBeatState
 {
 	public static var curSelected:Int = 0;
 
@@ -30,18 +28,9 @@ class OptionsMenuState extends TransitionableState
 	{
 		switch (label)
 		{
-			case 'Preferences':
-			{
-				openSubState(new PreferencesSubState(false));
-			}
-			case 'Controls':
-			{
-				openSubState(new ControlsSubState(false));
-			}
-			case 'Note Colors':
-			{
-				openSubState(new NotesSubState(false));
-			}
+			case 'Preferences': openSubState(new PreferencesSubState());
+			case 'Controls': openSubState(new ControlsSubState());
+			case 'Note Colors': openSubState(new NotesSubState());
 			case 'Adjust Delay and Combo':
 			{
 				FlxG.sound.music.pause();
@@ -67,16 +56,13 @@ class OptionsMenuState extends TransitionableState
 				FlxG.sound.play(Paths.getSound('cancelMenu'));
 				FlxG.switchState(new MainMenuState());
 			}
-			default:
-			{
-				flickering = false;
-			}
+			default: flickering = false;
 		}
 	}
 
 	public override function create():Void
 	{
-		Transition.nextCamera = null;
+		CustomFadeTransition.nextCamera = null;
 
 		super.create();
 
@@ -229,7 +215,7 @@ class OptionsMenuState extends TransitionableState
 	}
 }
 
-class OptionsSubState extends BaseSubState
+class OptionsSubState extends MusicBeatSubState
 {
 	private static var curSelected:Int = -1;
 

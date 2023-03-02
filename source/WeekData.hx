@@ -8,7 +8,6 @@ import sys.FileSystem;
 
 import haxe.Json;
 import Type.ValueType;
-import haxe.format.JsonParser;
 
 using StringTools;
 
@@ -455,7 +454,7 @@ class WeekData
 		#if MODS_ALLOWED
 		if (FileSystem.exists("modsList.txt"))
 		{
-			var list:Array<String> = CoolUtil.listFromString(File.getContent("modsList.txt"));
+			var list:Array<String> = CoolUtil.listFromString(File.getContent('modsList.txt'));
 			var foundTheTop:Bool = false;
 
 			for (i in list)

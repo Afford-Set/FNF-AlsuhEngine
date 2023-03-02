@@ -43,7 +43,7 @@ class MenuItem extends FlxSprite
 	{
 		super.update(elapsed);
 
-		y = CoolUtil.coolLerp(y, (targetY * 120) + 465, 0.17);
+		y = FlxMath.lerp(y, (targetY * 120) + 465, CoolUtil.boundTo(elapsed * 10.2, 0, 1));
 
 		if (isFlashing) {
 			flashingInt++;

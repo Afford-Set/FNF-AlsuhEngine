@@ -9,12 +9,10 @@ import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
-import transition.Transition;
-import transition.TransitionableState;
 
 using StringTools;
 
-class MasterEditorMenu extends TransitionableState
+class MasterEditorMenu extends MusicBeatUIState
 {
 	private var curSelected:Int = 0;
 	private var curDirectory:Int = 0;
@@ -35,10 +33,11 @@ class MasterEditorMenu extends TransitionableState
 
 	public override function create():Void
 	{
-		Transition.nextCamera = null;
+		CustomFadeTransition.nextCamera = null;
 
 		super.create();
 
+		FlxG.mouse.visible = true;
 		FlxG.camera.bgColor = FlxColor.BLACK;
 
 		if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {

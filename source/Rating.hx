@@ -19,11 +19,26 @@ class Rating extends FlxSprite
 		if (Paths.fileExists('images/' + rating + suffix + '.png', IMAGE)) {
 			loadGraphic(Paths.getImage(rating + suffix));
 		}
-		else if (Paths.fileExists('pixelUI/' + rating + suffix + '.png', IMAGE)) {
+		else if (Paths.fileExists('images/pixelUI/' + rating + suffix + '.png', IMAGE)) {
 			loadGraphic(Paths.getImage('pixelUI/' + rating + suffix));
 		}
-		else {
+		else if (Paths.fileExists('images/ratings/' + rating + suffix + '.png', IMAGE)) {
 			loadGraphic(Paths.getImage('ratings/' + rating + suffix));
+		}
+
+		if (suffix != null && suffix.length > 0)
+		{
+			var ourPath:String = rating + suffix;
+
+			if (Paths.fileExists('images/' + ourPath + '.png', IMAGE)) {
+				loadGraphic(Paths.getImage(ourPath));
+			}
+			else if (Paths.fileExists('images/pixelUI/' + ourPath + '.png', IMAGE)) {
+				loadGraphic(Paths.getImage('pixelUI/' + ourPath));
+			}
+			else if (Paths.fileExists('images/ratings/' + ourPath + '.png', IMAGE)) {
+				loadGraphic(Paths.getImage('ratings/' + ourPath));
+			}
 		}
 
 		screenCenter();

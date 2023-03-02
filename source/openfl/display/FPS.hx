@@ -1,4 +1,4 @@
-package counters;
+package openfl.display;
 
 import haxe.Timer;
 #if flash
@@ -16,7 +16,7 @@ import openfl.text.TextFormat;
 @:fileXml('tags="haxe,release"')
 @:noDebug
 #end
-class FPSCounter extends TextField
+class FPS extends TextField
 {
 	/**
 		The current frame rate, expressed using frames-per-second
@@ -68,17 +68,15 @@ class FPSCounter extends TextField
 		var currentCount = times.length;
 		currentFPS = Math.round((currentCount + cacheCount) / 2);
 
+		var framerateOption:Int = #if html5 60 #else OptionData.framerate #end;
+		if (currentFPS > framerateOption) currentFPS = framerateOption;
+
 		if (currentCount != cacheCount)
 		{
 			text = "FPS: " + currentFPS;
 			textColor = 0xFFFFFFFF;
 
-			var fpsShit:Int = 60;
-			#if !html5
-			fpsShit = OptionData.framerate;
-			#end
-
-			if (currentFPS <= fpsShit / 2) {
+			if (currentFPS < framerateOption / 2) {
 				textColor = 0xFFFF0000;
 			}
 		}

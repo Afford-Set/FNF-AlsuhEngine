@@ -1,7 +1,11 @@
 # Friday Night Funkin' Alsuh Engine
 
-**Alsuh Engine** - This is modified connecting version of Psych Engine, Kade Engine and other pull requests from both engines.
-Some pull requests from Psych Engine that are not needed to merge with ShadowMario/FNF-PsychEngine-main may be useful for Alsuh Engine.
+[READ THE WIKI BEFORE DOING QUESTIONS!!!](https://github.com/Afford-Set/FNF-AlsuhEngine/wiki)
+[READ THE WIKI BEFORE DOING QUESTIONS!!!](https://github.com/Afford-Set/FNF-AlsuhEngine/wiki)
+[READ THE WIKI BEFORE DOING QUESTIONS!!!](https://github.com/Afford-Set/FNF-AlsuhEngine/wiki)
+
+**Alsuh Engine** - This is modified connecting version of Psych Engine and Kade Engine. This engine is designed for modcharting.
+This engine is 24.7% more powerful than Psych Engine thanks to new features.
 
 ## Installation:
 You must have [version 4.2.5 of Haxe](https://haxe.org/download/version/4.2.5/), seriously, stop using 4.1.5, it misses some stuff.
@@ -16,7 +20,7 @@ after it finishes, simply type `haxelib run hmm install` in order to install all
 if you wish to disable things like *Lua Scripts* or *.MP4 Cutscenes* or *.Webm Cutscenes*, you can read over to `Project.xml`
 inside `Project.xml`, you will find several variables to customize Alsuh Engine to your liking
 
-to start you off, disabling *.MP4 Cutscenes* should be simple, simply Delete the line `"MP4_ALLOWED"` or comment it out by wrapping the line in XML-like comments, like this `<!-- YOUR_LINE_HERE -->`
+to start you off, disabling *.MP4 Cutscenes* should be simple, simply Delete the line `"VIDEOS_ALLOWED"` or comment it out by wrapping the line in XML-like comments, like this `<!-- YOUR_LINE_HERE -->`
 
 same goes for *Lua Scripts*, comment out or delete the line with `LUA_ALLOWED`, this and other customization options are all available within the `Project.xml` file,
 
@@ -28,11 +32,11 @@ It's the same as in the Psych Engine, only there are changes and additions shown
 The main feature is support for .MP3 audio files. .OGG audio files continue to be supported in this engine.
 
 ### Additions
-- Custom Inst and Voices on other difficulties
+- Custom Inst and Voices for other difficulties
 - .WEBM Videos Support (supported on Linux/Windows/MacOS)
 - Replays
 - Custom Achievements (original by [TheWorldMachinima](https://github.com/TheWorldMachinima))
-- PlayBack Rate/Pitch on other platforms (original by [Raltyro](https://github.com/Raltyro))
+- Playback Rate/Pitch on other platforms (original by [Raltyro](https://github.com/Raltyro))
 
 ### Changes:
 - Menu Character dances to every beat on Story Menu
@@ -40,7 +44,7 @@ The main feature is support for .MP3 audio files. .OGG audio files continue to b
 
 ## Credits:
 ### Alsuh Engine by
-- AlanSurtaev2008 (Null) - Programmer
+- Null - Programmer
 
 ### Psych Engine Team
 - Shadow Mario - Programmer

@@ -1,4 +1,4 @@
-package counters;
+package openfl.display;
 
 import haxe.Timer;
 import openfl.display.FPS;
@@ -7,7 +7,7 @@ import openfl.system.System;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 
-class MemoryCounter extends TextField
+class Memory extends TextField
 {
 	private var times:Array<Float>;
 	private var memPeak:Float = 0;
@@ -36,7 +36,8 @@ class MemoryCounter extends TextField
 			memPeak = mem;
 		}
 
-		if (visible) {
+		if (visible)
+		{
 			text = "\nMEM: " + mem + " MB\nMEM peak: " + memPeak + " MB";
 
 			if (mem > 3000) {

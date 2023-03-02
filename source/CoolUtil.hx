@@ -1,5 +1,7 @@
 package;
 
+import haxe.io.Path;
+
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.math.FlxMath;
@@ -73,6 +75,11 @@ class CoolUtil
 		}
 
 		return result;
+	}
+
+	public static function difficultyString():String
+	{
+		return PlayState.difficulties[0][PlayState.storyDifficulty].toUpperCase();
 	}
 
 	public static function fromSuffixToID(suffix:String):String
@@ -187,8 +194,11 @@ class CoolUtil
 		return FlxColor.interpolate(from, to, boundTo(FlxG.elapsed * (speed * multiplier), 0, 1));
 	}
 
+	@:deprecated("`CoolUtil.coolLerp()` is deprecated, use `FlxMath.lerp()` instead")
 	public static function coolLerp(a:Float, b:Float, ratio:Float, multiplier:Float = 54.5, ?integer:Null<Float> = null):Float
 	{
+		Debug.logWarn("`CoolUtil.coolLerp()` is deprecated! use `FlxMath.lerp()` instead");
+
 		if (integer != null) {
 			return FlxMath.lerp(a, b, boundTo(integer - (FlxG.elapsed * (ratio * multiplier)), 0, 1));
 		}
@@ -236,7 +246,7 @@ class CoolUtil
 	public static function coolTextFile(path:String, ?ignoreWarnMsg:Bool = false, ?optimize:Bool = false):Array<String>
 	{
 		if (Paths.fileExists(path, TEXT, null, optimize)) {
-			return [for (i in Paths.getTextFromFile(path).trim().split('\n')) i = i.trim()];
+			return listFromString(Paths.getTextFromFile(path));
 		}
 
 		if (!ignoreWarnMsg) {
@@ -364,6 +374,7 @@ class CoolUtil
 			skippedFrames++;
 		}
 
+		#if !hl
 		if (OptionData.rainMemory && skippedFrames >= 6)
 		{
 			if (currentColor2 >= colorArray.length) {
@@ -378,6 +389,14 @@ class CoolUtil
 		else {
 			skippedFrames2++;
 		}
+		#end
+	}
+	#end
+
+	#if sys
+	public static function convPathShit(path:String):String
+	{
+		return Path.normalize(Sys.getCwd() + path) #if windows .replace('/', '\\') #end;
 	}
 	#end
 }

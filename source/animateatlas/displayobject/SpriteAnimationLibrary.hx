@@ -71,7 +71,7 @@ class SpriteAnimationLibrary
 		return new SpriteMovieClip(getSymbol(symbol));
 	}
 
-	public function getAnimationNames(prefix:String = ""):Array<String>
+	public function getAnimationNames(prefix:String = ''):Array<String>
 	{
 		var out = new Array<String>();
 

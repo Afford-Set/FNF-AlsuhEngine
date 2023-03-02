@@ -15,11 +15,15 @@ class OptionData
 	public static var screenRes:String = '1280x720';
 	#end
 	public static var lowQuality:Bool = false;
+
 	public static var globalAntialiasing:Bool = true;
 	public static var shaders:Bool = true;
 	#if !html5
 	public static var framerate:Int = 60;
 	#end
+
+	public static var loadingOggFiles:Bool = false;
+	public static var loadingWavFiles:Bool = false;
 
 	public static var ghostTapping:Bool = true;
 	public static var controllerMode:Bool = false;
@@ -35,6 +39,7 @@ class OptionData
 	public static var badWindow:Int = 135;
 	public static var shitWindow:Int = 160;
 	public static var comboStacking:Bool = true;
+	public static var coloredHealthBar:Bool = true;
 	public static var safeFrames:Float = 10;
 	public static var noteOffset:Int = 0;
 
@@ -60,14 +65,18 @@ class OptionData
 	#if !mobile
 	public static var fpsCounter:Bool = false;
 	public static var rainFPS:Bool = false;
+	#if !hl
 	public static var memoryCounter:Bool = false;
 	public static var rainMemory:Bool = false;
+	#end
 	#end
 	#if CHECK_FOR_UPDATES
 	public static var checkForUpdates:Bool = true;
 	#end
 	public static var autoPause:Bool = false;
-	public static var watermarks:Bool = #if ALSUH_WATERMARKS true #else false #end;
+	#if ALSUH_WATERMARKS
+	public static var watermarks:Bool = true;
+	#end
 	public static var loadingScreen:Bool = true;
 	public static var flashingLights:Bool = true;
 
@@ -215,6 +224,7 @@ class OptionData
 								Main.fpsCounter.visible = fpsCounter;
 							}
 						}
+						#if !hl
 						case 'memoryCounter':
 						{
 							if (Main.memoryCounter != null) {
@@ -222,10 +232,6 @@ class OptionData
 							}
 						}
 						#end
-						#if !ALSUH_WATERMARKS
-						case 'watermarks': {
-							watermarks = false;
-						}
 						#end
 						case 'autoPause': {
 							FlxG.autoPause = autoPause;
@@ -272,7 +278,7 @@ class OptionData
 		luaPrefsMap.set('camZooms', ['cameraZoomOnBeat', camZooms]);
 		luaPrefsMap.set('camShakes', ['cameraShakes', camShakes]);
 		luaPrefsMap.set('iconZooms', ['iconZooms', iconZooms]);
-		luaPrefsMap.set('flashingLights', ['flashing', flashingLights]);
+		luaPrefsMap.set('flashingLights', ['flashingLights', flashingLights]);
 		luaPrefsMap.set('noteOffset', ['noteOffset', noteOffset]);
 		luaPrefsMap.set('healthBarAlpha', ['healthBarAlpha', healthBarAlpha]);
 		luaPrefsMap.set('noReset', ['noResetButton', noReset]);

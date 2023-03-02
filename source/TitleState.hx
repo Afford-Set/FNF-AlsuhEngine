@@ -6,7 +6,6 @@ import sys.FileSystem;
 #end
 
 import haxe.Json;
-import haxe.format.JsonParser;
 
 import flixel.FlxG;
 import openfl.Assets;
@@ -18,8 +17,7 @@ import flixel.util.FlxTimer;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxEase;
 import openfl.display.Bitmap;
-import transition.Transition;
-import shaderslmfao.ColorSwap;
+import shaders.ColorSwap;
 import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepad;
 import flixel.graphics.frames.FlxFrame;
@@ -75,7 +73,7 @@ class TitleState extends MusicBeatState
 		#end
 
 		WeekData.loadTheFirstEnabledMod();
-		Transition.skipNextTransOut = true;
+		CustomFadeTransition.skipNextTransOut = true;
 
 		super.create();
 
@@ -100,6 +98,10 @@ class TitleState extends MusicBeatState
 
 		if (FlxG.save.data.weekCompleted != null) {
 			WeekData.weekCompleted = FlxG.save.data.weekCompleted;
+		}
+
+		if (FlxG.save.data.seenWarningExt == null) {
+			FlxG.save.data.seenWarningExt = false;
 		}
 
 		#if REPLAYS_ALLOWED
@@ -358,7 +360,7 @@ class TitleState extends MusicBeatState
 				#if sys
 				if (controls.BACK || FlxG.mouse.justPressedRight)
 				{
-					if (FlxG.random.bool(25)) {
+					if (FlxG.random.bool(0.00001)) { // never gonna give you up never gonna let you down
 						CoolUtil.browserLoad('https://youtu.be/dQw4w9WgXcQ'); // lololololololol
 					}
 					else {
@@ -409,9 +411,17 @@ class TitleState extends MusicBeatState
 						}
 						else
 						{
-							Debug.logInfo('You now have the latest version'); #end
-							FlxG.switchState(new MainMenuState());
-						#if CHECK_FOR_UPDATES } #end
+							if (OptionData.checkForUpdates) {
+								Debug.logInfo('You now have the latest version');
+							} #end
+
+							if (FlxG.save.data.seenWarningExt) {
+								FlxG.switchState(new MainMenuState());
+							}
+							else {
+								FlxG.switchState(new WarningState());
+							} #if CHECK_FOR_UPDATES
+						} #end
 					});
 				}
 			}
@@ -487,9 +497,11 @@ class TitleState extends MusicBeatState
 		{
 			case 1:
 			{
+				#if ALSUH_WATERMARKS
 				if (OptionData.watermarks)
 					createCoolText(['afford-set']);
 				else
+				#end
 					createCoolText(['ninjamuffin99', 'phantomArcade', 'kawaisprite', 'evilsk8er'], -30);
 			}
 			case 3:
@@ -498,13 +510,16 @@ class TitleState extends MusicBeatState
 				deleteCoolText();
 			case 5:
 			{
+				#if ALSUH_WATERMARKS
 				if (OptionData.watermarks)
 					createCoolText(['Original by']);
 				else
+				#end
 					createCoolText(['In association', 'with'], -40);
 			}
 			case 7:
 			{
+				#if ALSUH_WATERMARKS
 				if (OptionData.watermarks)
 				{
 					addMoreText('ninjamuffin99', 30);
@@ -513,13 +528,13 @@ class TitleState extends MusicBeatState
 					addMoreText('evilsk8er', 30);
 				}
 				else
-				{
+				{	#end
 					addMoreText('newgrounds', -40);
 
 					if (ngSpr != null) {
 						ngSpr.visible = true;
-					}
-				}
+					} #if ALSUH_WATERMARKS
+				} #end
 			}
 			case 8:
 			{

@@ -9,7 +9,7 @@
 	<SubTexture name="green hold piece0000" x="60" y="5" width="50" height="44"/>
 	<SubTexture name="green instance0000" x="277" y="5" width="157" height="154"/>
 	<SubTexture name="purple instance0000" x="5" y="164" width="154" height="157"/>
-	<SubTexture name="pruple end hold0000" x="5" y="5" width="50" height="64"/>
+	<SubTexture name="purple end hold0000" x="5" y="5" width="50" height="64"/>
 	<SubTexture name="purple hold piece0000" x="60" y="5" width="50" height="44"/>
 	<SubTexture name="red hold end0000" x="5" y="5" width="50" height="64"/>
 	<SubTexture name="red hold piece0000" x="60" y="5" width="50" height="44"/>

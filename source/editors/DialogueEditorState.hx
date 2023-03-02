@@ -5,12 +5,12 @@ import Discord.DiscordClient;
 #end
 
 import haxe.Json;
-import haxe.format.JsonParser;
 
 import DialogueBoxPsych;
 
 #if sys
 import sys.io.File;
+import haxe.io.Path;
 import sys.FileSystem;
 #end
 
@@ -295,6 +295,7 @@ class DialogueEditorState extends MusicBeatUIState
 		}
 
 		daText.y = DialogueBoxPsych.DEFAULT_TEXT_Y;
+		if (daText.rows > 2) daText.y -= DialogueBoxPsych.LONG_TEXT_ADD;
 
 		#if DISCORD_ALLOWED
 		var rpcText:String = lineInputText.text;
@@ -376,7 +377,6 @@ class DialogueEditorState extends MusicBeatUIState
 		if (transitioning)
 		{
 			super.update(elapsed);
-
 			return;
 		}
 
@@ -452,7 +452,8 @@ class DialogueEditorState extends MusicBeatUIState
 
 					var animToPlay:String = character.jsonFile.animations[curAnim].anim;
 
-					if (character.dialogueAnimations.exists(animToPlay)) {
+					if (character.dialogueAnimations.exists(animToPlay))
+					{
 						character.playAnim(animToPlay, daText.finishedText);
 						dialogueFile.dialogue[curSelected].expression = animToPlay;
 					}
@@ -499,6 +500,16 @@ class DialogueEditorState extends MusicBeatUIState
 
 		angryCheckbox.checked = (curDialogue.boxState == 'angry');
 		speedStepper.value = curDialogue.speed;
+
+		if (curDialogue.sound == null) curDialogue.sound = '';
+		soundInputText.text = curDialogue.sound;
+
+		daText.delay = speedStepper.value;
+		daText.sound = soundInputText.text;
+		if (daText.sound != null && daText.sound.trim() == '') daText.sound = 'dialogue';
+
+		daText.y = DialogueBoxPsych.DEFAULT_TEXT_Y;
+		if (daText.rows > 2) daText.y -= DialogueBoxPsych.LONG_TEXT_ADD;
 
 		curAnim = 0;
 		character.reloadCharacterJson(characterInputText.text);
@@ -641,8 +652,12 @@ class DialogueEditorState extends MusicBeatUIState
 			_file.addEventListener(Event.COMPLETE, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-	
-			_file.save(data, "dialogue.json");
+
+			#if MODS_ALLOWED
+			_file.save(data.trim(), #if sys CoolUtil.convPathShit(Paths.modFolders('data/' + #end 'dialogue.json' #if sys )) #end);
+			#else
+			_file.save(data.trim(), #if sys CoolUtil.convPathShit(Paths.getJson('data/' + #end 'dialogue.json' #if sys )) #end);
+			#end
 		}
 	}
 
@@ -654,7 +669,7 @@ class DialogueEditorState extends MusicBeatUIState
 
 		_file = null;
 
-		FlxG.log.notice("Successfully saved file.");
+		Debug.logInfo("Successfully saved file.");
 	}
 
 	/**
@@ -680,6 +695,6 @@ class DialogueEditorState extends MusicBeatUIState
 
 		_file = null;
 
-		FlxG.log.error("Problem saving file");
+		Debug.logError("Problem saving file");
 	}
 }

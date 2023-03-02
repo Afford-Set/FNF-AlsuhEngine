@@ -1,6 +1,7 @@
 package;
 
 import flixel.FlxSprite;
+import flixel.graphics.FlxGraphic;
 
 using StringTools;
 
@@ -32,7 +33,7 @@ class HealthIcon extends FlxSprite
 
 			if (Paths.fileExists('images/' + name + '.png', IMAGE))
 			{
-				var file:Dynamic = Paths.getImage(name);
+				var file:FlxGraphic = Paths.getImage(name);
 				loadGraphic(file); // Load stupidly first for getting the file size
 
 				if (width >= 450)

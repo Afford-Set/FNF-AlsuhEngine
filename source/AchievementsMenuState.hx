@@ -11,11 +11,10 @@ import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
-import transition.TransitionableState;
 
 using StringTools;
 
-class AchievementsMenuState extends TransitionableState
+class AchievementsMenuState extends MusicBeatState
 {
 	#if ACHIEVEMENTS_ALLOWED
 	private static var curSelected:Int = 0;

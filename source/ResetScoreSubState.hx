@@ -6,7 +6,7 @@ import flixel.util.FlxColor;
 
 using StringTools;
 
-class ResetScoreSubState extends BaseSubState
+class ResetScoreSubState extends MusicBeatSubState
 {
 	static var onYes:Bool = false;
 

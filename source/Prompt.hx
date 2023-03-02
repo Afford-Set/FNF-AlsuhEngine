@@ -10,7 +10,7 @@ import flixel.addons.ui.FlxUIPopup;
 
 using StringTools;
 
-class Prompt extends BaseSubState
+class Prompt extends MusicBeatSubState
 {
 	var selected:Int = 0;
 

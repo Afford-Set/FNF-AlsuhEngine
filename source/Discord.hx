@@ -7,6 +7,7 @@ import llua.State;
 
 #if DISCORD_ALLOWED
 import Sys.sleep;
+import sys.thread.Thread;
 import discord_rpc.DiscordRpc;
 #end
 
@@ -63,18 +64,18 @@ class DiscordClient
 
 	static function onError(_code:Int, _message:String):Void
 	{
-		Debug.logInfo('Error! $_code : $_message');
+		Debug.logError('Error! $_code : $_message');
 	}
 
 	static function onDisconnected(_code:Int, _message:String):Void
 	{
-		Debug.logInfo('Disconnected! $_code : $_message');
+		Debug.logWarn('Disconnected! $_code : $_message');
 	}
 
 	public static function initialize():Void
 	{
 		#if DISCORD_ALLOWED
-		var DiscordDaemon = sys.thread.Thread.create(() -> {
+		Thread.create(function():Void {
 			new DiscordClient();
 		});
 		#end

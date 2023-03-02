@@ -43,22 +43,41 @@ class Conductor
 		return [new RatingData('sick'), good, bad, shit];
 	}
 
-	public static function judgeNote(note:Note, diff:Float = 0, ?isString:Null<Bool> = false):Any
+	public static function judgeNote(ratingsData:Array<RatingData>, note:Note, diff:Float = 0):RatingData
 	{
 		var data:Array<RatingData> = getDefaultRatings();
 
-		if (PlayState.instance != null) {
+		if (ratingsData != null && ratingsData.length > 0) {
+			data = ratingsData;
+		}
+
+		if ((ratingsData == null || ratingsData.length < 1) && PlayState.instance != null) {
 			data = PlayState.instance.ratingsData;
 		}
 
 		for (i in 0...data.length - 1) // skips last window (Shit)
 		{
 			if (diff <= data[i].hitWindow) {
-				return isString ? data[i].image : data[i];
+				return data[i];
 			}
 		}
 	
-		return isString ? data[data.length - 1].image : data[data.length - 1];
+		return data[data.length - 1];
+	}
+
+	public static function getRatingByName(ratingsData:Array<RatingData>, name:String):RatingData
+	{
+		if (ratingsData.length > 0)
+		{
+			for (rtg in ratingsData)
+			{
+				if (rtg != null && rtg.name == name) {
+					return rtg;
+				}
+			}
+		}
+
+		return new RatingData('sick');
 	}
 
 	public static function getCrotchetAtTime(time:Float):Float

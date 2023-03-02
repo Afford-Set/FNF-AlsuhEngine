@@ -47,6 +47,8 @@ class GameOverSubState extends MusicBeatSubState
 		endSoundName = 'gameOverEnd';
 	}
 
+	var randomGameover:Int = 1; // for week 7 from funkin source code update
+
 	public override function create():Void
 	{
 		super.create();
@@ -108,6 +110,14 @@ class GameOverSubState extends MusicBeatSubState
 
 			micIsDown = true;
 		});
+
+		var randomCensor:Array<Int> = [];
+
+		if (OptionData.naughtyness) {
+			randomCensor = [1, 3, 8, 13, 17, 21];
+		}
+
+		randomGameover = FlxG.random.int(1, 25, randomCensor);
 	}
 
 	public var micIsDown:Bool = false;
@@ -117,10 +127,12 @@ class GameOverSubState extends MusicBeatSubState
 	{
 		super.update(elapsed);
 
-		bg.alpha = CoolUtil.coolLerp(bg.alpha, 0, 0.01);
+		bg.alpha = FlxMath.lerp(bg.alpha, 0, CoolUtil.boundTo(elapsed * 2.4, 0, 1));
 
-		if (updateCamera) {
-			camFollowPos.setPosition(CoolUtil.coolLerp(camFollowPos.x, camFollow.x, 0.025), CoolUtil.coolLerp(camFollowPos.y, camFollow.y, 0.025));
+		if (updateCamera)
+		{
+			var lerpVal:Float = CoolUtil.boundTo(elapsed * 0.6, 0, 1);
+			camFollowPos.setPosition(FlxMath.lerp(camFollowPos.x, camFollow.x, lerpVal), FlxMath.lerp(camFollowPos.y, camFollow.y, lerpVal));
 		}
 
 		var exit:Bool = controls.BACK || FlxG.mouse.justPressedRight;
@@ -141,22 +153,24 @@ class GameOverSubState extends MusicBeatSubState
 
 			if (boyfriend.animation.curAnim.finished && !playingDeathSound)
 			{
-				if (OptionData.naughtyness && PlayState.SONG.stage == 'tank' && (PlayState.SONG.player2.contains('tankman') || PlayState.SONG.player2.contains('tankmen')))
+				switch (PlayState.SONG.stage)
 				{
-					playingDeathSound = true;
-					coolStartDeath(0.2);
-					
-					var exclude:Array<Int> = [];
-
-					FlxG.sound.play(Paths.getSound('jeffGameover/jeffGameover-' + FlxG.random.int(1, 25, exclude)), 1, false, null, true, function():Void
+					case 'tank':
 					{
-						if (!isEnding) {
-							FlxG.sound.music.fadeIn(4, 0.2, 1);
+						if (PlayState.SONG.player2.contains('tankman') || PlayState.SONG.player2.contains('tankmen'))
+						{
+							playingDeathSound = true;
+							coolStartDeath(0.2);
+
+							FlxG.sound.play(Paths.getSound('jeffGameover/jeffGameover-' + randomGameover), 1, false, null, true, function():Void
+							{
+								if (!isEnding) {
+									FlxG.sound.music.fadeIn(4, 0.2, 1);
+								}
+							});
 						}
-					});
-				}
-				else {
-					coolStartDeath(1);
+					}
+					default: coolStartDeath();
 				}
 
 				boyfriend.startedDeath = true;
@@ -224,8 +238,10 @@ class GameOverSubState extends MusicBeatSubState
 							default: FlxG.switchState(new MainMenuState());
 						}
 					}
-					else {
-						FlxG.resetState();
+					else
+					{
+						StageData.loadDirectory(PlayState.SONG);
+						LoadingState.loadAndSwitchState(new PlayState(), true);
 					}
 				});
 			});

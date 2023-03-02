@@ -14,7 +14,7 @@ import flixel.effects.FlxFlicker;
 
 using StringTools;
 
-class GameplayChangersSubState extends BaseSubState
+class GameplayChangersSubState extends MusicBeatSubState
 {
 	private static var curSelected:Int = 0;
 
@@ -126,15 +126,16 @@ class GameplayChangersSubState extends BaseSubState
 		{
 			if (isPause)
 			{
-				if (PlayState.instance != null) {
+				if (PlayState.instance != null)
+				{
 					PlayState.instance.practiceMode = PlayStateChangeables.practiceMode;
-				}
-	
-				if (PlayState.instance.practiceMode) {
-					FlxTween.tween(practiceText, {alpha: 1, y: practiceText.y + 5}, 0.4, {ease: FlxEase.quartInOut});
-				}
-				else {
-					FlxTween.tween(practiceText, {alpha: 0, y: practiceText.y - 5}, 0.4, {ease: FlxEase.quartInOut});
+
+					if (PlayState.instance.practiceMode) {
+						FlxTween.tween(practiceText, {alpha: 1, y: practiceText.y + 5}, 0.4, {ease: FlxEase.quartInOut});
+					}
+					else {
+						FlxTween.tween(practiceText, {alpha: 0, y: practiceText.y - 5}, 0.4, {ease: FlxEase.quartInOut});
+					}
 				}
 			}
 	

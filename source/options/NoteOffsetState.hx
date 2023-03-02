@@ -7,7 +7,6 @@ import flixel.ui.FlxBar;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
-import transition.Transition;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
@@ -57,7 +56,7 @@ class NoteOffsetState extends MusicBeatState
 
 		FlxG.cameras.setDefaultDrawTarget(camGame, true);
 
-		Transition.nextCamera = camOther;
+		CustomFadeTransition.nextCamera = camOther;
 		FlxG.camera.scroll.set(120, 130);
 
 		super.create();
@@ -453,7 +452,7 @@ class NoteOffsetState extends MusicBeatState
 
 			persistentUpdate = false;
 
-			Transition.nextCamera = camOther;
+			CustomFadeTransition.nextCamera = camOther;
 
 			FlxG.sound.music.pause();
 			FlxG.sound.music.volume = 0;

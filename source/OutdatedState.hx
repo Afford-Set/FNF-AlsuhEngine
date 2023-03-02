@@ -5,12 +5,11 @@ import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxTween;
-import transition.TransitionableState;
 
 using StringTools;
 
 #if CHECK_FOR_UPDATES
-class OutdatedState extends TransitionableState
+class OutdatedState extends MusicBeatState
 {
 	public static var leftState:Bool = false;
 
@@ -58,8 +57,14 @@ class OutdatedState extends TransitionableState
 
 			FlxTween.tween(txt, {alpha: 0}, 1,
 			{
-				onComplete: function(tween:FlxTween):Void {
-					FlxG.switchState(new MainMenuState());
+				onComplete: function(tween:FlxTween):Void
+				{
+					if (FlxG.save.data.seenWarningExt) {
+						FlxG.switchState(new MainMenuState());
+					}
+					else {
+						FlxG.switchState(new WarningState());
+					}
 				}
 			});
 

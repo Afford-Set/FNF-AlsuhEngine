@@ -1,7 +1,6 @@
 package;
 
 import haxe.Json;
-import haxe.format.JsonParser;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -45,7 +44,7 @@ class Character extends FlxSprite
 {
 	public var char_name:String = 'Boyfriend';
 
-	public var animOffsets:Map<String, Array<Float>>;
+	public var animOffsets:Map<String, Array<Float>> = new Map<String, Array<Float>>();
 	public var debugMode:Bool = false;
 
 	public var isPlayer:Bool = false;
@@ -88,12 +87,6 @@ class Character extends FlxSprite
 	{
 		super(x, y);
 
-		#if (haxe >= "4.0.0")
-		animOffsets = new Map();
-		#else
-		animOffsets = new Map<String, Array<Dynamic>>();
-		#end
-
 		this.curCharacter = curCharacter;
 		this.isPlayer = isPlayer;
 
@@ -106,11 +99,11 @@ class Character extends FlxSprite
 			// }
 			default:
 			{
-				var path:String = Paths.getFile('characters/' + DEFAULT_CHARACTER + '.json', TEXT);
+				var path:String = Paths.getJson('characters/' + DEFAULT_CHARACTER);
 				var characterPath:String = 'characters/' + curCharacter + '.json';
 
 				if (Paths.fileExists(characterPath, TEXT)) {
-					path = Paths.getFile(characterPath, TEXT);
+					path = Paths.getJson(characterPath);
 				}
 
 				var rawJson:String = Paths.getTextFromFile(path);
@@ -118,13 +111,13 @@ class Character extends FlxSprite
 				var json:CharacterFile = cast Json.parse(rawJson);
 				var spriteType:String = 'sparrow';
 
-				var txtToFind:String = Paths.getFile('images/' + json.image + '.txt', TEXT);
+				var txtToFind:String = Paths.getTxt('images/' + json.image);
 				
 				if (Paths.fileExists(txtToFind, TEXT)) {
 					spriteType = 'packer';
 				}
 
-				var animToFind:String = Paths.getFile('images/' + json.image + '/Animation.json', TEXT);
+				var animToFind:String = Paths.getJson('images/' + json.image + '/Animation');
 
 				if (Paths.fileExists(animToFind, TEXT)) {
 					spriteType = 'texture';
@@ -215,8 +208,40 @@ class Character extends FlxSprite
 		recalculateDanceIdle();
 		dance();
 
-		if (isPlayer) {
+		if (isPlayer)
+		{
 			flipX = !flipX;
+
+			if (!curCharacter.startsWith('bf') && !curCharacter.endsWith('-player')) // Doesn't flip for BF, since his are already in the right place???
+			{
+				if (animation.getByName('singRIGHT') != null)
+				{
+					var oldRight:Array<Int> = animation.getByName('singRIGHT').frames;
+					animation.getByName('singRIGHT').frames = animation.getByName('singLEFT').frames;
+					animation.getByName('singLEFT').frames = oldRight;
+
+					if (animOffsets.exists('singLEFT') && animOffsets.exists('singRIGHT'))
+					{
+						var oldRightOffset:Array<Float> = animOffsets.get('singRIGHT');
+						animOffsets.set('singRIGHT', animOffsets.get('singLEFT'));
+						animOffsets.set('singLEFT', oldRightOffset);
+					}
+
+					if (animation.getByName('singRIGHTmiss') != null)
+					{
+						var oldMiss:Array<Int> = animation.getByName('singRIGHTmiss').frames;
+						animation.getByName('singRIGHTmiss').frames = animation.getByName('singLEFTmiss').frames;
+						animation.getByName('singLEFTmiss').frames = oldMiss;
+
+						if (animOffsets.exists('singLEFTmiss') && animOffsets.exists('singRIGHTmiss'))
+						{
+							var oldRightOffset:Array<Float> = animOffsets.get('singRIGHTmiss');
+							animOffsets.set('singRIGHTmiss', animOffsets.get('singLEFTmiss'));
+							animOffsets.set('singLEFTmiss', oldRightOffset);
+						}
+					}
+				}
+			}
 		}
 
 		switch (curCharacter)
@@ -226,7 +251,7 @@ class Character extends FlxSprite
 				skipDance = true;
 
 				loadMappedAnims();
-				playAnim("shoot1");
+				playAnim('shoot1');
 			}
 		}
 	}
@@ -289,8 +314,7 @@ class Character extends FlxSprite
 				}
 			}
 
-			if (animation.curAnim.finished && animation.getByName(animation.curAnim.name + '-loop') != null)
-			{
+			if (animation.curAnim.finished && animation.getByName(animation.curAnim.name + '-loop') != null) {
 				playAnim(animation.curAnim.name + '-loop');
 			}
 		}
@@ -330,7 +354,7 @@ class Character extends FlxSprite
 			animation.callback = callback;
 		}
 
-		var daOffset = animOffsets.get(AnimName);
+		var daOffset:Array<Float> = animOffsets.get(AnimName);
 
 		if (animOffsets.exists(AnimName)) {
 			offset.set(daOffset[0], daOffset[1]);
@@ -366,7 +390,6 @@ class Character extends FlxSprite
 		}
 
 		TankmenBG.animationNotes = animationNotes;
-
 		animationNotes.sort(sortAnims);
 	}
 
@@ -403,7 +426,7 @@ class Character extends FlxSprite
 
 	public function addOffset(name:String, x:Float = 0, y:Float = 0):Void
 	{
-		animOffsets[name] = [x, y];
+		animOffsets.set(name, [x, y]);
 	}
 
 	public function quickAnimAdd(name:String, anim:String):Void

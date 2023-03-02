@@ -24,7 +24,6 @@ import openfl.events.Event;
 import flixel.util.FlxColor;
 import lime.system.Clipboard;
 import flixel.group.FlxGroup;
-import transition.Transition;
 import flixel.addons.ui.FlxUI;
 import openfl.net.FileReference;
 import openfl.events.IOErrorEvent;
@@ -94,7 +93,7 @@ class CharacterEditorState extends MusicBeatUIState
 		FlxG.cameras.add(camOther, false);
 
 		FlxG.cameras.setDefaultDrawTarget(camEditor, true);
-		Transition.nextCamera = camOther;
+		CustomFadeTransition.nextCamera = camOther;
 
 		super.create();
 
@@ -1291,7 +1290,7 @@ class CharacterEditorState extends MusicBeatUIState
 		{
 			if (FlxG.keys.justPressed.ESCAPE)
 			{
-				Transition.nextCamera = camOther;
+				CustomFadeTransition.nextCamera = camOther;
 
 				if (goToPlayState) {
 					FlxG.switchState(new PlayState());
@@ -1408,7 +1407,7 @@ class CharacterEditorState extends MusicBeatUIState
 
 		_file = null;
 
-		FlxG.log.notice("Successfully saved file.");
+		Debug.logInfo("Successfully saved file.");
 	}
 
 	/**
@@ -1434,7 +1433,7 @@ class CharacterEditorState extends MusicBeatUIState
 
 		_file = null;
 
-		FlxG.log.error("Problem saving file");
+		Debug.logError("Problem saving file");
 	}
 
 	function saveCharacter():Void
@@ -1464,7 +1463,12 @@ class CharacterEditorState extends MusicBeatUIState
 			_file.addEventListener(Event.COMPLETE, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data, daAnim + ".json");
+
+			#if MODS_ALLOWED
+			_file.save(data, #if sys CoolUtil.convPathShit(Paths.modFolders('characters/' + #end daAnim + ".json" #if sys )) #end);
+			#else
+			_file.save(data, #if sys CoolUtil.convPathShit(Paths.getJson('characters/' + #end daAnim + ".json" #if sys )) #end);
+			#end
 		}
 	}
 
@@ -1476,7 +1480,6 @@ class CharacterEditorState extends MusicBeatUIState
 		}
 
 		var text:String = prefix + Clipboard.text.replace('\n', '');
-
 		return text;
 	}
 }

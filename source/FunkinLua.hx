@@ -2412,7 +2412,7 @@ class FunkinLua
 				return;
 			}
 
-			var object:FlxObject = Reflect.getProperty(getInstance(), obj);
+			var object:FlxObject = Reflect.getProperty(getInstance(), getVariableByPrefix(getInstanceName(), obj));
 
 			if (object != null) {
 				object.scrollFactor.set(scrollX, scrollY);
@@ -2587,7 +2587,7 @@ class FunkinLua
 				return;
 			}
 
-			var sprite:FlxSprite = Reflect.getProperty(getInstance(), obj);
+			var sprite:FlxSprite = Reflect.getProperty(getInstance(), getVariableByPrefix(getInstanceName(), obj));
 
 			if (sprite != null)
 			{
@@ -2767,7 +2767,7 @@ class FunkinLua
 					objectsArray.push(real);
 				}
 				else {
-					objectsArray.push(Reflect.getProperty(getInstance(), namesArray[i]));
+					objectsArray.push(Reflect.getProperty(getInstance(), getVariableByPrefix(getInstanceName(), namesArray[i])));
 				}
 			}
 
@@ -3421,7 +3421,7 @@ class FunkinLua
 				return true;
 			}
 
-			var spr:FlxSprite = Reflect.getProperty(getInstance(), obj);
+			var spr:FlxSprite = Reflect.getProperty(getInstance(), getVariableByPrefix(getInstanceName(), obj));
 
 			if (spr != null)
 			{
@@ -3788,7 +3788,7 @@ class FunkinLua
 
 	public static function getTextObject(name:String):FlxText
 	{
-		return PlayState.instance.modchartTexts.exists(name) ? PlayState.instance.modchartTexts.get(name) : Reflect.getProperty(PlayState.instance, name);
+		return PlayState.instance.modchartTexts.exists(name) ? PlayState.instance.modchartTexts.get(name) : Reflect.getProperty(PlayState.instance, getVariableByPrefix('PlayState.instance', name));
 	}
 
 	#if (!flash && MODS_ALLOWED)

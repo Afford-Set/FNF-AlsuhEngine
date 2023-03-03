@@ -119,7 +119,7 @@ class ChartingState extends MusicBeatUIState
 		['Set Music Volume', "Sets the music volume.\n\nValue 1: Volume number"],
 		['Set Vocals Volume', "Sets the vocals volume.\n\nValue 1: Volume number"],
 		['Change Icon', "Changes specificed icon to new icon.\n\nValue 1: Which player to change icon (P1, P2).\nValue 2: Icon name."],
-		['Camera Tween Pos', "Tweens the position of the GAME CAMERA and LOCKS it.\nYou can use this event and the \"Camera Follow Pos\"\none after another respectively.\n\nValue 1: x, y, Duration, Start Delay (with a ', ' between the values)\nValue 2: Ease name"],
+		['Camera Tween Pos', "Tweens the position of the GAME CAMERA and LOCKS it.\nYou can use this event and the \"Camera Follow Pos\"\none after another respectively.\n\nValue 1: x, y, Duration (with a ', ' between the values)\nValue 2: Ease name"],
 		['Camera Tween Zoom', "Tweens the game camera's zoom to a specific value in a specific duration in a specific ease\n\nValue 1: TargetZoom, Duration (with a ', ' between the values)\nValue 2: Ease name"],
 		['Set Cam Zoom', "Sets Camera Zoom\n\nValue 1: Cam zoom\nValue 2: if blank, it will smoothly zoom regularly,\notherwise it will do an instant zoom"],
 		['Cam Boom Speed', "Value 1: Speed\nValue 2: Intensity"],

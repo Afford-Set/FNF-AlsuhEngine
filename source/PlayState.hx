@@ -7029,8 +7029,14 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		if (boomSpeed != 4 && curBeat % boomSpeed == 0) {
-			triggerEventNote("Add Camera Zoom", Std.string(0.015 * bamVal), Std.string(0.03 * bamVal));
+		try
+		{
+			if (boomSpeed != 4 && curBeat % boomSpeed == 0) {
+				triggerEventNote("Add Camera Zoom", Std.string(0.015 * bamVal), Std.string(0.03 * bamVal));
+			}
+		}
+		catch (e:Dynamic) {
+			Debug.logError('error: ' + e);
 		}
 
 		lastBeatHit = curBeat;

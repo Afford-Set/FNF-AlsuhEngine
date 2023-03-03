@@ -4275,6 +4275,15 @@ class FunkinLua
 			{
 				switch (prefix.trim())
 				{
+					case 'timeTxt': {
+						newVar = 'songPosName';
+					}
+					case 'timeBarBG': {
+						newVar = 'songPosBG';
+					}
+					case 'timeBar': {
+						newVar = 'songPosBar';
+					}
 					case 'ratingPercent': {
 						newVar = 'songAccuracy';
 					}

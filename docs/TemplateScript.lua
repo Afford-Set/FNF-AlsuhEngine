@@ -238,11 +238,15 @@ function onMoveCamera(focus)
 	elseif focus == 'dad' then
 		-- called when the camera focus on dad
 	else
-		-- called when the camera focue on girlfriend
+		-- called when the camera focus on girlfriend
 	end
 end
 
 -- Event notes hooks
+function onEventPushed(name)
+	-- event note precache
+end
+
 function onEvent(name, value1, value2)
 	-- event note triggered
 	-- triggerEvent() does not call this function!!

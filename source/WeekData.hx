@@ -97,7 +97,7 @@ class WeekData
 	public static function onLoadJson(weekFile:WeekFile, fileName:String):Void
 	{
 		if (weekFile.weekID == null) {
-			weekFile.weekID = Paths.formatToSongPath(fileName);
+			weekFile.weekID = fileName;
 		}
 
 		if (weekFile.itemFile == null) {

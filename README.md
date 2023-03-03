@@ -32,6 +32,7 @@ It's the same as in the Psych Engine, only there are changes and additions shown
 The main feature is support for .MP3 audio files. .OGG audio files continue to be supported in this engine.
 
 ### Additions
+- Winning Icons
 - Custom Inst and Voices for other difficulties
 - .WEBM Videos Support (supported on Linux/Windows/MacOS)
 - Replays

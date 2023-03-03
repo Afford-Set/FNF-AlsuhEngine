@@ -6,6 +6,7 @@ import sys.FileSystem;
 #end
 
 import haxe.Json;
+import haxe.Http;
 
 import flixel.FlxG;
 import openfl.Assets;
@@ -126,7 +127,7 @@ class TitleState extends MusicBeatState
 		#if CHECK_FOR_UPDATES
 		if (OptionData.checkForUpdates && !initialized)
 		{
-			var http = new haxe.Http("https://raw.githubusercontent.com/Afford-Set/FNF-AlsuhEngine/main/version.downloadMe");
+			var http:Http = new Http("https://raw.githubusercontent.com/Afford-Set/FNF-AlsuhEngine/main/version.downloadMe");
 			var returnedData:Array<String> = [];
 	
 			http.onData = function(data:String):Void

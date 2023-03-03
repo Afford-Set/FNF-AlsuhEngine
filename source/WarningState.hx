@@ -14,7 +14,7 @@ class WarningState extends MusicBeatState
 
 		var txt:FlxText = new FlxText(0, 0, FlxG.width, "WARNING!\n\nAlsuh Engine will soon stop supporting\nfile extensions such as .OGG, .WAV, .WEBM."
 			+ "\n\nModcharters who have chosen this engine, you\nmust replace the old file extensions with the new ones.\n\nSound files must be .MP3."
-			+ "\nVideo files must be .MP4.\n\nPress ENTER to play new mods with optimized new formats.\nor press ESCAPE to keep playing mods with older file formats.", 32);
+			+ "\nVideo files must be .MP4.\n\nWe apologize for the inconvenience.\n\nPress ENTER to play new mods with optimized new formats.\nor press ESCAPE to keep playing mods with older file formats.", 32);
 		txt.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		txt.scrollFactor.set();
 		txt.screenCenter();

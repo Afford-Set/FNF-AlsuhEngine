@@ -121,10 +121,8 @@ class CoolUtil
 	{
 		var splitter:Array<String> = name.trim().split('-');
 
-		for (i in 0...splitter.length)
-		{
-			var str:String = splitter[i];
-			str = '' + str.charAt(0).toUpperCase().trim() + str.substr(1).toLowerCase().trim();
+		for (i in 0...splitter.length) {
+			splitter[i] = '' + splitter[i].charAt(0).toUpperCase().trim() + splitter[i].substr(1).toLowerCase().trim();
 		}
 
 		return splitter.join(' ');

@@ -3149,7 +3149,7 @@ class PlayState extends MusicBeatState
 				var newCharacter:String = event.value2;
 				addCharacterToList(newCharacter, charType);
 			}
-			case 'Dadbattle Spotlight':
+			case 'Dad Battle Spotlight' | 'Dadbattle Spotlight':
 			{
 				dadbattleBlack = new BGSprite(null, -800, -400, 0, 0);
 				dadbattleBlack.makeGraphic(Std.int(FlxG.width * 2), Std.int(FlxG.height * 2), FlxColor.BLACK);
@@ -3226,6 +3226,8 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
+
+		callOnLuas('eventPushed', [event.event]);
 
 		if (!eventPushedMap.exists(event.event)) {
 			eventPushedMap.set(event.event, true);
@@ -4255,7 +4257,7 @@ class PlayState extends MusicBeatState
 	{
 		switch (eventName)
 		{
-			case 'Dadbattle Spotlight':
+			case 'Dad Battle Spotlight' | 'Dadbattle Spotlight':
 			{
 				var val:Null<Int> = Std.parseInt(value1);
 				if (val == null) val = 0;
@@ -4910,17 +4912,23 @@ class PlayState extends MusicBeatState
 			}
 			case 'Fade Event':
 			{
-				var strColor:String = value2.startsWith('0x') ? value2 : ('0x' + value2);
+				if (!Paths.fileExists('custom_events/' + eventName + '.lua', TEXT)) // fuck it
+				{
+					var strColor:String = value2.startsWith('0x') ? value2 : ('0x' + value2);
 
-				var color:FlxColor = Std.parseInt(strColor);
-				FlxG.camera.fade(color, Std.parseFloat(value1), false);
+					var color:FlxColor = Std.parseInt(strColor);
+					FlxG.camera.fade(color, Std.parseFloat(value1), false);
+				}
 			}
 			case 'Flash Event':
 			{
-				var strColor:String = value2.startsWith('0x') ? value2 : ('0x' + value2);
+				if (!Paths.fileExists('custom_events/' + eventName + '.lua', TEXT)) // fuck it
+				{
+					var strColor:String = value2.startsWith('0x') ? value2 : ('0x' + value2);
 
-				var color:FlxColor = Std.parseInt(strColor);
-				FlxG.camera.flash(color, Std.parseFloat(value1), null, false);
+					var color:FlxColor = Std.parseInt(strColor);
+					FlxG.camera.flash(color, Std.parseFloat(value1), null, false);
+				}
 			}
 			case 'Object X Tween':
 			{
@@ -5268,199 +5276,223 @@ class PlayState extends MusicBeatState
 			}
 			case 'Set Health Bar Colors':
 			{
-				if (value1 == null || value1.length < 1) {
-					value1 = Std.string(FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]));
-				}
-
-				var left:FlxColor = Std.parseInt(value1);
-				if (!value1.startsWith('0x')) left = Std.parseInt('0xff' + value1);
-
-				if (value2 == null || value2.length < 1) {
-					value2 = Std.string(FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]));
-				}
+				if (!Paths.fileExists('custom_events/' + eventName + '.lua', TEXT)) // fuck it
+				{
+					if (value1 == null || value1.length < 1) {
+						value1 = Std.string(FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]));
+					}
 	
-				var right:FlxColor = Std.parseInt(value2);
-				if (!value2.startsWith('0x')) right = Std.parseInt('0xff' + value2);
+					var left:FlxColor = Std.parseInt(value1);
+					if (!value1.startsWith('0x')) left = Std.parseInt('0xff' + value1);
 	
-				healthBar.createFilledBar(left, right);
-				healthBar.updateBar();
+					if (value2 == null || value2.length < 1) {
+						value2 = Std.string(FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]));
+					}
+		
+					var right:FlxColor = Std.parseInt(value2);
+					if (!value2.startsWith('0x')) right = Std.parseInt('0xff' + value2);
+		
+					healthBar.createFilledBar(left, right);
+					healthBar.updateBar();
+				}
 			}
 			case 'Set Music Volume':
 			{
-				if (FlxG.sound.music != null)
+				if (!Paths.fileExists('custom_events/' + eventName + '.lua', TEXT)) // fuck it
 				{
-					var newValue:Float = Std.parseFloat(value1);
-					if (Math.isNaN(newValue)) newValue = 1;
-
-					FlxG.sound.music.volume = newValue;
+					if (FlxG.sound.music != null)
+					{
+						var newValue:Float = Std.parseFloat(value1);
+						if (Math.isNaN(newValue)) newValue = 1;
+	
+						FlxG.sound.music.volume = newValue;
+					}
 				}
 			}
 			case 'Set Vocals Volume':
 			{
-				if (vocals != null)
+				if (!Paths.fileExists('custom_events/' + eventName + '.lua', TEXT)) // fuck it
 				{
-					var newValue:Float = Std.parseFloat(value1);
-					if (Math.isNaN(newValue)) newValue = 1;
+					if (vocals != null)
+					{
+						var newValue:Float = Std.parseFloat(value1);
+						if (Math.isNaN(newValue)) newValue = 1;
 
-					vocalsVolume = newValue;
-					vocals.volume = vocalsVolume;
+						vocalsVolume = newValue;
+						vocals.volume = vocalsVolume;
+					}
 				}
 			}
 			case 'Change Icon':
 			{
-				var icon:HealthIcon = null;
-
-				switch (value1.toLowerCase().trim())
+				if (!Paths.fileExists('custom_events/' + eventName + '.lua', TEXT)) // fuck it
 				{
-					case 'iconp2' | 'p2' | '2' | 'dad' | 'opponent':
-						icon = iconP2;
-					default:
-						icon = iconP1;
+					var icon:HealthIcon = null;
+
+					switch (value1.toLowerCase().trim())
+					{
+						case 'iconp2' | 'p2' | '2' | 'dad' | 'opponent':
+							icon = iconP2;
+						default:
+							icon = iconP1;
+					}
+					
+					icon.changeIcon(value2);
 				}
-				
-				icon.changeIcon(value2);
 			}
 			case 'Camera Tween Pos':
 			{
-				if (value1 != '' && value2 != '')
+				if (!Paths.fileExists('custom_events/' + eventName + '.lua', TEXT)) // fuck it
 				{
-					FunkinLua.cancelTween('CameraEventX');
-					FunkinLua.cancelTween('CameraEventY');
-
-					var xyAndDur:Array<String> = value1.trim().split(',');
-
-					for (i in 0...xyAndDur.length) {
-						xyAndDur[i] = xyAndDur[i].trim();
-					}
-
-					var newX:Float = Std.parseFloat(xyAndDur[0]);
-					if (Math.isNaN(newX)) newX = 100;
-
-					var newY:Float = Std.parseFloat(xyAndDur[1]);
-					if (Math.isNaN(newY)) newY = 100;
-
-					var duration:Float = Std.parseFloat(xyAndDur[2]);
-					if (Math.isNaN(duration)) duration = 1;
-
-					if (camFollow != null && camFollowPos != null)
+					if (value1 != '' && value2 != '')
 					{
-						modchartTweens.set('CameraEventX', FlxTween.tween(camFollowPos, {x: newX}, duration,
+						FunkinLua.cancelTween('CameraEventX');
+						FunkinLua.cancelTween('CameraEventY');
+
+						var xyAndDur:Array<String> = value1.trim().split(',');
+
+						for (i in 0...xyAndDur.length) {
+							xyAndDur[i] = xyAndDur[i].trim();
+						}
+
+						var newX:Float = Std.parseFloat(xyAndDur[0]);
+						if (Math.isNaN(newX)) newX = 100;
+
+						var newY:Float = Std.parseFloat(xyAndDur[1]);
+						if (Math.isNaN(newY)) newY = 100;
+
+						var duration:Float = Std.parseFloat(xyAndDur[2]);
+						if (Math.isNaN(duration)) duration = 1;
+
+						if (camFollow != null && camFollowPos != null)
 						{
-							ease: FunkinLua.getFlxEaseByString(value2),
-							onUpdate: function(twn:FlxTween):Void
+							modchartTweens.set('CameraEventX', FlxTween.tween(camFollowPos, {x: newX}, duration,
 							{
-								callOnLuas('onTweenUpdate', ['CameraEventX', FlxG.elapsed]);
-								modchartTweens.remove('CameraEventX');
-							},
-							onComplete: function(twn:FlxTween):Void
+								ease: FunkinLua.getFlxEaseByString(value2),
+								onUpdate: function(twn:FlxTween):Void
+								{
+									callOnLuas('onTweenUpdate', ['CameraEventX', FlxG.elapsed]);
+									modchartTweens.remove('CameraEventX');
+								},
+								onComplete: function(twn:FlxTween):Void
+								{
+									camFollow.x = newX;
+
+									callOnLuas('onTweenCompleted', ['CameraEventX']);
+									modchartTweens.remove('CameraEventX');
+								}
+							}));
+
+							modchartTweens.set('CameraEventY', FlxTween.tween(camFollowPos, {y: newY}, duration,
 							{
-								camFollow.x = newX;
+								ease: FunkinLua.getFlxEaseByString(value2),
+								onUpdate: function(twn:FlxTween):Void
+								{
+									callOnLuas('onTweenUpdate', ['CameraEventY', FlxG.elapsed]);
+									modchartTweens.remove('CameraEventY');
+								},
+								onComplete: function(twn:FlxTween):Void
+								{
+									camFollow.y = newY;
 
-								callOnLuas('onTweenCompleted', ['CameraEventX']);
-								modchartTweens.remove('CameraEventX');
-							}
-						}));
+									callOnLuas('onTweenCompleted', ['CameraEventY']);
+									modchartTweens.remove('CameraEventY');
+								}
+							}));
 
-						modchartTweens.set('CameraEventY', FlxTween.tween(camFollowPos, {y: newY}, duration,
-						{
-							ease: FunkinLua.getFlxEaseByString(value2),
-							onUpdate: function(twn:FlxTween):Void
-							{
-								callOnLuas('onTweenUpdate', ['CameraEventY', FlxG.elapsed]);
-								modchartTweens.remove('CameraEventY');
-							},
-							onComplete: function(twn:FlxTween):Void
-							{
-								camFollow.y = newY;
-
-								callOnLuas('onTweenCompleted', ['CameraEventY']);
-								modchartTweens.remove('CameraEventY');
-							}
-						}));
-
-						isCameraOnForcedPos = true;
+							isCameraOnForcedPos = true;
+						}
 					}
-				}
-				else {
-					isCameraOnForcedPos = false;
+					else {
+						isCameraOnForcedPos = false;
+					}
 				}
 			}
 			case 'Camera Tween Zoom':
 			{
-				FunkinLua.cancelTween('ZoomEvent');
-
-				var tarAndDur:Array<String> = value1.trim().split(',');
-
-				for (i in 0...tarAndDur.length) {
-					tarAndDur[i] = tarAndDur[i].trim();
-				}
-
-				var newValue:Float = Std.parseFloat(tarAndDur[0]);
-				if (Math.isNaN(newValue)) newValue = 1;
-
-				var duration:Float = Std.parseFloat(tarAndDur[1]);
-				if (Math.isNaN(duration)) duration = 1;
-
-				modchartTweens.set('ZoomEvent', FlxTween.tween(FlxG.camera, {zoom: newValue}, duration,
+				if (!Paths.fileExists('custom_events/' + eventName + '.lua', TEXT)) // fuck it
 				{
-					ease: FunkinLua.getFlxEaseByString(value2),
-					onUpdate: function(twn:FlxTween):Void
-					{
-						defaultCamZoom = FlxG.camera.zoom;
+					FunkinLua.cancelTween('ZoomEvent');
 
-						callOnLuas('onTweenUpdate', ['ZoomEvent', FlxG.elapsed]);
-						modchartTweens.remove('ZoomEvent');
-					},
-					onComplete: function(twn:FlxTween):Void
-					{
-						defaultCamZoom = FlxG.camera.zoom;
+					var tarAndDur:Array<String> = value1.trim().split(',');
 
-						callOnLuas('onTweenCompleted', ['ZoomEvent']);
-						modchartTweens.remove('ZoomEvent');
+					for (i in 0...tarAndDur.length) {
+						tarAndDur[i] = tarAndDur[i].trim();
 					}
-				}));
 
-				defaultCamZoom = newValue;
-			}
-			case 'Set Cam Zoom':
-			{
-				if (value1 != null && value1.length > 0)
-				{
-					var ourNewValue:Float = Std.parseFloat(value1);
-					if (Math.isNaN(ourNewValue)) ourNewValue = 0.9;
+					var newValue:Float = Std.parseFloat(tarAndDur[0]);
+					if (Math.isNaN(newValue)) newValue = 1;
 
-					var duration:Float = Std.parseFloat(value2);
+					var duration:Float = Std.parseFloat(tarAndDur[1]);
 					if (Math.isNaN(duration)) duration = 1;
 
-					defaultCamZoom = ourNewValue;
-
-					modchartTweens.set('camz', FlxTween.tween(FlxG.camera, {zoom: ourNewValue}, duration,
+					modchartTweens.set('ZoomEvent', FlxTween.tween(FlxG.camera, {zoom: newValue}, duration,
 					{
-						ease: FlxEase.sineInOut,
+						ease: FunkinLua.getFlxEaseByString(value2),
 						onUpdate: function(twn:FlxTween):Void
 						{
 							defaultCamZoom = FlxG.camera.zoom;
 
-							callOnLuas('onTweenUpdate', ['camz', FlxG.elapsed]);
-							modchartTweens.remove('camz');
+							callOnLuas('onTweenUpdate', ['ZoomEvent', FlxG.elapsed]);
+							modchartTweens.remove('ZoomEvent');
 						},
 						onComplete: function(twn:FlxTween):Void
 						{
 							defaultCamZoom = FlxG.camera.zoom;
 
-							callOnLuas('onTweenCompleted', ['camz']);
-							modchartTweens.remove('camz');
+							callOnLuas('onTweenCompleted', ['ZoomEvent']);
+							modchartTweens.remove('ZoomEvent');
 						}
 					}));
+
+					defaultCamZoom = newValue;
+				}
+			}
+			case 'Set Cam Zoom':
+			{
+				if (!Paths.fileExists('custom_events/' + eventName + '.lua', TEXT)) // fuck it
+				{
+					if (value1 != null && value1.length > 0)
+					{
+						var ourNewValue:Float = Std.parseFloat(value1);
+						if (Math.isNaN(ourNewValue)) ourNewValue = 0.9;
+
+						var duration:Float = Std.parseFloat(value2);
+						if (Math.isNaN(duration)) duration = 1;
+
+						defaultCamZoom = ourNewValue;
+
+						modchartTweens.set('camz', FlxTween.tween(FlxG.camera, {zoom: ourNewValue}, duration,
+						{
+							ease: FlxEase.sineInOut,
+							onUpdate: function(twn:FlxTween):Void
+							{
+								defaultCamZoom = FlxG.camera.zoom;
+
+								callOnLuas('onTweenUpdate', ['camz', FlxG.elapsed]);
+								modchartTweens.remove('camz');
+							},
+							onComplete: function(twn:FlxTween):Void
+							{
+								defaultCamZoom = FlxG.camera.zoom;
+
+								callOnLuas('onTweenCompleted', ['camz']);
+								modchartTweens.remove('camz');
+							}
+						}));
+					}
 				}
 			}
 			case 'Cam Boom Speed':
 			{
-				boomSpeed = Std.parseInt(value1);
-				if (Math.isNaN(boomSpeed)) boomSpeed = 4;
+				if (!Paths.fileExists('custom_events/' + eventName + '.lua', TEXT)) // fuck it
+				{
+					boomSpeed = Std.parseInt(value1);
+					if (Math.isNaN(boomSpeed)) boomSpeed = 4;
 
-				bamVal = Std.parseInt(value2);
-				if (Math.isNaN(bamVal)) bamVal = 1;
+					bamVal = Std.parseInt(value2);
+					if (Math.isNaN(bamVal)) bamVal = 1;
+				}
 			}
 		}
 

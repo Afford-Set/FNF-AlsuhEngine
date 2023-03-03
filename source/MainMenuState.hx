@@ -49,7 +49,7 @@ class MainMenuState extends MusicBeatState
 	var camFollowPos:FlxObject;
 	var camFollow:FlxPoint;
 
-	public static var engineVersion:String = '1.7.2'; // This is also used for Discord RPC
+	public static var engineVersion:String = '1.7.2h'; // This is also used for Discord RPC
 	public static var psychEngineVersion:String = '0.6.4';
 
 	public static var gameVersion(get, never):String;

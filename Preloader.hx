@@ -1,13 +1,13 @@
 package ;
- 
-import flixel.system.FlxBasePreloader;
-import openfl.display.Sprite;
-import flash.display.Bitmap;
-import flash.display.BitmapData;
-import flash.display.BlendMode;
-import flash.display.Sprite;
+
 import flash.Lib;
 import flixel.FlxG;
+import flash.display.Bitmap;
+import flash.display.Sprite;
+import openfl.display.Sprite;
+import flash.display.BlendMode;
+import flash.display.BitmapData;
+import flixel.system.FlxBasePreloader;
  
 @:bitmap("art/preloaderArt.png") class LogoImage extends BitmapData { }
  
@@ -20,7 +20,7 @@ class Preloader extends FlxBasePreloader
 	 
 	var logo:Sprite;
 	 
-	public override function create():Void 
+	public override function create():Void
 	{
 		super.create();
 

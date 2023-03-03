@@ -460,7 +460,9 @@ class StoryMenuState extends MusicBeatState
 
 			item.alpha = 0.6;
 
-			if (item.targetY == 0 && !WeekData.weekIsLocked(curWeek.weekID)) {
+			var unlocked:Bool = !WeekData.weekIsLocked(curWeek.weekID);
+
+			if (item.targetY == 0 && unlocked) {
 				item.alpha = 1;
 			}
 		}

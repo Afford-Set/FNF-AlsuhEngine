@@ -227,7 +227,7 @@ end
 -- Other function hooks
 function onRecalculateRating()
 	-- return Function_Stop if you want to do your own rating calculation,
-	-- use setRatingPercent() to set the number on the calculation and setRatingString() to set the funny rating name
+	-- use setRatingPercent() to set the number on the calculation and setRatingName() to set the funny rating name
 	-- NOTE: THIS IS CALLED BEFORE THE CALCULATION!!!
 	return Function_Continue;
 end

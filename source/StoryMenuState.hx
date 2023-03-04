@@ -52,7 +52,10 @@ class StoryMenuState extends MusicBeatState
 
 		super.create();
 
+		PlayState.gameMode = 'story';
+		PlayState.isStoryMode = true;
 		WeekData.reloadWeekFiles(true);
+
 		if (curSelected >= WeekData.weeksList.length) curSelected = 0;
 
 		#if DISCORD_ALLOWED

@@ -396,7 +396,7 @@ class WeekData
 					#end
 				}
 		
-				if ((PlayState.isStoryMode && !weekFile.hideStoryMode) || (!PlayState.isStoryMode && !weekFile.hideFreeplay))
+				if ((PlayState.gameMode == 'story' && PlayState.isStoryMode && !weekFile.hideStoryMode) || (PlayState.gameMode == 'freeplay' && !PlayState.isStoryMode && !weekFile.hideFreeplay))
 				{
 					weeksLoaded.set(weekToCheck, weekFile);
 					weeksList.push(weekToCheck);

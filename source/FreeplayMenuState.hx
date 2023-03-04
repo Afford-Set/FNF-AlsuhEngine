@@ -54,6 +54,8 @@ class FreeplayMenuState extends MusicBeatState
 			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 		}
 
+		PlayState.gameMode = 'freeplay';
+		PlayState.isStoryMode = false;
 		WeekData.reloadWeekFiles(false);
 
 		for (i in 0...WeekData.weeksList.length)

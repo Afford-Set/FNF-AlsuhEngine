@@ -41,6 +41,7 @@ typedef ReplayJSON =
 	public var songNotes:Array<Float>;
 	public var keyPresses:Array<KeyPress>;
 	public var keyReleases:Array<KeyRelease>;
+	public var currentModDirectory:Null<String>;
 
 	public var noteSpeed:Float;
 	public var isDownscroll:Bool;
@@ -71,6 +72,7 @@ class Replay
 			keyPresses: [],
 			songNotes: [],
 			keyReleases: [],
+			currentModDirectory: Paths.currentModDirectory,
 			timestamp: Date.now()
 		};
 	}
@@ -97,6 +99,7 @@ class Replay
 			"keyReleases": replay.keyReleases,
 			"noteSpeed": PlayState.instance.songSpeed,
 			"isDownscroll": OptionData.downScroll,
+			"directory": Paths.currentModDirectory,
 			"timestamp": Date.now()
 		};
 

@@ -151,6 +151,10 @@ class ReplaysMenuState extends MusicBeatState
 					{
 						persistentUpdate = false;
 
+						if (replay.currentModDirectory != null && replay.currentModDirectory.length > 0) {
+							Paths.currentModDirectory = replay.currentModDirectory;
+						}
+
 						PlayState.SONG = Song.loadFromJson(ourPath, songID);
 						PlayState.gameMode = 'replay';
 						PlayState.isStoryMode = false;

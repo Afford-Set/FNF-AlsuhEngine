@@ -91,13 +91,10 @@ class StoryMenuState extends MusicBeatState
 		grpWeekCharacters = new FlxTypedGroup<MenuCharacter>();
 		add(grpWeekCharacters);
 
-		var ourUIShit:FlxAtlasFrames = null;
+		var ui_tex:FlxAtlasFrames = Paths.getSparrowAtlas('storymenu/campaign_menu_UI_assets');
 
 		if (Paths.fileExists('images/campaign_menu_UI_assets.png', IMAGE)) {
-			ourUIShit = Paths.getSparrowAtlas('campaign_menu_UI_assets');
-		}
-		else {
-			ourUIShit = Paths.getSparrowAtlas('storymenu/campaign_menu_UI_assets');
+			ui_tex = Paths.getSparrowAtlas('campaign_menu_UI_assets');
 		}
 
 		var num:Int = 0;
@@ -125,7 +122,7 @@ class StoryMenuState extends MusicBeatState
 				if (isLocked)
 				{
 					var lock:FlxSprite = new FlxSprite(weekThing.width + 10 + weekThing.x);
-					lock.frames = ourUIShit;
+					lock.frames = ui_tex;
 					lock.animation.addByPrefix('lock', 'lock');
 					lock.animation.play('lock');
 					lock.ID = i;
@@ -151,7 +148,7 @@ class StoryMenuState extends MusicBeatState
 		var weekSpr:MenuItem = grpWeeks.members[0];
 
 		leftArrow = new FlxSprite(weekSpr.x + weekSpr.width + 10, weekSpr.y + 10);
-		leftArrow.frames = ourUIShit;
+		leftArrow.frames = ui_tex;
 		leftArrow.animation.addByPrefix('idle', "arrow left", 24, false);
 		leftArrow.animation.addByPrefix('press', "arrow push left", 24, false);
 		leftArrow.animation.play('idle');
@@ -163,7 +160,7 @@ class StoryMenuState extends MusicBeatState
 		add(sprDifficulty);
 
 		rightArrow = new FlxSprite(leftArrow.x + 376, leftArrow.y);
-		rightArrow.frames = ourUIShit;
+		rightArrow.frames = ui_tex;
 		rightArrow.animation.addByPrefix('idle', 'arrow right', 24, false);
 		rightArrow.animation.addByPrefix('press', "arrow push right", 24, false);
 		rightArrow.animation.play('idle');
@@ -297,11 +294,11 @@ class StoryMenuState extends MusicBeatState
 
 			var diffUnlocked:Bool = curWeek.difficulties[1].length > 1 && !WeekData.weekIsLocked(curWeek.weekID);
 
+			leftArrow.visible = diffUnlocked;
+			rightArrow.visible = diffUnlocked;
+
 			if (diffUnlocked)
 			{
-				leftArrow.visible = diffUnlocked;
-				rightArrow.visible = diffUnlocked;
-
 				if (controls.UI_LEFT_P)
 				{
 					leftArrow.animation.play('press');

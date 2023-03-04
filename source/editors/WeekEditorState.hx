@@ -31,6 +31,7 @@ import flixel.addons.ui.FlxUITabMenu;
 import flixel.addons.ui.FlxUICheckBox;
 import flixel.addons.ui.FlxUIInputText;
 import flixel.addons.ui.FlxUINumericStepper;
+import flixel.graphics.frames.FlxAtlasFrames;
 
 using StringTools;
 
@@ -74,7 +75,7 @@ class WeekEditorState extends MusicBeatUIState
 		txtWeekTitle.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, RIGHT);
 		txtWeekTitle.alpha = 0.7;
 		
-		var ui_tex = Paths.getSparrowAtlas('storymenu/campaign_menu_UI_assets');
+		var ui_tex:FlxAtlasFrames = Paths.getSparrowAtlas('storymenu/campaign_menu_UI_assets');
 
 		if (Paths.fileExists('images/campaign_menu_UI_assets.png', IMAGE)) {
 			ui_tex = Paths.getSparrowAtlas('campaign_menu_UI_assets');
@@ -256,8 +257,8 @@ class WeekEditorState extends MusicBeatUIState
 		tab_group.add(new FlxText(opponentInputText.x, opponentInputText.y - 18, 0, 'Characters:'));
 		tab_group.add(new FlxText(backgroundInputText.x, backgroundInputText.y - 18, 0, 'Background Asset:'));
 		tab_group.add(new FlxText(displayNameInputText.x, displayNameInputText.y - 18, 0, 'Display Name:'));
-		tab_group.add(new FlxText(weekIDInputText.x, weekIDInputText.y - 18, 0, 'Week\'s ID (must be lower case):'));
-		tab_group.add(new FlxText(weekNameInputText.x, weekNameInputText.y - 18, 0, 'Week\'s Name (for Reset Score Menu):'));
+		tab_group.add(new FlxText(weekIDInputText.x, weekIDInputText.y - 18, 0, 'Week\'s ID:'));
+		tab_group.add(new FlxText(weekNameInputText.x, weekNameInputText.y - 18, 0, 'Week\'s Name:'));
 		tab_group.add(new FlxText(weekFileInputText.x, weekFileInputText.y - 18, 0, 'Week File:'));
 
 		tab_group.add(songsIDsInputText);
@@ -477,9 +478,9 @@ class WeekEditorState extends MusicBeatUIState
 
 		if (assetName != null && assetName.length > 0)
 		{
-			if (Paths.fileExists('storymenu/$assetName.png', IMAGE))
+			if (Paths.fileExists('images/storymenu/$assetName.png', IMAGE))
 			{
-				weekThing.loadGraphic(Paths.getImage('storymenu/menuitems/' + assetName));
+				weekThing.loadGraphic(Paths.getImage('storymenu/' + assetName));
 				isMissing = false;
 			}
 			else if (Paths.fileExists('images/menuitems/' + assetName + '.png', IMAGE))

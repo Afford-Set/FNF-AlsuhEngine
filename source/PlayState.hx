@@ -195,7 +195,6 @@ class PlayState extends MusicBeatState
 		boyfriend = new Boyfriend(0, 0, name);
 		startCharacterPos(boyfriend, boyfriendGroup);
 		boyfriendGroup.add(boyfriend);
-		startCharacterLua(boyfriend.curCharacter);
 
 		if (boyfriend != null)
 		{
@@ -204,6 +203,8 @@ class PlayState extends MusicBeatState
 			GameOverSubState.loopSoundName = boyfriend.deathMusic;
 			GameOverSubState.endSoundName = boyfriend.deathConfirm;
 		}
+
+		startCharacterLua(boyfriend.curCharacter);
 	}
 
 	public var dadGroup:FlxSpriteGroup;

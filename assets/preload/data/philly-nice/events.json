@@ -1,22 +1,12 @@
 {
 	"song": {
-		"speed": 2,
-		"stage": null,
-		"player1": "bf",
-		"player2": "pico",
-		"player3": null,
 		"events": [
 			[
 				2742.85714285714,
 				[
 					[
 						"Hey!",
-						"0",
-						""
-					],
-					[
-						"Hey!",
-						"1",
+						"",
 						""
 					]
 				]
@@ -26,12 +16,7 @@
 				[
 					[
 						"Hey!",
-						"0",
-						""
-					],
-					[
-						"Hey!",
-						"1",
+						"",
 						""
 					]
 				]
@@ -41,12 +26,7 @@
 				[
 					[
 						"Hey!",
-						"0",
-						""
-					],
-					[
-						"Hey!",
-						"1",
+						"",
 						""
 					]
 				]
@@ -56,12 +36,7 @@
 				[
 					[
 						"Hey!",
-						"0",
-						""
-					],
-					[
-						"Hey!",
-						"1",
+						"",
 						""
 					]
 				]
@@ -71,12 +46,7 @@
 				[
 					[
 						"Hey!",
-						"0",
-						""
-					],
-					[
-						"Hey!",
-						"1",
+						"",
 						""
 					]
 				]
@@ -86,12 +56,7 @@
 				[
 					[
 						"Hey!",
-						"0",
-						""
-					],
-					[
-						"Hey!",
-						"1",
+						"",
 						""
 					]
 				]
@@ -101,12 +66,7 @@
 				[
 					[
 						"Hey!",
-						"0",
-						""
-					],
-					[
-						"Hey!",
-						"1",
+						"",
 						""
 					]
 				]
@@ -116,27 +76,11 @@
 				[
 					[
 						"Hey!",
-						"0",
-						""
-					],
-					[
-						"Hey!",
-						"1",
+						"",
 						""
 					]
 				]
 			]
-		],
-		"notes": [],
-		"splashSkin": "noteSplashes",
-		"arrowSkin2": "",
-		"gfVersion": null,
-		"bpm": 175,
-		"splashSkin2": "noteSplashes",
-		"arrowSkin": "",
-		"needsVoices": true,
-		"songID": "philly-nice",
-		"songName": "Philly Nice",
-		"song": "Philly Nice"
+		]
 	}
 }

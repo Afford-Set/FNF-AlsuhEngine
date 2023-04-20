@@ -42,8 +42,6 @@ class PhillyGlowParticle extends FlxSprite
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
 		lifeTime -= elapsed;
 
 		if (lifeTime < 0)
@@ -55,6 +53,8 @@ class PhillyGlowParticle extends FlxSprite
 				scale.set(originalScale * alpha, originalScale * alpha);
 			}
 		}
+
+		super.update(elapsed);
 	}
 }
 
@@ -82,8 +82,6 @@ class PhillyGlowGradient extends FlxSprite
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
 		var newHeight:Int = Math.round(height - 1000 * elapsed);
 
 		if (newHeight > 0)
@@ -100,6 +98,8 @@ class PhillyGlowGradient extends FlxSprite
 			alpha = 0;
 			y = -5000;
 		}
+
+		super.update(elapsed);
 	}
 
 	public function bop():Void

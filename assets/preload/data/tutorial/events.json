@@ -1,22 +1,12 @@
 {
 	"song": {
-		"speed": 1,
-		"stage": null,
-		"player1": "bf",
-		"player2": "gf",
-		"player3": null,
 		"events": [
 			[
 				18650,
 				[
 					[
 						"Hey!",
-						"0",
-						""
-					],
-					[
-						"Hey!",
-						"1",
+						"",
 						""
 					]
 				]
@@ -26,27 +16,11 @@
 				[
 					[
 						"Hey!",
-						"0",
-						""
-					],
-					[
-						"Hey!",
-						"1",
+						"",
 						""
 					]
 				]
 			]
-		],
-		"notes": [],
-		"splashSkin": "noteSplashes",
-		"arrowSkin2": "",
-		"gfVersion": null,
-		"bpm": 100,
-		"splashSkin2": "noteSplashes",
-		"arrowSkin": "",
-		"needsVoices": false,
-		"songID": "tutorial",
-		"songName": "Tutorial",
-		"song": "Tutorial"
+		]
 	}
 }

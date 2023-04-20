@@ -21,7 +21,7 @@ import flixel.addons.ui.interfaces.IFlxUIClickable;
 
 using StringTools;
 
-class FlxUIDropDownMenuCustom extends FlxUIGroup implements IFlxUIWidget implements IFlxUIClickable implements IHasParams // forked from Psych Engine
+class FlxUIDropDownMenuCustom extends FlxUIGroup implements IFlxUIWidget implements IFlxUIClickable implements IHasParams
 {
 	public var skipButtonUpdate(default, set):Bool;
 

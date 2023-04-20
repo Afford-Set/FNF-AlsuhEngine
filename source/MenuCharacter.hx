@@ -65,22 +65,7 @@ class MenuCharacter extends FlxSprite
 			}
 			default:
 			{
-				var rawJson:String = null;
-				var path:String = Paths.getJson('menucharacters/$DEFAULT_CHARACTER');
-
-				if (Paths.fileExists('images/menucharacters/$character.json', TEXT)) {
-					path = Paths.getJson('images/menucharacters/$character');
-				}
-				else if (Paths.fileExists('images/storymenu/menucharacters/$character.json', TEXT)) {
-					path = Paths.getJson('images/storymenu/menucharacters/$character');
-				}
-				else if (Paths.fileExists('menucharacters/$character.json', TEXT)) {
-					path = Paths.getJson('menucharacters/$character');
-				}
-
-				rawJson = Paths.getTextFromFile(path);
-
-				var charFile:MenuCharacterFile = cast Json.parse(rawJson);
+				var charFile:MenuCharacterFile = parseCharacter(character);
 
 				if (Paths.fileExists('images/menucharacters/' + charFile.image + '.png', IMAGE)) {
 					frames = Paths.getSparrowAtlas('menucharacters/' + charFile.image);
@@ -89,7 +74,7 @@ class MenuCharacter extends FlxSprite
 					frames = Paths.getSparrowAtlas('storymenu/menucharacters/' + charFile.image);
 				}
 
-				isDanced = charFile.isGF;
+				isDanced = charFile.isGF == true;
 
 				if (isDanced)
 				{
@@ -134,17 +119,20 @@ class MenuCharacter extends FlxSprite
 
 	public function dance():Void
 	{
-		if (isDanced)
+		if (character != null && character.length > 0)
 		{
-			danced = !danced;
+			if (isDanced)
+			{
+				danced = !danced;
 
-			if (danced)
-				animation.play('danceRight');
-			else
-				animation.play('danceLeft');
-		}
-		else {
-			animation.play('idle');
+				if (danced)
+					animation.play('danceRight');
+				else
+					animation.play('danceLeft');
+			}
+			else {
+				animation.play('idle');
+			}
 		}
 	}
 
@@ -152,5 +140,51 @@ class MenuCharacter extends FlxSprite
 	{
 		heyed = true;
 		animation.play('confirm');
+	}
+
+	public static function parseCharacter(character:String):MenuCharacterFile
+	{
+		var text:String = Paths.getTextFromFile('menucharacters/$DEFAULT_CHARACTER.json');
+
+		if (Paths.fileExists('images/menucharacters/$character.json', TEXT)) {
+			text = Paths.getTextFromFile('images/menucharacters/$character.json');
+		}
+		else if (Paths.fileExists('images/storymenu/menucharacters/$character.json', TEXT)) {
+			text = Paths.getTextFromFile('images/storymenu/menucharacters/$character.json');
+		}
+		else if (Paths.fileExists('menucharacters/$character.json', TEXT)) {
+			text = Paths.getTextFromFile('menucharacters/$character.json');
+		}
+
+		return cast Json.parse(text);
+	}
+
+	public static function precacheMenuCharacters(week:WeekData):Void
+	{
+		if (week != null)
+		{
+			var chars:Array<String> = week.weekCharacters;
+
+			for (char in chars)
+			{
+				try
+				{
+					if (char != null && char.length > 0)
+					{
+						var charFile:MenuCharacterFile = parseCharacter(char);
+
+						if (Paths.fileExists('images/menucharacters/' + charFile.image + '.png', IMAGE)) {
+							Paths.getSparrowAtlas('menucharacters/' + charFile.image);
+						}
+						else {
+							Paths.getSparrowAtlas('storymenu/menucharacters/' + charFile.image);
+						}
+					}
+				}
+				catch (_:Dynamic) {
+					Debug.logWarn('Cannot precache menu character "' + char + '" image file.');
+				}
+			}
+		}
 	}
 }

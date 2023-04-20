@@ -15,7 +15,11 @@ import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import flixel.math.FlxPoint;
 import flixel.group.FlxGroup;
+#if (flixel >= "5.3.0")
+import flixel.sound.FlxSound;
+#else
 import flixel.system.FlxSound;
+#end
 import flixel.util.FlxStringUtil;
 import flixel.effects.FlxFlicker;
 
@@ -44,7 +48,7 @@ class PreferencesSubState extends MusicBeatSubState
 		};
 		addOption(option);
 
-		#if sys
+		#if windows
 		var option:Option = new Option('Screen Resolution',
 			true,
 			'Choose your preferred screen resolution.',
@@ -100,10 +104,11 @@ class PreferencesSubState extends MusicBeatSubState
 
 		var option:Option = new Option('Shaders', //Name
 			true,
-			'If unchecked, disables shaders.\nIt\'s used for some visual effects, and also CPU intensive for weaker PCs.', //Description
+			'If unchecked, disables shaderslmfao.\nIt\'s used for some visual effects, and also CPU intensive for weaker PCs.', //Description
 			'shaders', //Save data variable name
 			'bool', //Variable type
 			true); //Default value
+		option.blockedOnPause = isPause;
 		addOption(option);
 
 		#if !html5 // Apparently other framerates isn't correctly supported on Browser? Probably it has some V-Sync shit enabled by default, idk
@@ -161,8 +166,8 @@ class PreferencesSubState extends MusicBeatSubState
 		{
 			addOption(new Option('Loading old formats', false));
 
-			for (pisspoop in loadingOldFiles) {
-				addOption(pisspoop);
+			for (i in loadingOldFiles) {
+				addOption(i);
 			}
 		}
 
@@ -174,15 +179,6 @@ class PreferencesSubState extends MusicBeatSubState
 			'ghostTapping',
 			'bool',
 			true);
-		addOption(option);
-
-		var option:Option = new Option('Controller Mode',
-			true,
-			'Check this if you want to play with\na controller instead of using your Keyboard.',
-			'controllerMode',
-			'bool',
-			false);
-		option.blockedOnPause = isPause;
 		addOption(option);
 
 		// I'd suggest using "Downscroll" as an example for making your own option since it is the simplest here
@@ -205,24 +201,13 @@ class PreferencesSubState extends MusicBeatSubState
 		option.blockedOnPause = isPause;
 		addOption(option);
 
-		var option:Option = new Option('Opponent Notes:',
+		var option:Option = new Option('Opponent Notes',
 			true,
-			'What should the opponent (CPU) notes?',
-			'opponentStrumsType',
-			'string',
-			'Glow',
-			['Glow', 'Glow no Sustains', 'Glow, while Sus', 'Static', 'Disabled']);
-
-		if (isPause)
-		{
-			if (option.getValue() == 'Disabled') {
-				option.blockedOnPause = isPause;
-			}
-			else {
-				option.options = ['Glow', 'Glow no Sustains', 'Glow, while Sus', 'Static'];
-			}
-		}
-
+			'If unchecked, opponent notes get hidden.',
+			'opponentStrums',
+			'bool',
+			true);
+		option.blockedOnPause = isPause;
 		addOption(option);
 
 		var option:Option = new Option('Disable Reset Button',
@@ -307,18 +292,6 @@ class PreferencesSubState extends MusicBeatSubState
 		option.maxValue = 135;
 		addOption(option);
 
-		var option:Option = new Option('Shit Hit Window',
-			true,
-			'Changes the amount of time you have\nfor hitting a "Shit" in milliseconds.',
-			'shitWindow',
-			'int',
-			160);
-		option.displayFormat = '%vms';
-		option.scrollSpeed = 60;
-		option.minValue = 15;
-		option.maxValue = 160;
-		addOption(option);
-
 		var option:Option = new Option('Safe Frames',
 			true,
 			'Changes how many frames you have for\nhitting a note earlier or late.',
@@ -360,16 +333,6 @@ class PreferencesSubState extends MusicBeatSubState
 			true);
 		addOption(option);
 
-		var option:Option = new Option('Consume Notes\'s Sustains:',
-			true,
-			"What should the Consume Notes's Sustains?",
-			'sustainsType',
-			'string',
-			'New',
-			['New', 'Old']);
-		option.blockedOnPause = isPause;
-		addOption(option);
-
 		var option:Option = new Option('Note Splash Opacity:',
 			true,
 			"Set the alpha for the Note Splashes, shown when hitting \"Sick!\" notes.",
@@ -398,7 +361,7 @@ class PreferencesSubState extends MusicBeatSubState
 		var option:Option = new Option('Time Bar:',
 			true,
 			"What should the Time Bar display?",
-			'songPositionType',
+			'timeBarType',
 			'string',
 			'Time Left and Elapsed',
 			['Time Left and Elapsed', 'Time Left', 'Time Elapsed', 'Song Name', 'Disabled']);
@@ -406,19 +369,19 @@ class PreferencesSubState extends MusicBeatSubState
 		{
 			if (isPause)
 			{
-				var showTime:Bool = OptionData.songPositionType != 'Disabled';
+				var showTime:Bool = OptionData.timeBarType != 'Disabled';
 	
-				PlayState.instance.songPosBG.visible = showTime;
-				PlayState.instance.songPosBar.visible = showTime;
-				PlayState.instance.songPosName.visible = showTime;
+				PlayState.instance.timeBarBG.visible = showTime;
+				PlayState.instance.timeBar.visible = showTime;
+				PlayState.instance.timeTxt.visible = showTime;
 	
 				var curTime:Float = Conductor.songPosition - OptionData.noteOffset;
 				if (curTime < 0) curTime = 0;
-	
-				PlayState.instance.songPositionBar = (curTime / PlayState.instance.songLength);
-	
+
+				PlayState.instance.songPercent = (curTime / PlayState.instance.songLength);
+
 				var songCalc:Float = (PlayState.instance.songLength - curTime);
-				if (OptionData.songPositionType == 'Time Elapsed') songCalc = curTime;
+				if (OptionData.timeBarType == 'Time Elapsed') songCalc = curTime;
 	
 				var secondsTotal:Int = Math.floor(songCalc / 1000);
 				if (secondsTotal < 0) secondsTotal = 0;
@@ -426,18 +389,23 @@ class PreferencesSubState extends MusicBeatSubState
 				var secondsTotalBlyad:Int = Math.floor(curTime / 1000);
 				if (secondsTotalBlyad < 0) secondsTotalBlyad = 0;
 	
-				PlayState.instance.songPosName.text = PlayState.SONG.songName + " - " + CoolUtil.getDifficultyName(PlayState.lastDifficulty, PlayState.difficulties);
-	
-				if (OptionData.songPositionType != 'Song Name')
+				var timeTxt:FlxText = PlayState.instance.timeTxt;
+
+				if (timeTxt != null)
 				{
-					switch (OptionData.songPositionType)
+					timeTxt.text = PlayState.SONG.songName + " - " + CoolUtil.difficultyStuff[PlayState.lastDifficulty][1];
+
+					if (OptionData.timeBarType != 'Song Name')
 					{
-						case 'Time Left and Elapsed':
-							PlayState.instance.songPosName.text += ' (' + FlxStringUtil.formatTime(secondsTotalBlyad, false) + ' / ' + FlxStringUtil.formatTime(secondsTotal, false) + ')';
-						case 'Time Elapsed':
-							PlayState.instance.songPosName.text += ' (' + FlxStringUtil.formatTime(secondsTotalBlyad, false) + ')';
-						default:
-							PlayState.instance.songPosName.text += ' (' + FlxStringUtil.formatTime(secondsTotal, false) + ')';
+						switch (OptionData.timeBarType)
+						{
+							case 'Time Left and Elapsed':
+								timeTxt.text += ' (' + FlxStringUtil.formatTime(secondsTotalBlyad) + ' / ' + FlxStringUtil.formatTime(secondsTotal) + ')';
+							case 'Time Elapsed':
+								timeTxt.text += ' (' + FlxStringUtil.formatTime(secondsTotalBlyad) + ')';
+							default:
+								timeTxt.text += ' (' + FlxStringUtil.formatTime(secondsTotal) + ')';
+						}
 					}
 				}
 			}
@@ -477,7 +445,7 @@ class PreferencesSubState extends MusicBeatSubState
 
 		var option:Option = new Option('Naughtyness',
 			true,
-			"Uncheck this if your mom doesn't allow swearing.",
+			"If unchecked, your mom won't be angry at you.",
 			'naughtyness',
 			'bool',
 			true);
@@ -485,7 +453,7 @@ class PreferencesSubState extends MusicBeatSubState
 
 		var option:Option = new Option('Combo Stacking',
 			true,
-			"If unchecked, Ratings and Combo won't stack, saving on System Memory and making them easier to read",
+			"If unchecked, Ratings and Combo won't stack, saving on System Memory and making them easier to read.",
 			'comboStacking',
 			'bool',
 			true);
@@ -501,16 +469,16 @@ class PreferencesSubState extends MusicBeatSubState
 		{
 			if (isPause)
 			{
-				for (rating in PlayState.instance.grpRatings) {
-					rating.goToVisible();
-				}
+				PlayState.instance.grpRatings.forEachAlive(function(rtg:RatingSprite):Void {
+					rtg.goToVisible();
+				});
 			}
 		};
 		addOption(option);
 
-		var option:Option = new Option('Show Numbers',
+		var option:Option = new Option('Show Combo',
 			true,
-			"If unchecked, hides combo numbers.",
+			"If unchecked, hides combo counter.",
 			'showNumbers',
 			'bool',
 			true);
@@ -518,9 +486,13 @@ class PreferencesSubState extends MusicBeatSubState
 		{
 			if (isPause)
 			{
-				for (number in PlayState.instance.grpNumbers) {
-					number.goToVisible();
-				}
+				PlayState.instance.grpCombo.forEachAlive(function(numb:ComboSprite):Void {
+					numb.visible = OptionData.showNumbers;
+				});
+
+				PlayState.instance.grpNumbers.forEachAlive(function(numb:NumberSprite):Void {
+					numb.visible = OptionData.showNumbers;
+				});
 			}
 		};
 		addOption(option);
@@ -569,8 +541,19 @@ class PreferencesSubState extends MusicBeatSubState
 
 			if (isPause)
 			{
-				if (OptionData.pauseMusic == 'None') {
+				if (OptionData.pauseMusic == 'None')
+				{
+					FlxG.sound.list.remove(PauseSubState.pauseMusic);
+
+					PauseSubState.pauseMusic = new FlxSound();
+
+					if (OptionData.pauseMusic != 'None') {
+						PauseSubState.pauseMusic.loadEmbedded(Paths.getMusic(Paths.formatToSongPath(OptionData.pauseMusic)), true, true);
+					}
+		
 					PauseSubState.pauseMusic.volume = 0;
+					PauseSubState.pauseMusic.play(false, FlxG.random.int(0, Std.int(PauseSubState.pauseMusic.length / 2)));
+					FlxG.sound.list.add(PauseSubState.pauseMusic);
 				}
 				else
 				{
@@ -597,41 +580,19 @@ class PreferencesSubState extends MusicBeatSubState
 		#if !mobile
 		var option:Option = new Option('FPS Counter',
 			true,
-			'If unchecked, hides FPS Counter.',
+			'If unchecked, hides the FPS Counter.',
 			'fpsCounter',
 			'bool',
-			false);
-		addOption(option);
-		option.onChange = function():Void
-		{
-			if (Main.fpsCounter != null) {
-				Main.fpsCounter.visible = OptionData.fpsCounter;
-			}
-		};
-
-		var option:Option = new Option('Rainbow FPS Counter',
-			true,
-			'If checked, FPS Counter becomes colorful.',
-			'rainFPS',
-			'bool',
-			false);
+			true);
 		addOption(option);
 
 		#if !hl
 		var option:Option = new Option('Memory Counter',
 			true,
-			'If unchecked, hides Memory Counter.',
+			'If unchecked, hides the Memory Counter.',
 			'memoryCounter',
 			'bool',
-			false);
-		addOption(option);
-
-		var option:Option = new Option('Rainbow Memory Counter',
-			true,
-			'If checked, Memory counter becomes colorful.',
-			'rainMemory',
-			'bool',
-			false);
+			true);
 		addOption(option);
 		#end
 		#end
@@ -673,7 +634,7 @@ class PreferencesSubState extends MusicBeatSubState
 			'Check this if you like to enjoy loading.',
 			'loadingScreen',
 			'bool',
-			true);
+			false);
 		addOption(option);
 		#end
 
@@ -717,8 +678,6 @@ class PreferencesSubState extends MusicBeatSubState
 
 	public override function create():Void
 	{
-		super.create();
-
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Options Menu - Preferences", null);
 		#end
@@ -764,22 +723,30 @@ class PreferencesSubState extends MusicBeatSubState
 			add(levelInfo);
 	
 			var levelDifficulty:FlxText = new FlxText(20, 20 + 32, 0, '', 32);
-			levelDifficulty.text += CoolUtil.getDifficultyName(PlayState.lastDifficulty, PlayState.difficulties).toUpperCase();
+			levelDifficulty.text += CoolUtil.difficultyString(true);
 			levelDifficulty.scrollFactor.set();
 			levelDifficulty.setFormat(Paths.getFont('vcr.ttf'), 32);
 			levelDifficulty.updateHitbox();
 			levelDifficulty.x = FlxG.width - (levelDifficulty.width + 20);
 			add(levelDifficulty);
 	
-			var blueballedTxt:FlxText = new FlxText(20, 20 + 64, 0, '', 32);
-			blueballedTxt.text = 'Blue balled: ' + PlayState.deathCounter;
-			blueballedTxt.scrollFactor.set();
-			blueballedTxt.setFormat(Paths.getFont('vcr.ttf'), 32);
-			blueballedTxt.updateHitbox();
-			blueballedTxt.x = FlxG.width - (blueballedTxt.width + 20);
-			add(blueballedTxt);
+			var pos:Int = 64;
+			var blueballedTxt:FlxText = null;
+			
+			if (OptionData.naughtyness)
+			{
+				blueballedTxt = new FlxText(20, 20 + 64, 0, '', 32);
+				blueballedTxt.text = 'Blue balled: ' + PlayState.deathCounter;
+				blueballedTxt.scrollFactor.set();
+				blueballedTxt.setFormat(Paths.getFont('vcr.ttf'), 32);
+				blueballedTxt.updateHitbox();
+				blueballedTxt.x = FlxG.width - (blueballedTxt.width + 20);
+				add(blueballedTxt);
 	
-			var chartingText:FlxText = new FlxText(20, 20 + 96, 0, "CHARTING MODE", 32);
+				pos = 96;
+			}
+	
+			var chartingText:FlxText = new FlxText(20, 20 + pos, 0, "CHARTING MODE", 32);
 			chartingText.scrollFactor.set();
 			chartingText.setFormat(Paths.getFont('vcr.ttf'), 32);
 			chartingText.x = FlxG.width - (chartingText.width + 20);
@@ -787,12 +754,12 @@ class PreferencesSubState extends MusicBeatSubState
 			chartingText.visible = PlayState.chartingMode;
 			add(chartingText);
 	
-			var practiceText:FlxText = new FlxText(20, 20 + (PlayState.chartingMode ? 128 : 96), 0, 'PRACTICE MODE', 32);
+			var practiceText:FlxText = new FlxText(20, 20 + (pos + (PlayState.chartingMode ? 32 : 0)), 0, 'PRACTICE MODE', 32);
 			practiceText.scrollFactor.set();
 			practiceText.setFormat(Paths.getFont('vcr.ttf'), 32);
 			practiceText.x = FlxG.width - (practiceText.width + 20);
 			practiceText.updateHitbox();
-			practiceText.alpha = PlayStateChangeables.practiceMode ? 1 : 0;
+			practiceText.alpha = PlayState.instance.practiceMode ? 1 : 0;
 			add(practiceText);
 		}
 
@@ -815,9 +782,9 @@ class PreferencesSubState extends MusicBeatSubState
 			var optionText:Alphabet = new Alphabet(isCentered ? FlxG.width / 2 : (leOption.type != 'bool' ? 180 : 300), 270, leOption.name, isCentered);
 			optionText.isMenuItem = true;
 			optionText.changeX = false;
-			optionText.lerpMult /= 2;
 			optionText.targetY = i - curSelected;
 			optionText.distancePerItem.y = 100;
+			optionText.lerpMult /= 2;
 			grpOptions.add(optionText);
 
 			if (!isCentered)
@@ -837,6 +804,7 @@ class PreferencesSubState extends MusicBeatSubState
 						}
 
 						checkbox.snapToUpdateVariables();
+						optionText.hasIcon = true;
 						checkboxGroup.add(checkbox);
 					}
 					case 'int' | 'float' | 'percent' | 'string':
@@ -882,6 +850,8 @@ class PreferencesSubState extends MusicBeatSubState
 		reloadCheckboxes();
 
 		if (isPause) cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
+
+		super.create();
 	}
 
 	var flickering:Bool = false;
@@ -899,7 +869,7 @@ class PreferencesSubState extends MusicBeatSubState
 
 		var pauseMusic:FlxSound = PauseSubState.pauseMusic;
 
-		if (isPause && pauseMusic != null && pauseMusic.volume < 0.5) {
+		if (isPause && OptionData.pauseMusic != 'None' && pauseMusic != null && pauseMusic.volume < 0.5) {
 			pauseMusic.volume += 0.01 * elapsed;
 		}
 
@@ -965,7 +935,7 @@ class PreferencesSubState extends MusicBeatSubState
 					{
 						flickering = true;
 
-						FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flick:FlxFlicker):Void
+						FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flk:FlxFlicker):Void
 						{
 							reset();
 							FlxG.sound.play(Paths.getSound('cancelMenu'));
@@ -989,7 +959,7 @@ class PreferencesSubState extends MusicBeatSubState
 						{
 							flickering = true;
 	
-							FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flick:FlxFlicker):Void {
+							FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flk:FlxFlicker):Void {
 								changeBool(curOption);
 							});
 	
@@ -1005,7 +975,7 @@ class PreferencesSubState extends MusicBeatSubState
 						{
 							flickering = true;
 
-							FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flick:FlxFlicker):Void
+							FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flk:FlxFlicker):Void
 							{
 								flickering = false;
 								curOption.change();
@@ -1051,12 +1021,7 @@ class PreferencesSubState extends MusicBeatSubState
 							{
 								case 'int' | 'float' | 'percent':
 								{
-									holdValue = curOption.getValue() + add;
-
-									if (holdValue < curOption.minValue)
-										holdValue = curOption.minValue;
-									else if (holdValue > curOption.maxValue)
-										holdValue = curOption.maxValue;
+									holdValue = CoolUtil.boundTo(curOption.getValue() + add, curOption.minValue, curOption.maxValue);
 
 									switch (curOption.type)
 									{
@@ -1067,7 +1032,7 @@ class PreferencesSubState extends MusicBeatSubState
 										}
 										case 'float' | 'percent':
 										{
-											holdValue = FlxMath.roundDecimal(holdValue, curOption.decimals);
+											holdValue = CoolUtil.roundDecimal(holdValue, curOption.decimals);
 											curOption.setValue(holdValue);
 										}
 									}
@@ -1075,16 +1040,7 @@ class PreferencesSubState extends MusicBeatSubState
 								case 'string':
 								{
 									var num:Int = curOption.curOption; // lol
-
-									if (controls.UI_LEFT_P)
-										--num;
-									else
-										num++;
-
-									if (num < 0)
-										num = curOption.options.length - 1;
-									else if (num >= curOption.options.length)
-										num = 0;
+									num = CoolUtil.boundSelection(num + (controls.UI_LEFT_P ? -1 : 1), curOption.options.length);
 
 									curOption.curOption = num;
 									curOption.setValue(curOption.options[num]); // lol
@@ -1098,22 +1054,16 @@ class PreferencesSubState extends MusicBeatSubState
 						}
 						else if (curOption.type != 'string')
 						{
-							holdValue += curOption.scrollSpeed * elapsed * (controls.UI_LEFT ? -1 : 1);
-
-							if (holdValue < curOption.minValue) 
-								holdValue = curOption.minValue;
-							else if (holdValue > curOption.maxValue)
-								holdValue = curOption.maxValue;
+							holdValue = CoolUtil.boundTo(holdValue + curOption.scrollSpeed * elapsed * (controls.UI_LEFT ? -1 : 1), curOption.minValue, curOption.maxValue);
 
 							switch (curOption.type)
 							{
 								case 'int':
-								{
 									curOption.setValue(Math.round(holdValue));
-								}
 								case 'float' | 'percent':
 								{
-									curOption.setValue(FlxMath.roundDecimal(holdValue, curOption.decimals));
+									var blah:Float = CoolUtil.boundTo(holdValue + curOption.changeValue - (holdValue % curOption.changeValue), curOption.minValue, curOption.maxValue);
+									curOption.setValue(CoolUtil.roundDecimal(blah, curOption.decimals));
 								}
 							}
 
@@ -1134,22 +1084,16 @@ class PreferencesSubState extends MusicBeatSubState
 				{
 					if (curOption.type != 'string')
 					{
-						holdValue += -(curOption.scrollSpeed / 50) * FlxG.mouse.wheel;
-
-						if (holdValue < curOption.minValue) 
-							holdValue = curOption.minValue;
-						else if (holdValue > curOption.maxValue)
-							holdValue = curOption.maxValue;
+						holdValue = CoolUtil.boundTo(holdValue + (curOption.scrollSpeed / 50) * FlxG.mouse.wheel, curOption.minValue, curOption.maxValue);
 
 						switch (curOption.type)
 						{
 							case 'int':
-							{
 								curOption.setValue(Math.round(holdValue));
-							}
 							case 'float' | 'percent':
 							{
-								curOption.setValue(FlxMath.roundDecimal(holdValue, curOption.decimals));
+								var blah:Float = CoolUtil.boundTo(holdValue + curOption.changeValue - (holdValue % curOption.changeValue), curOption.minValue, curOption.maxValue);
+								curOption.setValue(CoolUtil.roundDecimal(blah, curOption.decimals));
 							}
 						}
 		
@@ -1161,12 +1105,7 @@ class PreferencesSubState extends MusicBeatSubState
 					else if (curOption.type == 'string')
 					{
 						var num:Int = curOption.curOption; // lol
-						num += (-1 * FlxG.mouse.wheel);
-
-						if (num < 0)
-							num = curOption.options.length - 1;
-						else if (num >= curOption.options.length)
-							num = 0;
+						num = CoolUtil.boundSelection(num + (1 * FlxG.mouse.wheel), curOption.options.length);
 
 						curOption.curOption = num;
 						curOption.setValue(curOption.options[num]); // lol
@@ -1353,23 +1292,29 @@ class PreferencesSubState extends MusicBeatSubState
 	{
 		var wasVisible:Bool = false;
 
-		if (boyfriend != null)
+		try
 		{
-			wasVisible = boyfriend.visible;
-			boyfriend.kill();
-			remove(boyfriend);
+			if (boyfriend != null)
+			{
+				wasVisible = boyfriend.visible;
+				boyfriend.kill();
+				remove(boyfriend);
 
-			boyfriend.destroy();
+				boyfriend.destroy();
+			}
+
+			boyfriend = new Character(840, 170, Character.DEFAULT_CHARACTER, true);
+			boyfriend.setGraphicSize(Std.int(boyfriend.width * 0.75));
+			boyfriend.updateHitbox();
+			boyfriend.dance();
+			insert(members.indexOf(grpOptions), boyfriend);
+
+			boyfriend.visible = wasVisible;
 		}
-
-		boyfriend = new Character(840, 170, 'bf', true);
-		boyfriend.setGraphicSize(Std.int(boyfriend.width * 0.75));
-		boyfriend.updateHitbox();
-		boyfriend.dance();
-		insert(members.indexOf(grpOptions), boyfriend);
-
-		boyfriend.visible = wasVisible;
-	}	
+		catch (e:Dynamic) {
+			trace(e);
+		}
+	}
 
 	private function unselectableCheck(num:Int, ?checkDefaultValue:Bool = false):Bool
 	{

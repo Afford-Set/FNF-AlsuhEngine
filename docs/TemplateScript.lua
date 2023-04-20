@@ -6,11 +6,11 @@ function onStart(allowPlayCutscene)
 	-- this function is very simple, it is more similar to onStartCountdown
 	-- with this you can enable cut-scenes
 
-	-- Example:
+	-- EX:
 
 	-- for dialogue cutscenes:
 	--[[
-			if allowPlayCutscene and not allowStart then
+			if allowPlayCutscene and not allowStart and not seenCutscene then
 				runTimer('startDialogue', 0.8);
 				setProperty('inCutscene', true);
 				allowStart = true;
@@ -19,21 +19,10 @@ function onStart(allowPlayCutscene)
 			return Function_Continue;
 	-- ]]
 
-	-- for mp4 cutscenes:
+	-- for video cutscenes:
 	--[[
-			if allowPlayCutscene and not allowStart then
-				startVideo('your-video', 'mp4');
-				setProperty('inCutscene', true);
-				allowStart = true;
-				return Function_Stop;
-			end
-			return Function_Continue;
-	-- ]]
-
-	-- for webm cutscenes:
-	--[[
-			if allowPlayCutscene and not allowStart then
-				startVideo('your-video', 'webm');
+			if allowPlayCutscene and not allowStart and not seenCutscene then
+				startVideo('your-video');
 				setProperty('inCutscene', true);
 				allowStart = true;
 				return Function_Stop;
@@ -88,8 +77,6 @@ function onUpdatePost(elapsed)
 end
 
 function onStartCountdown()
-	-- this function is deprecated, use "onStart" instead
-
 	-- countdown started, duh
 	-- return Function_Stop if you want to stop the countdown from happening (Can be used to trigger dialogues and stuff! You can trigger the countdown with startCountdown())
 	return Function_Continue;
@@ -115,7 +102,7 @@ function onEndSong(allowPlayCutscene)
 
 	-- with this you can enable cut-scenes
 
-	-- Example:
+	-- EX:
 
 	-- for dialogue cutscenes:
 	--[[
@@ -151,9 +138,13 @@ function onEndSong(allowPlayCutscene)
 	-- ]]
 end
 
+--[[
+-- this caller is no more available lol
+-- use onEndSong instead
 function onEndSongPost(allowPlayCutscene)
 	-- end of "onEndSong"
 end
+- ]]
 
 --[[
 -- this caller is no more available lol
@@ -205,6 +196,10 @@ function goodNoteHit(id, direction, noteType, isSustainNote)
 	-- isSustainNote: If it's a hold note, can be either true or false
 end
 
+function onPopUpScore(rating, id, direction, noteType, isSustainNote)
+	-- Function called when rating a note
+end
+
 function onHitCauses(id, direction, noteType, isSustainNote)
 	-- this is a function like "goodNoteHit", only enabled when an hit note, while its "hitCausesMiss" variable's value is true
 end
@@ -223,9 +218,8 @@ function noteMiss(id, direction, noteType, isSustainNote)
 	-- Player missed a note by letting it go offscreen
 end
 
-
 -- Other function hooks
-function onRecalculateRating()
+function onRecalculateRating(badHit)
 	-- return Function_Stop if you want to do your own rating calculation,
 	-- use setRatingPercent() to set the number on the calculation and setRatingName() to set the funny rating name
 	-- NOTE: THIS IS CALLED BEFORE THE CALCULATION!!!
@@ -316,4 +310,33 @@ function onOpenCharacterEditor()
 	-- Called when you press Debug Key 2 while not on a cutscene/etc
 	-- return Function_Stop if you want to stop the player to go character editor
 	return Function_Continue;
+end
+
+function onCheckForAchievement(tag, song, week, misses, diff, lua_path, hidden)
+	--deals with achievement checks
+
+	--tag - tag of achievement for save data and icon
+	--song - song id from achievement
+	--misses - minimal combo breaks
+	--diff - difficulty id from achievement
+	--lua_path - achievement's lua file path
+	--hidden - is hidden achievement or not
+
+	--EX:
+	--[[
+		if tag == 'sick-full-combo' and getProperty('goods') < 1 and
+			getProperty('bads') < 1 and getProperty('shits') < 1 and getProperty('endingSong') then --checks is song completed on sick full combo or not
+			return true;
+		end
+
+		if tag == 'perfect-bad-health-finish' and getProperty('health') < EPSILON and getProperty('endingSong') then --checks is song completed on perfect bad health or not
+			return true;
+		end
+
+		if tag == 'halfway' and getSongPosition() > getPropertyFromClass('flixel.FlxG','sound.music.length') / 2 then --checks is are you in the middle of the song or not
+			return true;
+		end
+	]]
+
+	return false;
 end

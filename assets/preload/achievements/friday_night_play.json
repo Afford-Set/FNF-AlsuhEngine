@@ -1,0 +1,17 @@
+{
+	"week_nomiss": "",
+	"index": -1,
+	"lua_code": "",
+	"save_tag": "friday_night_play",
+	"desc": "Play on a Friday... Night.",
+	"diff": "",
+	"name": "Freaky on a Friday Night",
+	"color": [
+		255,
+		228,
+		0
+	],
+	"song": "",
+	"hidden": true,
+	"misses": -1
+}

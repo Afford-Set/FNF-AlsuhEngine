@@ -1,0 +1,17 @@
+{
+	"week_nomiss": "",
+	"index": -1,
+	"lua_code": "",
+	"save_tag": "ur_bad",
+	"desc": "Complete a Song with a rating lower than 20%.",
+	"diff": "",
+	"name": "What a Funkin' Disaster!",
+	"color": [
+		21,
+		21,
+		21
+	],
+	"song": "",
+	"hidden": false,
+	"misses": -1
+}

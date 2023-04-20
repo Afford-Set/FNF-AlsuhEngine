@@ -3,34 +3,34 @@ package;
 import flixel.*;
 import flixel.FlxSprite;
 import flixel.text.FlxText;
-import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 import openfl.geom.Rectangle;
-import flixel.addons.ui.FlxUIPopup;
+import flixel.addons.ui.FlxUIButton;
+//import flixel.addons.ui.FlxUIPopup;
 
 using StringTools;
 
 class Prompt extends MusicBeatSubState
 {
-	var selected:Int = 0;
+	//var selected:Int = 0;
 
 	public var okc:Void->Void;
 	public var cancelc:Void->Void;
 
-	var buttons:FlxSprite = new FlxSprite(473.3, 450);
+	//var buttons:FlxSprite = new FlxSprite(473.3, 450);
 	var theText:String = '';
 	var goAnyway:Bool = false;
-	var UI_box:FlxUIPopup;
+	//var UI_box:FlxUIPopup;
 
 	var panel:FlxSprite;
 	var panelbg:FlxSprite;
-	var buttonAccept:FlxButton;
-	var buttonNo:FlxButton;
+	var buttonAccept:FlxUIButton;
+	var buttonNo:FlxUIButton;
 	var cornerSize:Int = 10;
 
-	public function new(promptText:String = '', defaultSelected:Int = 0, okCallback:Void->Void, cancelCallback:Void->Void, acceptOnDefault:Bool = false, option1:String = null, option2:String = null):Void
+	public function new(promptText:String = '', /*defaultSelected:Int = 0,*/ okCallback:Void->Void, cancelCallback:Void->Void, acceptOnDefault:Bool = false, option1:String = null, option2:String = null):Void
 	{
-		selected = defaultSelected;
+		//selected = defaultSelected;
 		okc = okCallback;
 		cancelc = cancelCallback;
 		theText = promptText;
@@ -42,13 +42,13 @@ class Prompt extends MusicBeatSubState
 		if (option1 != null) op1 = option1;
 		if (option2 != null) op2 = option2;
 	
-		buttonAccept = new FlxButton(473.3, 450, op1, function():Void
+		buttonAccept = new FlxUIButton(473.3, 450, op1, function():Void
 		{
 			if (okc != null) okc();
 			close();
 		});
 
-		buttonNo = new FlxButton(633.3, 450, op2, function():Void
+		buttonNo = new FlxUIButton(633.3, 450, op2, function():Void
 		{
 			if (cancelc != null) cancelc();
 			close();
@@ -59,8 +59,6 @@ class Prompt extends MusicBeatSubState
 	
 	public override function create():Void 
 	{
-		super.create();
-
 		if (goAnyway)
 		{
 			if (okc != null) okc();
@@ -72,7 +70,7 @@ class Prompt extends MusicBeatSubState
 			panelbg = new FlxSprite(0, 0);
 
 			makeSelectorGraphic(panel, 300, 150, 0xff999999);
-			makeSelectorGraphic(panelbg, 304, 154, 0xff000000);
+			makeSelectorGraphic(panelbg, 304, 154, FlxColor.BLACK);
 
 			panel.scrollFactor.set();
 			panel.screenCenter();
@@ -100,6 +98,8 @@ class Prompt extends MusicBeatSubState
 	
 			textshit.scrollFactor.set();
 		}
+
+		super.create();
 	}
 	
 	function makeSelectorGraphic(panel:FlxSprite,w,h,color:FlxColor)

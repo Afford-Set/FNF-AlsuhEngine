@@ -1,0 +1,28 @@
+name: HTML5
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.2.5
+      - name: Install Haxelib
+        run: |
+          sudo apt-get update
+          sudo apt-get install vlc-bin
+          sudo apt-get install libvlc-dev
+          sudo apt-get install libvlccore-dev
+          sudo apt-get -y install libidn12
+          sudo apt-get install gcc-multilib g++-multilib haxe -y
+          haxelib setup ~/haxelib
+          haxelib install hmm --quiet
+          haxelib run hmm install
+      - name: Compile
+        run: haxelib run openfl build html5
+      - uses: actions/upload-artifact@v2
+        with:
+          name: HTML5 Build
+          path: export/release/html5/bin

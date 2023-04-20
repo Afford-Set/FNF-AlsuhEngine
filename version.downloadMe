@@ -1,12 +1,12 @@
 1.7.2h;
 - Added .MP3 files support
 - Added Pixel Note Splashes
-- Fixed Some custom Events
-- Fixed Custom Song's Name
-- Fixed Crash on Story Menu
-- Fixed animations of antagonists when the player plays them
-- Fixed giving health on sustain note
-- Fixed Combo Stacking
-- Fixed Tween Events
-- Fixed Loading of Global Mods
-- Fixed Dialogue Text
+- Added new optimized event "Pico Speaker Shoot"
+- Added custom mod name on window's title
+- Added autosave when pressing BACKSPACE to exit Chart Editor
+- Fixed camera movement on Guns Cutscene
+- Fixed Week 6's dialogue box
+- Fixed Pixel Note Splashes on Downscroll
+- Fixed Middlescroll on Chart Testing
+- Fixed some texts on Menu Character Editor
+- Removed "picospeaker.json"

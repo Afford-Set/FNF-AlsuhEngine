@@ -54,7 +54,7 @@ class CutsceneHandler extends FlxBasic
 
 		if (endTime <= cutsceneTime)
 		{
-			finishCallback();
+			if (finishCallback != null) finishCallback();
 			if (finishCallback2 != null) finishCallback2();
 
 			for (spr in objects)
@@ -69,7 +69,7 @@ class CutsceneHandler extends FlxBasic
 
 			PlayState.instance.remove(this);
 		}
-		
+
 		while (timedEvents.length > 0 && timedEvents[0][0] <= cutsceneTime)
 		{
 			timedEvents[0][1]();

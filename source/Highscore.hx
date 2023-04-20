@@ -4,9 +4,9 @@ import flixel.util.FlxSave;
 
 class Highscore
 {
-	private static var weekScores:Map<String, Int> = new Map<String, Int>();
-	private static var songScores:Map<String, Int> = new Map<String, Int>();
-	private static var songAccuracy:Map<String, Float> = new Map<String, Float>();
+	public static var weekScores:Map<String, Int> = new Map<String, Int>();
+	public static var songScores:Map<String, Int> = new Map<String, Int>();
+	public static var songAccuracy:Map<String, Float> = new Map<String, Float>();
 
 	public static function resetSong(song:String):Void
 	{
@@ -127,9 +127,28 @@ class Highscore
 		}
 	}
 
-	public static function getScoreText(deaths:Int, accuracy:Float, rating:String, comboRank:String, health:Float, misses:Int, score:Int):String
+	@:deprecated()
+	public static function floorDecimal(number:Float, precision:Int = 0):Float
+	{
+		if (Math.isNaN(number)) number = 0;
+
+		if (precision < 1) {
+			return Math.floor(number);
+		}
+
+		var tempMult:Float = 1;
+
+		for (i in 0...precision) {
+			tempMult *= 10;
+		}
+
+		return Math.floor(number * tempMult) / tempMult;
+	}
+
+	@:deprecated()
+	public static function getScoreText(deaths:Int, accuracy:Float, rating:String, ratingFC:String, health:Float, misses:Int, score:Int):String
 	{
 		return 'Deaths: ' + deaths + ' | Accuracy: ' + CoolUtil.floorDecimal(accuracy, 2) + '% | Rating: ' + rating +
-			(rating != 'N/A' ? ' (' + comboRank + ')' : '') + ' | Health: ' + Math.floor(health * 50) + '% | Combo Breaks: ' + misses + ' | Score: ' + score;
+			(rating != 'N/A' ? ' (' + ratingFC + ')' : '') + ' | Health: ' + Math.floor(health * 50) + '% | Combo Breaks: ' + misses + ' | Score: ' + score;
 	}
 }

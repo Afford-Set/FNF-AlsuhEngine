@@ -3,10 +3,10 @@ package;
 import flixel.FlxG;
 import flixel.FlxSprite;
 
+using StringTools;
+
 class TankmenBG extends FlxSprite
 {
-	public static var animationNotes:Array<Dynamic> = [];
-
 	private var tankSpeed:Float;
 	private var endingOffset:Float;
 	private var goingRight:Bool;
@@ -59,24 +59,31 @@ class TankmenBG extends FlxSprite
 
 		if (animation.curAnim.name == 'run')
 		{
-			var speed:Float = (Conductor.songPosition - strumTime) * tankSpeed;
+			var endDirection:Float = (FlxG.width * 0.74) + endingOffset;
 
-			if (goingRight) x = (0.02 * FlxG.width - endingOffset) + speed;
-			else x = (0.74 * FlxG.width + endingOffset) - speed;
-		}
-		else if (animation.curAnim.finished) {
-			kill();
+			if (goingRight)
+			{
+				endDirection = (FlxG.width * 0.02) - endingOffset;
+				x = (endDirection + (Conductor.songPosition - strumTime) * tankSpeed);
+			}
+			else {
+				x = (endDirection - (Conductor.songPosition - strumTime) * tankSpeed);
+			}
 		}
 
 		if (Conductor.songPosition > strumTime)
 		{
 			animation.play('shot');
-	
+
 			if (goingRight)
 			{
-				offset.x = 300;
 				offset.y = 200;
+				offset.x = 300;
 			}
+		}
+
+		if (animation.curAnim.name == 'shot' && animation.curAnim.curFrame >= animation.curAnim.frames.length - 1) {
+			kill();
 		}
 	}
 }

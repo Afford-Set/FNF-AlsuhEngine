@@ -1,5 +1,6 @@
 {
 	"char_name": "Pico",
+	"skip_dance": false,
 	"animations": [
 		{
 			"loop": false,

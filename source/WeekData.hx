@@ -9,6 +9,8 @@ import sys.FileSystem;
 import haxe.Json;
 import Type.ValueType;
 
+import flixel.util.FlxColor;
+
 using StringTools;
 
 typedef WeekFile =
@@ -32,6 +34,7 @@ typedef WeekFile =
 
 	var hideStoryMode:Bool;
 	var hideFreeplay:Bool;
+	var itemColor:Array<Int>;
 }
 
 typedef SongLabel =
@@ -60,7 +63,7 @@ class WeekData
 	public var startUnlocked:Bool;
 	public var hiddenUntilUnlocked:Bool;
 	public var songs:Array<Dynamic>;
-	public var difficulties:Array<Array<String>>;
+	public var difficulties:Dynamic;
 	public var defaultDifficulty:String;
 	public var weekCharacters:Array<String>;
 	public var weekBackground:String;
@@ -69,6 +72,7 @@ class WeekData
 	public var storyName:String;
 	public var hideStoryMode:Bool;
 	public var hideFreeplay:Bool;
+	public var itemColor:Array<Int>;
 
 	public var fileName:String;
 
@@ -90,115 +94,66 @@ class WeekData
 		storyName = weekFile.storyName;
 		hideStoryMode = weekFile.hideStoryMode;
 		hideFreeplay = weekFile.hideFreeplay;
+		itemColor = weekFile.itemColor;
 
 		this.fileName = fileName;
 	}
 
-	public static function onLoadJson(weekFile:WeekFile, fileName:String):Void
-	{
-		if (weekFile.weekID == null) {
+	public static function onLoadJson(weekFile:WeekFile, fileName:String) {
+		if(weekFile.weekID == null) {
 			weekFile.weekID = fileName;
 		}
-
-		if (weekFile.itemFile == null) {
+		if(weekFile.itemFile == null) {
 			weekFile.itemFile = fileName;
 		}
-
-		if (weekFile.difficulties == null || weekFile.difficulties.length < 1)
-		{
-			weekFile.difficulties = [
-				['Easy',	'Normal',	'Hard'],
-				['easy',	'normal',	'hard'],
-				['-easy',	'',			'-hard']
-			];
+		if(weekFile.itemColor == null || weekFile.itemColor.length < 2) {
+			var col:FlxColor = MenuItem.DEFAULT_COLOR;
+			weekFile.itemColor = [col.red, col.green, col.blue];
 		}
-		else if (Std.isOfType(weekFile.difficulties, String) && weekFile.difficulties.length > 0)
-		{
-			var diffArr:Array<String> = [];
-
-			var diffStr:String = weekFile.difficulties;
-			if (diffStr != null) diffStr = diffStr.trim();
-	
-			if (diffStr != null && diffStr.length > 0)
-			{
-				var diffs:Array<String> = diffStr.split(',');
-				var i:Int = diffs.length - 1;
-
-				while (i > 0)
-				{
-					if (diffs[i] != null)
-					{
-						diffs[i] = diffs[i].trim();
-						if (diffs[i].length < 1) diffs.remove(diffs[i]);
-					}
-
-					--i;
-				}
-	
-				if (diffs.length > 0 && diffs[0].length > 0) {
-					diffArr = diffs.copy();
-				}
-			}
-
-			var diffArrIDs:Array<String> = diffArr.copy();
-
-			for (i in 0...diffArrIDs.length) {
-				diffArrIDs[i] = Paths.formatToSongPath(diffArrIDs[i]);
-			}
-
-			var diffArrSuffixes:Array<String> = diffArrIDs.copy();
-
-			for (i in 0...diffArrSuffixes.length) {
-				diffArrSuffixes[i] = CoolUtil.getDifficultyFilePath(diffArrSuffixes[i]);
-			}
-
-			weekFile.difficulties = [diffArr, diffArrIDs, diffArrSuffixes];
+		if(weekFile.defaultDifficulty == null || weekFile.defaultDifficulty.length < 1) {
+			weekFile.defaultDifficulty = Paths.formatToSongPath(CoolUtil.defaultDifficulty);
 		}
-
-		if (weekFile.defaultDifficulty == null || weekFile.defaultDifficulty.length < 1) {
-			weekFile.defaultDifficulty = 'normal';
-		}
-
 		var newSongs:Array<Dynamic> = [];
 		var targetBool:Array<Bool> = [];
-
-		for (i in 0...weekFile.songs.length)
-		{
+		for(i in 0...weekFile.songs.length) {
 			var oldSongOrNot:Dynamic = weekFile.songs[i];
 			targetBool[i] = false;
-
-			if (Std.isOfType(oldSongOrNot, Array))
-			{
+			if(Std.isOfType(oldSongOrNot, Array)) {
 				targetBool[i] = true;
-
-				var newSong:SongLabel =
-				{
+				var newSong:SongLabel = {
 					songID: 'bopeebo',
 					songName: 'Bopeebo',
 					character: 'dad',
 					color: [146, 113, 253],
-					difficulties: [
-						['Easy',	'Normal',	'Hard'],
-						['easy',	'normal',	'hard'],
-						['-easy',	'',			'-hard']
-					],
-					defaultDifficulty: 'normal'
+					difficulties: [],
+					defaultDifficulty: ''
 				};
-
 				newSong.songID = Paths.formatToSongPath(oldSongOrNot[0]);
 				newSong.songName = CoolUtil.formatToName(oldSongOrNot[0]);
 				newSong.character = oldSongOrNot[1];
 				newSong.color = oldSongOrNot[2];
-				newSong.difficulties = weekFile.difficulties.copy();
+				var shit:Dynamic = weekFile.difficulties; // fucking HTML5
+				if(Std.isOfType(shit,Array)){
+					var arr:Array<Dynamic> = shit;
+					newSong.difficulties = arr.copy();
+				} else {
+					newSong.difficulties = shit;
+				}
 				newSong.defaultDifficulty = weekFile.defaultDifficulty;
-
 				newSongs[i] = newSong;
+			} else {
+				var song:SongLabel = weekFile.songs[i];
+				if(song.difficulties == null || song.difficulties.length < 1) {
+					var shit:Array<Dynamic> = weekFile.difficulties; // fucking HTML5
+					song.difficulties = shit.copy();
+				}
+				if(song.defaultDifficulty == null || song.defaultDifficulty.length < 1) {
+					song.defaultDifficulty = weekFile.defaultDifficulty;
+				}
 			}
 		}
-
-		for (i in 0...targetBool.length)
-		{
-			if (targetBool[i]) {
+		for(i in 0...targetBool.length) {
+			if(targetBool[i] == true) {
 				weekFile.songs[i] = newSongs[i];
 			}
 		}
@@ -207,42 +162,31 @@ class WeekData
 	public static function createWeekFile():WeekFile
 	{
 		return {
+			itemColor: [],
 			songs: [
 				{
 					songID: 'bopeebo',
 					songName: 'Bopeebo',
 					character: 'dad',
 					color: [146, 113, 253],
-					difficulties: [
-						['Easy',	'Normal',	'Hard'],
-						['easy',	'normal',	'hard'],
-						['-easy',	'',			'-hard']
-					],
-					defaultDifficulty: 'normal'
+					difficulties: [],
+					defaultDifficulty: ''
 				},
 				{
 					songID: 'fresh',
 					songName: 'Fresh',
 					character: 'dad',
 					color: [146, 113, 253],
-					difficulties: [
-						['Easy',	'Normal',	'Hard'],
-						['easy',	'normal',	'hard'],
-						['-easy',	'',			'-hard']
-					],
-					defaultDifficulty: 'normal'
+					difficulties: [],
+					defaultDifficulty: ''
 				},
 				{
 					songID: 'dad-battle',
 					songName: 'Dad Battle',
 					character: 'dad',
 					color: [146, 113, 253],
-					difficulties: [
-						['Easy',	'Normal',	'Hard'],
-						['easy',	'normal',	'hard'],
-						['-easy',	'',			'-hard']
-					],
-					defaultDifficulty: 'normal'
+					difficulties: [],
+					defaultDifficulty: ''
 				}
 			],
 			weekCharacters: ['dad', 'bf', 'gf'],
@@ -256,12 +200,8 @@ class WeekData
 			hiddenUntilUnlocked: false,
 			hideStoryMode: false,
 			hideFreeplay: false,
-			difficulties: [
-				['Easy',	'Normal',	'Hard'],
-				['easy',	'normal',	'hard'],
-				['-easy',	'',			'-hard']
-			],
-			defaultDifficulty: 'normal'
+			difficulties: [],
+			defaultDifficulty: ''
 		};
 	}
 
@@ -291,7 +231,7 @@ class WeekData
 				{
 					var path:String = Path.join([Paths.mods(), splitName[0]]);
 
-					if (sys.FileSystem.isDirectory(path) && !Paths.ignoreModFolders.contains(splitName[0]) && !disabledMods.contains(splitName[0]) && !directories.contains(path + '/')) {
+					if (FileSystem.isDirectory(path) && !Paths.ignoreModFolders.contains(splitName[0]) && !disabledMods.contains(splitName[0]) && !directories.contains(path + '/')) {
 						directories.push(path + '/');
 					}
 				}
@@ -360,7 +300,7 @@ class WeekData
 					{
 						var path:String = directory + daWeek + '.json';
 
-						if (sys.FileSystem.exists(path)) {
+						if (FileSystem.exists(path)) {
 							addWeek(daWeek, path, directories[i], i, originalLength);
 						}
 					}
@@ -370,7 +310,7 @@ class WeekData
 				{
 					var path:String = Path.join([directory, file]);
 
-					if (!sys.FileSystem.isDirectory(path) && file.endsWith('.json')) {
+					if (!FileSystem.isDirectory(path) && file.endsWith('.json')) {
 						addWeek(file.substr(0, file.length - 5), path, directories[i], i, originalLength);
 					}
 				}
@@ -405,11 +345,11 @@ class WeekData
 		}
 	}
 
-	public static function getWeekFile(path:String, ?optimize:Bool = false):WeekFile
+	public static function getWeekFile(path:String, ?absolute:Bool = false):WeekFile
 	{
 		var rawJson:String = null;
 
-		if (Paths.fileExists(path, TEXT, null, optimize)) {
+		if (Paths.fileExists(path, TEXT, absolute)) {
 			rawJson = Paths.getTextFromFile(path);
 		}
 
@@ -426,10 +366,10 @@ class WeekData
 		return (!leWeek.startUnlocked && leWeek.weekBefore.length > 0 && (!weekCompleted.exists(leWeek.weekBefore) || !weekCompleted.get(leWeek.weekBefore)));
 	}
 
-	@:deprecated("`WeekData.getWeekFileName()` is deprecated, use `PlayState.storyWeekText` instead")
+	@:deprecated("`WeekData.getWeekFileName()` is deprecated. use `PlayState.storyWeekID` instead.")
 	public static function getWeekFileName():String
 	{
-		Debug.logWarn("`WeekData.getWeekFileName()` is deprecated! use `PlayState.storyWeekText` instead");
+		Debug.logWarn("`WeekData.getWeekFileName()` is deprecated! use `PlayState.storyWeekID` instead.");
 		return weeksList[PlayState.storyWeek];
 	}
 
@@ -452,7 +392,7 @@ class WeekData
 		Paths.currentModDirectory = '';
 		
 		#if MODS_ALLOWED
-		if (FileSystem.exists("modsList.txt"))
+		if (FileSystem.exists('modsList.txt'))
 		{
 			var list:Array<String> = CoolUtil.listFromString(File.getContent('modsList.txt'));
 			var foundTheTop:Bool = false;

@@ -1,19 +1,52 @@
 {
 	"dependencies": [
 		{
+			"name": "openfl",
+			"type": "haxelib",
+			"version": null
+		},
+		{
+			"name": "openfl-samples",
+			"type": "haxelib",
+			"version": null
+		},
+		{
 			"name": "lime",
 			"type": "haxelib",
 			"version": null
 		},
 		{
-			"name": "openfl",
-			"type": "git",
-			"version": null,
-			"ref": "develop",
-			"url": "https://github.com/openfl/openfl"
+			"name": "lime-samples",
+			"type": "haxelib",
+			"version": null
+		},
+		{
+			"name": "hscript",
+			"type": "haxelib",
+			"version": null
+		},
+		{
+			"name": "hxcpp",
+			"type": "haxelib",
+			"version": "4.2.1"
+		},
+		{
+			"name": "hxnodejs",
+			"type": "haxelib",
+			"version": null
+		},
+		{
+			"name": "hxcpp-debug-server",
+			"type": "haxelib",
+			"version": null
 		},
 		{
 			"name": "flixel",
+			"type": "haxelib",
+			"version": null
+		},
+		{
+			"name": "flixel-ui",
 			"type": "haxelib",
 			"version": null
 		},
@@ -28,37 +61,22 @@
 			"version": null
 		},
 		{
-			"name": "flixel-ui",
+			"name": "hxCodec",
 			"type": "haxelib",
-			"version": null
-		},
-		{
-			"name": "hxcpp",
-			"type": "haxelib",
-			"version": null
-		},
-		{
-			"name": "tjson",
-			"type": "haxelib",
-			"version": null
-		},
-		{
-			"name": "hxjsonast",
-			"type": "haxelib",
-			"version": null
-		},
-		{
-			"name": "hscript",
-			"type": "haxelib",
-			"version": null
-		},
-		{
-			"name": "hxcpp-debug-server",
-			"type": "haxelib",
-			"version": "1.2.4"
+			"version": "2.6.1"
 		},
 		{
 			"name": "actuate",
+			"type": "haxelib",
+			"version": null
+		},
+		{
+			"name": "box2d",
+			"type": "haxelib",
+			"version": null
+		},
+		{
+			"name": "layout",
 			"type": "haxelib",
 			"version": null
 		},
@@ -67,35 +85,21 @@
 			"type": "git",
 			"dir": null,
 			"ref": "master",
-			"url": "https://github.com/Aidan63/linc_discord-rpc"
+			"url": "https://github.com/Afford-Set/linc_discord-rpc"
 		},
 		{
-			"name": "hscript-ex",
+			"name": "extension-webm",
 			"type": "git",
 			"dir": null,
-			"ref": "master",
-			"url": "https://github.com/ianharrigan/hscript-ex"
+			"ref": "main",
+			"url": "https://github.com/Afford-Set/extension-webm"
 		},
 		{
 			"name": "linc_luajit",
 			"type": "git",
 			"dir": null,
 			"ref": "master",
-			"url": "https://github.com/nebulazorua/linc_luajit"
-		},
-		{
-			"name": "hxCodec",
-			"type": "git",
-			"dir": null,
-			"ref": "main",
-			"url": "https://github.com/polybiusproxy/hxCodec"
-		},
-		{
-			"name": "extension-webm",
-			"type": "git",
-			"dir": null,
-			"ref": "master",
-			"url": "https://github.com/GrowtopiaFli/extension-webm"
+			"url": "https://github.com/Afford-Set/linc_luajit"
 		}
 	]
 }

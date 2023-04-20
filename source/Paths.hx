@@ -1,22 +1,23 @@
 package;
 
-#if sys
-import sys.io.File;
+import haxe.Json;
 import haxe.io.Path;
+import haxe.format.JsonParser;
+
+#if MODS_ALLOWED
+import sys.io.File;
 import sys.FileSystem;
-#else
-import openfl.utils.Assets as OpenFlAssets;
 #end
 
-import haxe.Json;
-
 import flixel.FlxG;
-import lime.utils.Assets;
 import flash.media.Sound;
 import openfl.system.System;
 import openfl.utils.AssetType;
+import flixel.system.FlxAssets;
 import flash.display.BitmapData;
 import flixel.graphics.FlxGraphic;
+import lime.utils.Assets as LimeAssets;
+import openfl.utils.Assets as OpenFlAssets;
 import flixel.graphics.frames.FlxAtlasFrames;
 
 using StringTools;
@@ -26,7 +27,7 @@ class Paths
 	public static var songLibrary:String = 'songs';
 
 	public static var SOUND_EXT:String = #if MP3_ALLOWED 'mp3' #else 'ogg' #end;
-	public static var VIDEO_EXT:String = 'mp4';
+	public static var VIDEO_EXT:Array<String> = ['mp4', 'webm', 'mov', 'wmv', 'avi', 'flv'];
 
 	public static var currentModDirectory:String = null;
 
@@ -62,8 +63,8 @@ class Paths
 	public static var dumpExclusions:Array<String> =
 	[
 		'assets/music/freakyMenu.$SOUND_EXT',
-		'assets/shared/music/breakfast.$SOUND_EXT',
-		'assets/shared/music/tea-time.$SOUND_EXT'
+		'shared:assets/shared/music/breakfast.$SOUND_EXT',
+		'shared:assets/shared/music/tea-time.$SOUND_EXT'
 	];
 
 	public static function clearUnusedMemory():Void
@@ -108,16 +109,13 @@ class Paths
 		{
 			if (key != null && !localTrackedAssets.contains(key) && !dumpExclusions.contains(key))
 			{
-				Assets.cache.clear(key);
+				LimeAssets.cache.clear(key);
 				currentTrackedSounds.remove(key);
 			}
 		}
 
-		localTrackedAssets = [];
-
-		#if !html5
-		openfl.Assets.cache.clear(songLibrary);
-		#end
+		localTrackedAssets = []; #if PRELOAD_ALL
+		openfl.Assets.cache.clear(songLibrary); #end
 	}
 
 	public static var currentLevel:String = null;
@@ -127,7 +125,7 @@ class Paths
 		currentLevel = formatToSongPath(name);
 	}
 
-	public static function getPath(file:String, type:AssetType = TEXT, ?library:Null<String> = null):String
+	public static function getPath(file:String, ?type:Null<AssetType> = TEXT, ?library:Null<String> = null):String
 	{
 		if (library != null && library.length > 0) {
 			return getLibraryPath(file, library);
@@ -141,14 +139,14 @@ class Paths
 			{
 				levelPath = getLibraryPath(file, currentLevel);
 
-				if (fileExists(levelPath, type, currentLevel, true)) {
+				if (OpenFlAssets.exists(levelPath, type)) {
 					return levelPath;
 				}
 			}
 
 			levelPath = getLibraryPath(file, 'shared');
 
-			if (fileExists(levelPath, type, 'shared', true)) {
+			if (OpenFlAssets.exists(levelPath, type)) {
 				return levelPath;
 			}
 		}
@@ -167,7 +165,7 @@ class Paths
 
 	public static function getLibraryPathForce(file:String = '', library:String = 'shared'):String
 	{
-		return #if web '$library:' + #end getPreloadPath('$library/$file');
+		return '$library:' + getPreloadPath('$library/$file');
 	}
 
 	public static function getPreloadPath(file:String = ''):String
@@ -175,399 +173,464 @@ class Paths
 		return 'assets/$file';
 	}
 
-	public static function getFile(file:String, type:AssetType = TEXT, ?library:Null<String> = null):String
+	public static function getFile(file:String, ?type:Null<AssetType> = TEXT, ?library:Null<String> = null, ?ignoreMods:Null<Bool> = false):String
 	{
 		#if MODS_ALLOWED
-		if (library != null && library.length > 0 && library != 'preload' && library != 'default')
+		if (!ignoreMods)
 		{
-			var modLibraryPath:String = modFolders(library + '/' + file);
+			var path:String = getModPath(file, library);
 
-			if (FileSystem.exists(modLibraryPath)) {
-				return modLibraryPath;
+			if (FileSystem.exists(path)) {
+				return path;
 			}
-		}
-
-		if (currentLevel != null && currentLevel.length > 0 && currentLevel != 'preload' && currentLevel != 'default')
-		{
-			var modLibraryPath:String = modFolders(currentLevel + '/' + file);
-
-			if (FileSystem.exists(modLibraryPath)) {
-				return modLibraryPath;
-			}
-		}
-
-		var modPath:String = modFolders(file);
-
-		if (FileSystem.exists(modPath)) {
-			return modPath;
 		}
 		#end
 
 		return getPath(file, type, library);
 	}
 
-	@:deprecated("`Paths.file()` is deprecated, use 'Paths.getFile()' instead")
-	public static function file(file:String, type:AssetType = TEXT, ?library:String):String
+	@:deprecated("`Paths.file()` is deprecated. use 'Paths.getFile()' instead.")
+	public static function file(file:String, ?type:Null<AssetType> = TEXT, ?library:String, ?ignoreMods:Null<Bool> = false):String
 	{
-		Debug.logWarn("`Paths.file()` is deprecated! use 'Paths.getFile()' instead");
-
-		return getFile(file, type, library);
+		Debug.logWarn("`Paths.file()` is deprecated! use 'Paths.getFile()' instead.");
+		return getFile(file, type, library, ignoreMods);
 	}
 
-	public static function getTxt(key:String, ?library:String):String
+	public static function getTxt(key:String, ?library:String, ?ignoreMods:Null<Bool> = false):String
 	{
 		if (key.endsWith('.txt')) {
-			key = key.replace('.txt', '');
+			key = key.substring(0, key.lastIndexOf('.'));
 		}
 
-		return getFile('$key.txt', TEXT, library);
+		return getFile('$key.txt', library, ignoreMods);
 	}
 
-	public static function getXml(key:String, ?library:String):String
+	@:deprecated("`Paths.txt()` is deprecated. use 'Paths.getTxt()' instead.")
+	public static function txt(key:String, ?library:String, ?ignoreMods:Null<Bool> = false):String
+	{
+		Debug.logWarn("`Paths.txt()` is deprecated! use 'Paths.getTxt()' instead.");
+		return getTxt(key, library, ignoreMods);
+	}
+
+	public static function getXml(key:String, ?library:String, ?ignoreMods:Null<Bool> = false):String
 	{
 		if (key.endsWith('.xml')) {
-			key = key.replace('.xml', '');
+			key = key.substring(0, key.lastIndexOf('.'));
 		}
 
-		return getFile('$key.xml', TEXT, library);
+		return getFile('$key.xml', library, ignoreMods);
 	}
 
-	public static function getJson(key:String, ?library:String):String
+	@:deprecated("`Paths.xml()` is deprecated. use 'Paths.getXml()' instead.")
+	public static function xml(key:String, ?library:String, ?ignoreMods:Null<Bool> = false):String
+	{
+		Debug.logWarn("`Paths.xml()` is deprecated! use 'Paths.getXml()' instead.");
+		return getXml(key, library, ignoreMods);
+	}
+
+	public static function getJson(key:String, ?library:String, ?ignoreMods:Null<Bool> = false):String
 	{
 		if (key.endsWith('.json')) {
-			key = key.replace('.json', '');
+			key = key.substring(0, key.lastIndexOf('.'));
 		}
 
-		return getFile('$key.json', TEXT, library);
+		return getFile('$key.json', library, ignoreMods);
 	}
 
-	public static function getLua(key:String, ?library:String):String
+	@:deprecated("`Paths.json()` is deprecated. use 'Paths.getJson()' instead.")
+	public static function json(key:String, ?library:String, ?ignoreMods:Null<Bool> = false):String
+	{
+		Debug.logWarn("`Paths.json()` is deprecated! use 'Paths.getJson()' instead.");
+		return getJson(key, library, ignoreMods);
+	}
+
+	public static function getLua(key:String, ?library:String, ?ignoreMods:Null<Bool> = false):String
 	{
 		if (key.endsWith('.lua')) {
-			key = key.replace('.lua', '');
+			key = key.substring(0, key.lastIndexOf('.'));
 		}
 
-		return getFile('$key.lua', TEXT, library);
+		return getFile('$key.lua', library, ignoreMods);
 	}
 
-	public static function getSound(key:String, ?library:String, ?getId:Bool = false):Dynamic
+	@:deprecated("`Paths.lua()` is deprecated. use 'Paths.getLua()' instead.")
+	public static function lua(key:String, ?library:String, ?ignoreMods:Null<Bool> = false):String
 	{
-		return getTrackedAudioFromFile('sounds', '$key', library, getId);
+		Debug.logWarn("`Paths.lua()` is deprecated! use 'Paths.getLua()' instead.");
+		return getLua(key, library, ignoreMods);
 	}
 
-	@:deprecated("`Paths.sound()` is deprecated, use 'Paths.getSound()' instead")
-	public static function sound(key:String, ?library:String, ?getId:Bool = false):Dynamic
+	public static function getSound(key:String, ?library:String, ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):FlxSoundAsset
 	{
-		Debug.logWarn("`Paths.sound()` is deprecated! use 'Paths.getSound()' instead");
-
-		return getSound(key, library, getId);
+		return returnSound('sounds', key, library, getId, ignoreMods);
 	}
 
-	public static function getSoundRandom(key:String, min:Int, max:Int, ?library:String, ?getId:Bool = false):Dynamic
+	@:deprecated("`Paths.sound()` is deprecated. use 'Paths.getSound()' instead.")
+	public static function sound(key:String, ?library:String, ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):FlxSoundAsset
 	{
-		return getSound(key + FlxG.random.int(min, max), library, getId);
+		Debug.logWarn("`Paths.sound()` is deprecated! use 'Paths.getSound()' instead.");
+		return getSound(key, library, getId, ignoreMods);
 	}
 
-	@:deprecated("`Paths.soundRandom()` is deprecated, use 'Paths.getSoundRandom()' instead")
-	public static function soundRandom(key:String, min:Int, max:Int, ?library:String, ?getId:Bool = false):Dynamic
+	public static function getSoundRandom(key:String, min:Int, max:Int, ?library:String, ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):FlxSoundAsset
 	{
-		Debug.logWarn("`Paths.soundRandom()` is deprecated! use 'Paths.getSoundRandom()' instead");
-
-		return getSoundRandom(key, min, max, library, getId);
+		return getSound(key + FlxG.random.int(min, max), library, getId, ignoreMods);
 	}
 
-	public static function getMusic(key:String, ?library:String, ?getId:Bool = false):Dynamic
+	@:deprecated("`Paths.soundRandom()` is deprecated. use 'Paths.getSoundRandom()' instead.")
+	public static function soundRandom(key:String, min:Int, max:Int, ?library:String, ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):FlxSoundAsset
 	{
-		return getTrackedAudioFromFile('music', '$key', library, getId);
+		Debug.logWarn("`Paths.soundRandom()` is deprecated! use 'Paths.getSoundRandom()' instead.");
+		return getSoundRandom(key, min, max, library, getId, ignoreMods);
 	}
 
-	@:deprecated("`Paths.music()` is deprecated, use 'Paths.getMusic()' instead")
-	public static function music(key:String, ?library:String, ?getId:Bool = false):Dynamic
+	public static function getMusic(key:String, ?library:String, ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):FlxSoundAsset
 	{
-		Debug.logWarn("`Paths.music()` is deprecated! use 'Paths.getMusic()' instead");
-
-		return getMusic(key, library, getId);
+		return returnSound('music', key, library, getId, ignoreMods);
 	}
 
-	public static function getInst(song:String, ?diffPath:String = '', ?getId:Bool = false):Dynamic
+	@:deprecated("`Paths.music()` is deprecated. use 'Paths.getMusic()' instead.")
+	public static function music(key:String, ?library:String, ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):FlxSoundAsset
+	{
+		Debug.logWarn("`Paths.music()` is deprecated! use 'Paths.getMusic()' instead.");
+		return getMusic(key, library, getId, ignoreMods);
+	}
+
+	public static function getInst(song:String, ?diffPath:String = '', ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):FlxSoundAsset
 	{
 		var songPath:String = formatToSongPath(song);
+		var path:String = returnSound(songPath + diffPath, 'Inst', songLibrary, true, ignoreMods);
 
-		var path:String = getTrackedAudioFromFile(songPath + '-' + diffPath, 'Inst', songLibrary, true);
-
-		if (fileExists(path, SOUND, songLibrary, true)) {
-			return getTrackedAudioFromFile(null, path, null);
+		if (fileExists(path, SOUND)) {
+			return returnSound(null, path, null, getId, ignoreMods);
 		}
 
-		var path:String = getTrackedAudioFromFile(songPath, 'Inst' + '-' + diffPath, songLibrary, true);
-
-		if (fileExists(path, SOUND, songLibrary, true)) {
-			return getTrackedAudioFromFile(null, path, null);
-		}
-
-		var path:String = getTrackedAudioFromFile(songPath + '-' + diffPath, 'Inst' + '-' + diffPath, songLibrary, true);
-
-		if (fileExists(path, SOUND, songLibrary, true)) {
-			return getTrackedAudioFromFile(null, path, null);
-		}
-
-		return getTrackedAudioFromFile(songPath, 'Inst', songLibrary, getId);
+		return returnSound(songPath, 'Inst', songLibrary, getId, ignoreMods);
 	}
 
-	@:deprecated("`Paths.inst()` is deprecated, use 'Paths.getInst()' instead")
-	public static function inst(song:String, ?diffPath:String = '', ?getId:Bool = false):Dynamic
+	@:deprecated("`Paths.inst()` is deprecated. use 'Paths.getInst()' instead.")
+	public static function inst(song:String, ?diffPath:String = '', ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):FlxSoundAsset
 	{
-		Debug.logWarn("`Paths.inst()` is deprecated! use 'Paths.getInst()' instead");
-
-		return getInst(song, diffPath, getId);
+		Debug.logWarn("`Paths.inst()` is deprecated! use 'Paths.getInst()' instead.");
+		return getInst(song, diffPath, getId, ignoreMods);
 	}
 
-	public static function getVoices(song:String, ?diffPath:String = '', ?getId:Bool = false):Dynamic
+	public static function getVoices(song:String, ?diffPath:String = '', ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):FlxSoundAsset
 	{
 		var songPath:String = formatToSongPath(song);
+		var path:String = returnSound(songPath + diffPath, 'Voices', songLibrary, true, ignoreMods);
 
-		var path:String = getTrackedAudioFromFile(songPath + '-' + diffPath, 'Voices', songLibrary, true);
-
-		if (fileExists(path, SOUND, songLibrary, true)) {
-			return getTrackedAudioFromFile(null, path, null);
+		if (fileExists(path, SOUND)) {
+			return returnSound(null, path, null, getId, ignoreMods);
 		}
 
-		var path:String = getTrackedAudioFromFile(songPath, 'Voices' + '-' + diffPath, songLibrary, true);
-
-		if (fileExists(path, SOUND, songLibrary, true)) {
-			return getTrackedAudioFromFile(null, path, null);
-		}
-
-		var path:String = getTrackedAudioFromFile(songPath + '-' + diffPath, 'Voices' + '-' + diffPath, songLibrary, true);
-
-		if (fileExists(path, SOUND, songLibrary, true)) {
-			return getTrackedAudioFromFile(null, path, null);
-		}
-
-		return getTrackedAudioFromFile(songPath, 'Voices', songLibrary, getId);
+		return returnSound(songPath, 'Voices', songLibrary, getId, ignoreMods);
 	}
 
-	@:deprecated("`Paths.voices()` is deprecated, use 'Paths.getVoices()' instead")
-	public static function voices(song:String, ?diffPath:String = '', ?getId:Bool = false):Dynamic
+	@:deprecated("`Paths.voices()` is deprecated. use 'Paths.getVoices()' instead.")
+	public static function voices(song:String, ?diffPath:String = '', ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):FlxSoundAsset
 	{
-		Debug.logWarn("`Paths.voices()` is deprecated! use 'Paths.getVoices()' instead");
-
-		return getVoices(song, diffPath, getId);
+		Debug.logWarn("`Paths.voices()` is deprecated! use 'Paths.getVoices()' instead.");
+		return getVoices(song, diffPath, getId, ignoreMods);
 	}
 
 	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
 
-	public static function getImage(key:String, ?library:String, ?getId:Bool = false):Dynamic
+	public static function getImage(key:String, ?library:String, ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):FlxGraphicAsset
+	{
+		return returnGraphic(key, library, getId, ignoreMods);
+	}
+
+	@:deprecated("`Paths.image()` is deprecated. use 'Paths.getImage()' instead.")
+	public static function image(key:String, ?library:String = null, ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):FlxGraphicAsset
+	{
+		Debug.logWarn("`Paths.image()` is deprecated! use 'Paths.getImage()' instead.");
+		return getImage(key, library, getId, ignoreMods);
+	}
+
+	public static function returnGraphic(key:String, ?library:String, ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):FlxGraphicAsset
 	{
 		if (key.endsWith('.png')) {
-			key.replace('.png', '');
+			key = key.substring(0, key.lastIndexOf('.'));
 		}
 
-		var ourFile:String = getFile('images/$key.png', IMAGE, library);
+		#if MODS_ALLOWED
+		if (!ignoreMods)
+		{
+			var modKey:String = getModPath('images/$key.png', library);
 
-		if (fileExists('$key.png', IMAGE, library, true)) {
-			ourFile = '$key.png';
+			if (FileSystem.exists('$key.png')) {
+				modKey = '$key.png';
+			}
+
+			if (FileSystem.exists(modKey))
+			{
+				if (getId) {
+					return modKey;
+				}
+
+				if (!currentTrackedAssets.exists(modKey))
+				{
+					var newBitmap:BitmapData = BitmapData.fromFile(modKey);
+
+					var newGraphic:FlxGraphic = FlxG.bitmap.add(newBitmap, false, modKey);
+					newGraphic.persist = true;
+					currentTrackedAssets.set(modKey, newGraphic);
+				}
+
+				localTrackedAssets.push(modKey);
+				return currentTrackedAssets.get(modKey);
+			}
+		}
+		#end
+
+		var path:String = getPath('images/$key.png', IMAGE, library);
+
+		if (OpenFlAssets.exists('$key.png', IMAGE)) {
+			path = '$key.png';
 		}
 
 		if (getId) {
-			return ourFile;
+			return path;
 		}
 
-		if (fileExists(ourFile, IMAGE, library, true))
+		if (OpenFlAssets.exists(path, IMAGE))
 		{
-			if (!currentTrackedAssets.exists(ourFile))
+			if (!currentTrackedAssets.exists(path))
 			{
-				#if sys
-				var newBitmap:BitmapData = BitmapData.fromFile(ourFile);
-				#else
-				var newBitmap:BitmapData = OpenFlAssets.getBitmapData(ourFile);
-				#end
+				var newBitmap:BitmapData = OpenFlAssets.getBitmapData(path);
 
-				var newGraphic:FlxGraphic = FlxG.bitmap.add(newBitmap, false, ourFile);
+				var newGraphic:FlxGraphic = FlxG.bitmap.add(newBitmap, false, path);
 				newGraphic.persist = true;
-				currentTrackedAssets.set(ourFile, newGraphic);
+				currentTrackedAssets.set(path, newGraphic);
 			}
 
-			localTrackedAssets.push(ourFile);
-			return currentTrackedAssets.get(ourFile);
+			localTrackedAssets.push(path);
+			return currentTrackedAssets.get(path);
 		}
 
-		Debug.logError('Could not find a image asset with path "$ourFile".');
+		if (!getId) {
+			Debug.logWarn('Could not find a image asset with key "$key".');
+		}
+
 		return null;
 	}
 
-	@:deprecated("`Paths.image()` is deprecated, use 'Paths.getImage()' instead")
-	public static function image(key:String, ?library:String = null):Dynamic
+	public static function getVideo(key:String, ?library:String, ?ignoreMods:Null<Bool> = false):String
 	{
-		Debug.logWarn("`Paths.image()` is deprecated! use 'Paths.getImage()' instead");
-
-		return getImage(key, library);
-	}
-
-	public static function getVideo(key:String, ?library:String):String
-	{
-		if (key.endsWith('.$VIDEO_EXT')) {
-			key = key.replace('.$VIDEO_EXT', '');
-		}
-
-		#if WEBM_ALLOWED
-		if (key.endsWith('.webm')) {
-			key = key.replace('.webm', '');
-		}
-
-		var fileToCheckWebm:String = getFile('videos/$key.webm', BINARY, library);
-
-		if (fileExists(fileToCheckWebm, BINARY, null, true))
+		#if desktop
+		for (i in VIDEO_EXT)
 		{
-			Debug.logWarn('Warning: .WEBM files is deprecated. Use .MP4 files instead');
-			return fileToCheckWebm;
+			if (i != 'mp4')
+			{
+				var path:String = getFile('videos/$key.$i', BINARY, library, ignoreMods);
+
+				if (fileExists(path, BINARY, true, ignoreMods)) {
+					return path;
+				}
+			}
 		}
 		#end
 
-		return getFile('videos/$key.$VIDEO_EXT', BINARY, library);
+		return getFile('videos/$key.mp4', BINARY, library, ignoreMods);
 	}
 
-	@:deprecated("`Paths.video()` is deprecated, use 'Paths.getVideo()' instead")
-	public static function video(key:String, ?library:String):String
+	@:deprecated("`Paths.video()` is deprecated. use 'Paths.getVideo()' instead.")
+	public static function video(key:String, ?library:String, ?ignoreMods:Null<Bool> = false):String
 	{
-		Debug.logWarn("`Paths.video()` is deprecated! use 'Paths.getVideo()' instead");
-
-		return getVideo(key, library);
+		Debug.logWarn("`Paths.video()` is deprecated! use 'Paths.getVideo()' instead.");
+		return getVideo(key, library, ignoreMods);
 	}
 
-	public static function getTextFromFile(key:String, ?library:String = null):String
+	public static function getFont(key:String, ?library:String, ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):String
 	{
-		var ourPath:String = getFile(key, TEXT, library);
+		return getFile('fonts/$key', FONT, library, ignoreMods);
+	}
 
-		if (fileExists(ourPath, TEXT, library, true))
+	public static var cachedAtlasFrames:Map<Array<String>, FlxAtlasFrames> = [];
+
+	public static function getSparrowAtlas(key:String, ?library:String, ?ignoreMods:Null<Bool> = false):FlxAtlasFrames
+	{
+		var imagePath:String = getImage(key, library, true, ignoreMods);
+		var descPath:String = getXml('images/$key', library, ignoreMods);
+
+		if (fileExists(imagePath, IMAGE, true, ignoreMods) && fileExists(descPath, TEXT, true, ignoreMods))
 		{
-			#if sys
-			return File.getContent(ourPath);
-			#else
-			return OpenFlAssets.getText(ourPath);
-			#end
+			var array:Array<String> = [imagePath, descPath];
+
+			if (!cachedAtlasFrames.exists(array))
+			{
+				if (OpenFlAssets.exists(descPath, TEXT)) {
+					cachedAtlasFrames.set(array, FlxAtlasFrames.fromSparrow(getImage(key, null, false, ignoreMods), descPath));
+				}
+				else {
+					cachedAtlasFrames.set(array, FlxAtlasFrames.fromSparrow(getImage(key, null, false, ignoreMods), getTextFromFile(descPath, ignoreMods)));
+				}
+			}
+
+			return cachedAtlasFrames.get(array);
 		}
 
-		#if sys
-		return File.getContent(key);
-		#else
-		return OpenFlAssets.getText(key);
-		#end
+		Debug.logWarn('Could not find a sparrow asset with key "$key".');
+		return null;
 	}
 
-	public static function getFont(key:String, ?library:String):String
+	public static function getPackerAtlas(key:String, ?library:String, ?ignoreMods:Null<Bool> = false):FlxAtlasFrames
 	{
-		return getFile('fonts/$key', FONT, library);
-	}
+		var imagePath:String = getImage(key, library, true, ignoreMods);
+		var descPath:String = getTxt('images/$key', library, ignoreMods);
 
-	public static function getSparrowAtlas(key:String, ?library:String):FlxAtlasFrames
-	{
-		return FlxAtlasFrames.fromSparrow(getImage(key, library), getTextFromFile(getXml('images/$key', library)));
-	}
+		if (fileExists(imagePath, IMAGE, true, ignoreMods) && fileExists(descPath, TEXT, true, ignoreMods))
+		{
+			var array:Array<String> = [imagePath, descPath];
 
-	public static function getPackerAtlas(key:String, ?library:String):FlxAtlasFrames
-	{
-		return FlxAtlasFrames.fromSpriteSheetPacker(getImage(key, library), getTextFromFile(getTxt('images/$key', library)));
+			if (!cachedAtlasFrames.exists(array))
+			{
+				if (OpenFlAssets.exists(descPath, TEXT)) {
+					cachedAtlasFrames.set(array, FlxAtlasFrames.fromSpriteSheetPacker(getImage(key, null, false, ignoreMods), descPath));
+				}
+				else {
+					cachedAtlasFrames.set(array, FlxAtlasFrames.fromSpriteSheetPacker(getImage(key, null, false, ignoreMods), getTextFromFile(descPath, ignoreMods)));
+				}
+			}
+
+			return cachedAtlasFrames.get(array);
+		}
+
+		Debug.logWarn('Could not find a packer asset with key "$key".');
+		return null;
 	}
 
 	public static var currentTrackedSounds:Map<String, Sound> = [];
 
-	public static function getTrackedAudioFromFile(path:String, key:String, ?library:String, ?getId:Bool = false):Dynamic
+	public static function returnSound(path:String, key:String, ?library:String, ?getId:Bool = false, ?ignoreMods:Null<Bool> = false):FlxSoundAsset
 	{
-		if (key.endsWith('.$SOUND_EXT')) {
-			key = key.replace('.$SOUND_EXT', '');
+		if (key.endsWith('.$SOUND_EXT') #if FEATURE_OGG || key.endsWith('.ogg') #end #if FEATURE_WAV || key.endsWith('.wav') #end) {
+			key = key.substring(0, key.lastIndexOf('.'));
 		}
 
-		#if FEATURE_OGG
-		if (OptionData.loadingOggFiles)
+		#if MODS_ALLOWED
+		if (!ignoreMods)
 		{
-			if (key.endsWith('.ogg')) {
-				key = key.replace('.ogg', '');
+			var file:String = getModPath('$key.$SOUND_EXT', library);
+
+			if (path != null && path.length > 0) {
+				file = getModPath('$path/$key.$SOUND_EXT', library);
+			}
+			#if FEATURE_OGG
+			var ogg:String = getModPath('$key.ogg', library);
+
+			if (path != null && path.length > 0) {
+				ogg = getModPath('$path/$key.ogg', library);
+			}
+
+			if (OptionData.loadingOggFiles && FileSystem.exists(ogg)) {
+				file = ogg;
+			}
+			#end
+
+			#if FEATURE_WAV
+			var wav:String = getModPath('$key.wav', library);
+
+			if (path != null && path.length > 0) {
+				wav = getModPath('$path/$key.ogg', library);
+			}
+
+			if (OptionData.loadingWavFiles && FileSystem.exists(wav)) {
+				file = wav;
+			}
+			#end
+
+			if (FileSystem.exists('$key.$SOUND_EXT'))
+				file = '$key.$SOUND_EXT';
+			#if FEATURE_OGG
+			if (OptionData.loadingOggFiles && FileSystem.exists('$key.ogg'))
+				file = '$key.ogg';
+			#end
+			#if FEATURE_WAV
+			if (OptionData.loadingWavFiles && FileSystem.exists('$key.wav'))
+				file = '$key.wav';
+			#end
+
+			if (FileSystem.exists(file))
+			{
+				if (getId) {
+					return file;
+				}
+
+				if (!currentTrackedSounds.exists(file)) {
+					currentTrackedSounds.set(file, Sound.fromFile(file));
+				}
+		
+				localTrackedAssets.push(key);
+				return currentTrackedSounds.get(file);
 			}
 		}
 		#end
 
-		#if FEATURE_WAV
-		if (OptionData.loadingWavFiles)
-		{
-			if (key.endsWith('.wav')) {
-				key = key.replace('.wav', '');
-			}
-		}
-		#end
-
-		var gottenPath:String = getFile('$key.$SOUND_EXT', SOUND, library);
+		var gottenPath:String = getPath('$key.$SOUND_EXT', SOUND, library);
 
 		if (path != null && path.length > 0) {
-			gottenPath = getFile('$path/$key.$SOUND_EXT', SOUND, library);
-		}
-
-		if (fileExists(key + '.$SOUND_EXT', SOUND, library, true)) {
-			gottenPath = key + '.$SOUND_EXT';
+			gottenPath = getPath('$path/$key.$SOUND_EXT', SOUND, library);
 		}
 
 		#if FEATURE_OGG
-		if (OptionData.loadingOggFiles)
-		{
-			var fileToCheckOgg:String = getFile('$key.ogg', SOUND, library);
+		var ogg:String = getPath('$key.ogg', SOUND, library);
 
-			if (path != null && path.length > 0) {
-				fileToCheckOgg = getFile('$path/$key.ogg', SOUND, library);
-			}
+		if (path != null && path.length > 0) {
+			ogg = getPath('$path/$key.ogg', SOUND, library);
+		}
 
-			if (fileExists(key + '.ogg', SOUND, library, true)) {
-				gottenPath = key + '.ogg';
-			}
-
-			if (fileExists(fileToCheckOgg, SOUND, library, true))
-			{
-				Debug.logWarn('Warning: .OGG files is deprecated. Use .MP3 files instead');
-				gottenPath = fileToCheckOgg;
-			}
+		if (OptionData.loadingOggFiles && OpenFlAssets.exists(ogg, SOUND)) {
+			gottenPath = ogg;
 		}
 		#end
 
 		#if FEATURE_WAV
-		if (OptionData.loadingWavFiles)
-		{
-			var fileToCheckWav:String = getFile('$key.wav', SOUND, library);
+		var wav:String = getPath('$key.wav', SOUND, library);
 
-			if (path != null && path.length > 0) {
-				fileToCheckWav = getFile('$path/$key.wav', SOUND, library);
-			}
-
-			if (fileExists(key + '.wav', SOUND, library, true)) {
-				gottenPath = key + '.wav';
-			}
-
-			if (fileExists(fileToCheckWav, SOUND, library, true))
-			{
-				Debug.logWarn('Warning: .WAV files is deprecated. Use .MP3 files instead');
-				gottenPath = fileToCheckWav;
-			}
+		if (path != null && path.length > 0) {
+			wav = getPath('$path/$key.wav', SOUND, library);
 		}
+
+		if (OptionData.loadingWavFiles && OpenFlAssets.exists(wav, SOUND)) {
+			gottenPath = wav;
+		}
+		#end
+
+		if (OpenFlAssets.exists('$key.$SOUND_EXT', SOUND))
+			gottenPath = '$key.$SOUND_EXT';
+		#if FEATURE_OGG
+		if (OptionData.loadingOggFiles && OpenFlAssets.exists('$key.ogg', SOUND))
+			gottenPath = '$key.ogg';
+		#end
+		#if FEATURE_WAV
+		if (OptionData.loadingWavFiles && OpenFlAssets.exists('$key.wav', SOUND))
+			gottenPath = '$key.wav';
 		#end
 
 		if (getId) {
 			return gottenPath;
 		}
 
-		if (fileExists(gottenPath, SOUND, library, true))
+		if (OpenFlAssets.exists(gottenPath, SOUND))
 		{
 			if (!currentTrackedSounds.exists(gottenPath))
-			{
-				#if sys
-				currentTrackedSounds.set(gottenPath, Sound.fromFile(gottenPath));
-				#else
-				currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(gottenPath));
-				#end
+			{ #if (MP3_ALLOWED && cpp)
+				if (gottenPath.endsWith('.$SOUND_EXT'))
+					currentTrackedSounds.set(gottenPath, Sound.fromMP3(OpenFlAssets.getBytes(gottenPath)));
+				else #end
+					currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(gottenPath));
 			}
 
 			localTrackedAssets.push(gottenPath);
 			return currentTrackedSounds.get(gottenPath);
 		}
 
-		Debug.logError('Could not find a sound asset with path "$gottenPath".');
+		if (!getId) {
+			Debug.logWarn('Could not find a sound asset with key "$gottenPath".');
+		}
+
 		return null;
 	}
 
@@ -580,34 +643,58 @@ class Paths
 		return hideChars.split(path).join('').toLowerCase();
 	}
 
-	public static function fileExists(key:String, type:AssetType, ?library:String, ?optimize:Bool = false):Bool
+	public static function fileExists(key:String, type:Null<AssetType> = TEXT, ?library:String, ?absolute:Bool = false, ?ignoreMods:Null<Bool> = false):Bool
 	{
-		if (optimize)
+		if (absolute)
 		{
-			#if sys
-			if (FileSystem.exists(key)) {
-				return true;
-			}
-			#else
-			if (OpenFlAssets.exists(key, type)) {
+			#if MODS_ALLOWED
+			if (!ignoreMods && FileSystem.exists(key)) {
 				return true;
 			}
 			#end
+
+			if (OpenFlAssets.exists(key, type)) {
+				return true;
+			}
 		}
 
-		var altPath:String = getFile(key, type, library);
-
-		#if sys
-		if (FileSystem.exists(altPath) || FileSystem.exists(key)) {
-			return true;
-		}
-		#else
-		if (OpenFlAssets.exists(altPath, type) || OpenFlAssets.exists(key, type)) {
+		#if MODS_ALLOWED
+		if (!ignoreMods && FileSystem.exists(getModPath(key, library))) {
 			return true;
 		}
 		#end
 
+		if (OpenFlAssets.exists(getPath(key, type, library), type)) {
+			return true;
+		}
+
 		return false;
+	}
+
+	public static function getTextFromFile(key:String, ?library:String = null, ?ignoreMods:Null<Bool> = false):String
+	{
+		#if MODS_ALLOWED
+		if (!ignoreMods && FileSystem.exists(key)) {
+			return File.getContent(key);
+		}
+		#end
+
+		if (OpenFlAssets.exists(key)) {
+			return OpenFlAssets.getText(key);
+		}
+
+		#if MODS_ALLOWED
+		if (!ignoreMods)
+		{
+			var modpath:String = getModPath(key, library);
+
+			if (FileSystem.exists(modpath)) {
+				return File.getContent(modpath);
+			}
+		}
+		#end
+
+		return OpenFlAssets.getText(getPath(key, TEXT, library));
 	}
 
 	#if MODS_ALLOWED
@@ -639,6 +726,20 @@ class Paths
 		return 'mods/' + key;
 	}
 
+	public static function getModPath(file:String, ?library:Null<String> = null):String
+	{
+		if (library != null && library.length > 0 && library != 'preload' && library != 'default')
+		{
+			var modLibraryPath:String = modFolders(library + '/' + file);
+
+			if (FileSystem.exists(modLibraryPath)) {
+				return modLibraryPath;
+			}
+		}
+
+		return modFolders(file);
+	}
+
 	public static var globalMods:Array<String> = [];
 
 	public static function getGlobalMods():Array<String>
@@ -658,9 +759,9 @@ class Paths
 
 			for (i in list)
 			{
-				var dat:Array<String> = i.split("|");
+				var dat:Array<String> = i.split('|');
 	
-				if (dat[1] == "1")
+				if (dat[1] == '1')
 				{
 					var folder = dat[0];
 					var path:String = Paths.mods(folder + '/pack.json');
@@ -674,7 +775,7 @@ class Paths
 							if (rawJson != null && rawJson.length > 0)
 							{
 								var stuff:Dynamic = Json.parse(rawJson);
-								var global:Bool = Reflect.getProperty(stuff, "runsGlobally");
+								var global:Bool = Reflect.getProperty(stuff, 'runsGlobally');
 							
 								if (global) globalMods.push(dat[0]);
 							}

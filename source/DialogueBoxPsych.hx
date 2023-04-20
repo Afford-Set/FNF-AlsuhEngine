@@ -4,7 +4,7 @@ import haxe.Json;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-import openfl.utils.Assets;
+import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.group.FlxSpriteGroup;
 
@@ -79,25 +79,23 @@ class DialogueCharacter extends FlxSprite
 
 		reloadAnimations();
 
-		antialiasing = jsonFile.no_antialiasing ? false : OptionData.globalAntialiasing;
+		antialiasing = OptionData.globalAntialiasing && !jsonFile.no_antialiasing;
 	}
 
 	public function reloadCharacterJson(character:String):Void
 	{
-		var rawJson:String = null;
-		var path:String = Paths.getJson('portraits/$DEFAULT_CHARACTER.json');
+		var rawJson:String = Paths.getTextFromFile('portraits/$DEFAULT_CHARACTER.json');
 
 		if (Paths.fileExists('images/dialogue/$character.json', TEXT)) {
-			path = Paths.getJson('images/dialogue/$character');
+			rawJson = Paths.getTextFromFile('images/dialogue/$character.json');
 		}
 		else if (Paths.fileExists('images/dialogue/$character.json', TEXT)) {
-			path = Paths.getJson('images/dialogue/$character');
+			rawJson = Paths.getTextFromFile('images/dialogue/$character.json');
 		}
 		else if (Paths.fileExists('portraits/$character.json', TEXT)) {
-			path = Paths.getJson('portraits/$character');
+			rawJson = Paths.getTextFromFile('portraits/$character.json');
 		}
 
-		rawJson = Paths.getTextFromFile(path);
 		jsonFile = cast Json.parse(rawJson);
 	}
 
@@ -249,11 +247,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 
 	function spawnCharacters()
 	{
-		#if (haxe >= "4.0.0")
-		var charsMap:Map<String, Bool> = new Map();
-		#else
 		var charsMap:Map<String, Bool> = new Map<String, Bool>();
-		#end
 
 		for (i in 0...dialogueList.dialogue.length)
 		{
@@ -276,7 +270,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 			char.setGraphicSize(Std.int(char.width * DialogueCharacter.DEFAULT_SCALE * char.jsonFile.scale));
 			char.updateHitbox();
 			char.scrollFactor.set();
-			char.alpha = 0.00001;
+			char.alpha = FlxMath.EPSILON;
 			add(char);
 
 			var saveY:Bool = false;
@@ -335,7 +329,9 @@ class DialogueBoxPsych extends FlxSpriteGroup
 			bgFade.alpha += 0.5 * elapsed;
 			if (bgFade.alpha > 0.5) bgFade.alpha = 0.5;
 
-			if (PlayerSettings.player1.controls.ACCEPT || FlxG.mouse.justPressed)
+			var controls:Controls = Controls.instance;
+
+			if (controls.ACCEPT || FlxG.mouse.justPressed)
 			{
 				if (!daText.finishedText)
 				{
@@ -446,7 +442,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 							}
 
 							char.alpha -= 3 * elapsed;
-							if (char.alpha < 0.00001) char.alpha = 0.00001;
+							if (char.alpha < FlxMath.EPSILON) char.alpha = FlxMath.EPSILON;
 						}
 						else
 						{

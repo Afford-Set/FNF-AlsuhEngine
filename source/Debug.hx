@@ -19,7 +19,7 @@ import flixel.system.debug.watch.Tracker;
 
 using StringTools;
 
-class Debug
+class Debug // stolen from kade engine
 {
 	static final LOG_STYLE_ERROR:LogStyle = new LogStyle('[ERROR] ', 'FF8888', 12, true, false, false, 'flixel/sounds/beep', true);
 	static final LOG_STYLE_WARN:LogStyle = new LogStyle('[WARN ] ', 'D9F85C', 12, true, false, false, 'flixel/sounds/beep', true);
@@ -343,13 +343,13 @@ class Debug
 
 		if (Paths.fileExists('data/' + songName + '/' + songName + ourDiffPath + '.json', TEXT))
 		{
-			var difficulties:Array<Array<String>> = [[diffName], [difficulty], [ourDiffPath]];
+			var difficulties:Array<Dynamic> = [[difficulty, diffName, ourDiffPath]];
+			CoolUtil.difficultyStuff = difficulties.copy();
 
-			PlayState.SONG = Song.loadFromJson(songName + CoolUtil.getDifficultySuffix(difficulty, false, difficulties), songName);
+			PlayState.SONG = Song.loadFromJson(songName + difficulty, songName);
 			PlayState.gameMode = 'freeplay';
 			PlayState.isStoryMode = false;
-			PlayState.storyDifficultyID = difficulty;
-			PlayState.lastDifficulty = difficulty;
+			PlayState.storyDifficulty = 0;
 			PlayState.seenCutscene = false;
 	
 			if (isCharting) {
@@ -410,7 +410,7 @@ class DebugLogWriter
 		#if (sys && desktop)
 		printDebug("Initializing log file...");
 
-		var logFilePath = '$LOG_FOLDER/${Sys.time()}.log';
+		var logFilePath:String = '$LOG_FOLDER/${Sys.time()}.log';
 
 		if (logFilePath.indexOf("/") != -1) // Make sure that the path exists
 		{
@@ -453,19 +453,19 @@ class DebugLogWriter
 
 	function shouldLog(input:String):Bool
 	{
-		var levelIndex = LOG_LEVELS.indexOf(input);
-		
+		var levelIndex:Int = LOG_LEVELS.indexOf(input);
+
 		if (levelIndex == -1) return false; // Could not find this log level.
 		return levelIndex <= logLevel;
 	}
 
 	public function setLogLevel(input:String):Void
 	{
-		var levelIndex = LOG_LEVELS.indexOf(input);
-		
-		if (levelIndex == -1) return; // Could not find this log level.
+		var levelIndex:Int = LOG_LEVELS.indexOf(input);
 
+		if (levelIndex == -1) return; // Could not find this log level.
 		logLevel = levelIndex;
+
 		FlxG.save.data.debugLogLevel = logLevel;
 	}
 
@@ -474,8 +474,8 @@ class DebugLogWriter
 	 */
 	public function write(input:Array<Dynamic>, logLevel:String = 'TRACE'):Void
 	{
-		var ts = FlxStringUtil.formatTime(getTime(), true);
-		var msg = '$ts [${logLevel.rpad(' ', 5)}] ${input.join('')}';
+		var ts:String = FlxStringUtil.formatTime(getTime(), true);
+		var msg:String = '$ts [$logLevel] ${input.join('')}';
 
 		#if (sys && desktop)
 		if (active && file != null)

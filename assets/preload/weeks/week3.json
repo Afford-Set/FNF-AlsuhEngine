@@ -3,57 +3,39 @@
 	"weekName": "Week 3",
 	"startUnlocked": true,
 	"hiddenUntilUnlocked": false,
+	"itemColor": [252, 150, 215],
 	"songs": [
 		{
 			"songID": "pico",
 			"songName": "Pico",
 			"character": "pico",
 			"color": [148, 22, 83],
-			
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		},
 		{
 			"songID": "philly-nice",
 			"songName": "Philly Nice",
 			"character": "pico",
 			"color": [148, 22, 83],
-			
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		},
 		{
 			"songID": "blammed",
 			"songName": "Blammed",
 			"character": "pico",
 			"color": [148, 22, 83],
-			
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		}
 	],
-	"difficulties": [
-		["Easy", "Normal", "Hard"],
-		["easy", "normal", "hard"],
-		["-easy", "",     "-hard"]
-	],
+	"difficulties": [],
 	"weekCharacters": ["pico", "bf", "gf"],
 	"weekBackground": "philly",
 	"weekBefore": "week2",
 	"storyName": "Pico",
-	"defaultDifficulty": "normal",
+	"defaultDifficulty": "",
 	"itemFile": "week3",
 	"hideStoryMode": false,
 	"hideFreeplay": false

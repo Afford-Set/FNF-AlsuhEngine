@@ -4,7 +4,9 @@ import Conductor;
 
 import flixel.FlxG;
 import flixel.FlxState;
+import flixel.FlxCamera;
 import flixel.addons.ui.FlxUIState;
+import flixel.addons.transition.FlxTransitionableState;
 
 using StringTools;
 
@@ -19,21 +21,23 @@ class MusicBeatUIState extends FlxUIState
 	private var curDecStep:Float = 0;
 	private var curDecBeat:Float = 0;
 
-	private var controls(get, never):Controls;
+	public var controls(get, never):Controls;
+	private function get_controls():Controls return Controls.instance;
 
-	inline function get_controls():Controls {
-		return PlayerSettings.player1.controls;
-	}
+	public static var camBeat:FlxCamera;
 
 	public override function create():Void
 	{
+		camBeat = FlxG.camera;
+		var skip:Bool = FlxTransitionableState.skipNextTransOut;
+
 		super.create();
 
-		if (!CustomFadeTransition.skipNextTransOut) {
+		if (!skip) {
 			openSubState(new CustomFadeTransition(0.7, true));
 		}
 
-		CustomFadeTransition.skipNextTransOut = false;
+		FlxTransitionableState.skipNextTransOut = false;
 	}
 
 	#if !mobile
@@ -44,10 +48,6 @@ class MusicBeatUIState extends FlxUIState
 	public override function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
-
-		#if !mobile
-		CoolUtil.recolorCounters(skippedFrames, skippedFrames2);
-		#end
 
 		var oldStep:Int = curStep;
 
@@ -127,22 +127,21 @@ class MusicBeatUIState extends FlxUIState
 
 	public override function switchTo(nextState:FlxState):Bool
 	{
-		if (!CustomFadeTransition.skipNextTransIn)
+		if (!FlxTransitionableState.skipNextTransIn)
 		{
 			if (!exiting)
 			{
-				CustomFadeTransition.finishCallback = function():Void
+				openSubState(new CustomFadeTransition(0.6, false, function():Void
 				{
 					exiting = true;
 					FlxG.switchState(nextState);
-				}
-				openSubState(new CustomFadeTransition(0.6, false));
+				}));
 			}
 
 			return exiting;
 		}
 
-		CustomFadeTransition.skipNextTransIn = false;
+		FlxTransitionableState.skipNextTransIn = false;
 		return true;
 	}
 
@@ -165,7 +164,20 @@ class MusicBeatUIState extends FlxUIState
 
 	function getBeatsOnSection():Float
 	{
+		#if hl
+		var val:Null<Float> = null;
+
+		if (PlayState.SONG == null && PlayState.SONG.notes[curSection] == null) {
+			val = 4;
+		}
+		else {
+			val = PlayState.SONG.notes[curSection].sectionBeats;
+		}
+		return
+		#else
 		var val:Null<Float> = PlayState.SONG != null && PlayState.SONG.notes[curSection] != null ? PlayState.SONG.notes[curSection].sectionBeats : 4;
-		return val == null ? 4 : val;
+		#end
+
+		return val #if !hl == null ? 4 : val #end;
 	}
 }

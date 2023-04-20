@@ -351,7 +351,6 @@ class AudioBuffer
 		return promise.future;
 		#else
 		// TODO: Streaming
-
 		var request = new HTTPRequest<AudioBuffer>();
 		return request.load(path).then(function(buffer)
 		{

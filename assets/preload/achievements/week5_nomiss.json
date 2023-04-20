@@ -1,0 +1,17 @@
+{
+	"week_nomiss": "week5",
+	"index": -1,
+	"lua_code": "",
+	"save_tag": "week5_nomiss",
+	"desc": "Beat Week 5 on Hard with no Combo Breaks.",
+	"diff": "hard",
+	"name": "Missless Christmas",
+	"color": [
+		160,
+		209,
+		255
+	],
+	"song": "",
+	"hidden": false,
+	"misses": 0
+}

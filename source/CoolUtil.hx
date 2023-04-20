@@ -13,73 +13,94 @@ using StringTools;
 
 class CoolUtil
 {
-	public static function getDifficultyIndex(diff:String, ?difficulties:Array<Dynamic> = null):Int
-	{
-		if (difficulties == null) {
-			difficulties = PlayState.difficulties;
+	//[Difficulty id, Difficulty custom name, Chart file suffix]
+	public static var defaultDifficultes(default, never):Array<Dynamic> = [
+		['easy',	'Easy',		'-easy'],
+		['normal',	'Normal',	''],
+		['hard',	'Hard',		'-hard']
+	];
+	public static var defaultDifficulty(default, never):String = 'Normal';
+	public static var difficultyStuff:Array<Dynamic> = [];
+	public static function loadDifficultiesFromLevel(level:Dynamic):Void {
+		var difficulties:Dynamic = level.difficulties;
+		if(difficulties != null && difficulties.length > 0) {
+			if(Std.isOfType(difficulties, String)) {
+				var diffStr:String = difficulties;
+				if(diffStr != null && diffStr.length > 0) {
+					var diffs:Array<String> = diffStr.trim().split(',');
+					var i:Int = diffs.length - 1;
+					while(i > 0) {
+						if(diffs[i] != null) {
+							diffs[i] = diffs[i].trim();
+							if(diffs[i].length < 1) diffs.remove(diffs[i]);
+						}
+						--i;
+					}
+					if(diffs.length > 0 && diffs[0].length > 0) {
+						difficultyStuff=[];
+						for(i in diffs) {
+							difficultyStuff.push([
+								Paths.formatToSongPath(i),
+								formatToName(i),
+								getDifficultyFilePath(i)
+							]);
+						}
+					}
+				}
+			} else {
+				var diffs:Array<Dynamic> = difficulties;
+				difficultyStuff = diffs;
+			}
+		} else {
+			resetDifficulties();
 		}
-
-		return difficulties[1].indexOf(diff);
+	}
+	public static function resetDifficulties():Void {
+		difficultyStuff = defaultDifficultes.copy();
+	}
+	public static function copyDifficultiesFrom(diffs:Array<Dynamic>):Void {
+		difficultyStuff = diffs.copy();
 	}
 
-	public static function getDifficultyName(diff:String, ?isSuffix:Null<Bool> = false, ?difficulties:Array<Dynamic> = null):String
+	public static function getDifficultyFilePath(diff:String = null):String
 	{
-		if (difficulties == null) {
-			difficulties = PlayState.difficulties;
-		}
-
-		return difficulties[0][difficulties[isSuffix ? 2 : 1].indexOf(diff)];
-	}
-
-	public static function getDifficultyID(diff:String, ?isSuffix:Null<Bool> = false, ?difficulties:Array<Dynamic> = null):String
-	{
-		if (difficulties == null) {
-			difficulties = PlayState.difficulties;
-		}
-
-		return difficulties[1][difficulties[isSuffix ? 2 : 0].indexOf(diff)];
-	}
-
-	public static function getDifficultySuffix(diff:String, ?isName:Null<Bool> = false, ?difficulties:Array<Dynamic> = null):String
-	{
-		if (difficulties == null) {
-			difficulties = PlayState.difficulties;
-		}
-
-		return difficulties[2][difficulties[isName ? 0 : 1].indexOf(diff)];
-	}
-
-	public static function getDifficultyFilePath(diff:String = 'normal'):String
-	{
+		if (diff == null || diff.length < 1) diff = defaultDifficulty;
 		var fileSuffix:String = diff;
 
-		if (fileSuffix != 'normal') {
+		if (fileSuffix != defaultDifficulty) {
 			fileSuffix = '-' + fileSuffix;
 		}
 		else {
 			fileSuffix = '';
 		}
 
-		var result:String = Paths.formatToSongPath(fileSuffix);
-
-		if (result == diff) {
-			return diff;
-		}
-
-		if (diff.contains('normal')) {
-			return '';
-		}
-
-		if (diff.startsWith('-')) {
-			return diff.substring(1, diff.length);
-		}
-
-		return result;
+		return Paths.formatToSongPath(fileSuffix);
 	}
 
-	public static function difficultyString():String
+	public static function difficultyString(last:Bool = false):String
 	{
-		return PlayState.difficulties[0][PlayState.storyDifficulty].toUpperCase();
+		return difficultyStuff[last ? PlayState.lastDifficulty : PlayState.storyDifficulty][1].toUpperCase();
+	}
+
+	public static function getDifficultyIndex(diff:String):Int
+	{
+		for (i in 0...difficultyStuff.length)
+		{
+			if (diff == difficultyStuff[i][0]) {
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
+	public static function difficultyExists(diff:String):Bool
+	{
+		for (i in difficultyStuff) {
+			if (diff == i[0]) return true;
+		}
+
+		return false;
 	}
 
 	public static function fromSuffixToID(suffix:String):String
@@ -125,83 +146,78 @@ class CoolUtil
 			splitter[i] = '' + splitter[i].charAt(0).toUpperCase().trim() + splitter[i].substr(1).toLowerCase().trim();
 		}
 
+		var splitter:Array<String> = splitter.join(' ').trim().split(' ');
+
+		for (i in 0...splitter.length) {
+			splitter[i] = '' + splitter[i].charAt(0).toUpperCase().trim() + splitter[i].substr(1).toLowerCase().trim();
+		}
+
 		return splitter.join(' ');
 	}
 
 	public static function getKeyName(key:FlxKey):String
 	{
-		return switch (key)
+		switch (key)
 		{
-			case BACKSPACE: "BckSpc";
-			case CONTROL: "Ctrl";
-			case ALT: "Alt";
-			case CAPSLOCK: "Caps";
-			case PAGEUP: "PgUp";
-			case PAGEDOWN: "PgDown";
-			case ZERO: "0";
-			case ONE: "1";
-			case TWO: "2";
-			case THREE: "3";
-			case FOUR: "4";
-			case FIVE: "5";
-			case SIX: "6";
-			case SEVEN: "7";
-			case EIGHT: "8";
-			case NINE: "9";
-			case NUMPADZERO: "#0";
-			case NUMPADONE: "#1";
-			case NUMPADTWO: "#2";
-			case NUMPADTHREE: "#3";
-			case NUMPADFOUR: "#4";
-			case NUMPADFIVE: "#5";
-			case NUMPADSIX: "#6";
-			case NUMPADSEVEN: "#7";
-			case NUMPADEIGHT: "#8";
-			case NUMPADNINE: "#9";
-			case NUMPADMULTIPLY: "#*";
-			case NUMPADPLUS: "#+";
-			case NUMPADMINUS: "#-";
-			case NUMPADPERIOD: "#.";
-			case SEMICOLON: ";";
-			case COMMA: ",";
-			case PERIOD: ".";
-			case GRAVEACCENT: "`";
-			case LBRACKET: "[";
-			case RBRACKET: "]";
-			case QUOTE: "'";
-			case PRINTSCREEN: "PrtScrn";
-			case NONE: '---';
+			case BACKSPACE: return "BckSpc";
+			case CONTROL: return "Ctrl";
+			case ALT: return "Alt";
+			case CAPSLOCK: return "Caps";
+			case PAGEUP: return "PgUp";
+			case PAGEDOWN: return "PgDown";
+			case ZERO: return "0";
+			case ONE: return "1";
+			case TWO: return "2";
+			case THREE: return "3";
+			case FOUR: return "4";
+			case FIVE: return "5";
+			case SIX: return "6";
+			case SEVEN: return "7";
+			case EIGHT: return "8";
+			case NINE: return "9";
+			case NUMPADZERO: return "#0";
+			case NUMPADONE: return "#1";
+			case NUMPADTWO: return "#2";
+			case NUMPADTHREE: return "#3";
+			case NUMPADFOUR: return "#4";
+			case NUMPADFIVE: return "#5";
+			case NUMPADSIX: return "#6";
+			case NUMPADSEVEN: return "#7";
+			case NUMPADEIGHT: return "#8";
+			case NUMPADNINE: return "#9";
+			case NUMPADMULTIPLY: return "#*";
+			case NUMPADPLUS: return "#+";
+			case NUMPADMINUS: return "#-";
+			case NUMPADPERIOD: return "#.";
+			case SEMICOLON: return ";";
+			case COMMA: return ",";
+			case PERIOD: return ".";
+			case GRAVEACCENT: return "`";
+			case LBRACKET: return "[";
+			case RBRACKET: return "]";
+			case QUOTE: return "'";
+			case PRINTSCREEN: return "PrtScrn";
+			case NONE: return '---';
 			default:
-			{
-				var label:String = '' + key;
-
-				if (label.toLowerCase() == 'null') {
-					'---';
-				}
-
-				'' + label.charAt(0).toUpperCase() + label.substr(1).toLowerCase();
-			} 
-		}
-	}
-
-	@:deprecated("`CoolUtil.interpolateColor()` is deprecated, use 'FlxTween.color()' instead")
-	public static function interpolateColor(from:FlxColor, to:FlxColor, speed:Float = 0.045, multiplier:Float = 54.5):FlxColor
-	{
-		Debug.logWarn("`CoolUtil.interpolateColor()` is deprecated! use 'FlxTween.color()' instead");
-
-		return FlxColor.interpolate(from, to, boundTo(FlxG.elapsed * (speed * multiplier), 0, 1));
-	}
-
-	@:deprecated("`CoolUtil.coolLerp()` is deprecated, use `FlxMath.lerp()` instead")
-	public static function coolLerp(a:Float, b:Float, ratio:Float, multiplier:Float = 54.5, ?integer:Null<Float> = null):Float
-	{
-		Debug.logWarn("`CoolUtil.coolLerp()` is deprecated! use `FlxMath.lerp()` instead");
-
-		if (integer != null) {
-			return FlxMath.lerp(a, b, boundTo(integer - (FlxG.elapsed * (ratio * multiplier)), 0, 1));
 		}
 
-		return FlxMath.lerp(a, b, boundTo(FlxG.elapsed * (ratio * multiplier), 0, 1));
+		var label:String = '' + key;
+
+		if (label.toLowerCase() == 'null') {
+			return '---';
+		}
+
+		return '' + label.charAt(0).toUpperCase() + label.substr(1).toLowerCase();
+	}
+
+	public static function lerpColor(a:FlxColor, b:FlxColor, ratio:Float):FlxColor
+	{
+		return FlxColor.fromRGBFloat(
+			FlxMath.lerp(a.red, b.red, ratio),
+			FlxMath.lerp(a.green, b.green, ratio),
+			FlxMath.lerp(a.blue, b.blue, ratio),
+			FlxMath.lerp(a.alpha, b.alpha, ratio)
+		);
 	}
 
 	public static function boundTo(value:Float, min:Float, max:Float):Float
@@ -209,19 +225,15 @@ class CoolUtil
 		return Math.max(min, Math.min(max, value));
 	}
 
-	@:deprecated("`CoolUtil.truncateFloat()` is deprecated, use `CoolUtil.floorDecimal()` or 'FlxMath.roundDecimal()' instead")
-	public static function truncateFloat(number:Float, precision:Int):Float
+	public static function roundDecimal(number:Float, precision:Int = 0):Float // copy of field `FlxMath.roundDecimal` you will ask why? answer at the bottom)
 	{
-		Debug.logWarn("`CoolUtil.truncateFloat()` is deprecated! use `CoolUtil.floorDecimal()` or 'FlxMath.roundDecimal()' instead");
+		if (Math.isNaN(number)) number = 0;
 
-		var num:Float = number;
+		if (precision < 1) { // that's the because the `FlxMath.roundDecimal` callback does not have this, and the `CoolUtil.floorDecimal` callback already has this
+			return Math.round(number);
+		}
 
-		if (Math.isNaN(num)) num = 0;
-
-		num = num * Math.pow(10, precision);
-		num = Math.round(num) / Math.pow(10, precision);
-
-		return num;
+		return FlxMath.roundDecimal(number, precision);
 	}
 
 	public static function floorDecimal(number:Float, precision:Int = 0):Float
@@ -241,9 +253,9 @@ class CoolUtil
 		return Math.floor(number * tempMult) / tempMult;
 	}
 
-	public static function coolTextFile(path:String, ?ignoreWarnMsg:Bool = false, ?optimize:Bool = false):Array<String>
+	public static function coolTextFile(path:String, ?ignoreWarnMsg:Bool = false, ?absolute:Bool = false):Array<String>
 	{
-		if (Paths.fileExists(path, TEXT, null, optimize)) {
+		if (Paths.fileExists(path, TEXT, absolute)) {
 			return listFromString(Paths.getTextFromFile(path));
 		}
 
@@ -259,7 +271,18 @@ class CoolUtil
 		return [for (i in string.trim().split('\n')) i = i.trim()];
 	}
 
-	public static function dominantColor(sprite:FlxSprite):Int
+	public static function getColorFromString(?str:Null<String> = null):FlxColor
+	{
+		var string:String = str;
+
+		if (!string.startsWith('0x')) {
+			string = '0xFF' + str;
+		}
+
+		return FlxColor.fromString(string);
+	}
+
+	public static function dominantColor(sprite:FlxSprite):FlxColor
 	{
 		var countByColor:Map<Int, Int> = new Map<Int, Int>();
 
@@ -272,7 +295,7 @@ class CoolUtil
 				if (colorOfThisPixel != 0)
 				{
 					if (countByColor.exists(colorOfThisPixel)) {
-						countByColor[colorOfThisPixel] =  countByColor[colorOfThisPixel] + 1;
+						countByColor[colorOfThisPixel] = countByColor[colorOfThisPixel] + 1;
 					}
 					else if (countByColor[colorOfThisPixel] != 13520687 - (2 * 13520687)) {
 						countByColor[colorOfThisPixel] = 1;
@@ -295,7 +318,7 @@ class CoolUtil
 			}
 		}
 
-		return maxKey;
+		return FlxColor.fromInt(maxKey);
 	}
 
 	public static function numberArray(max:Int, ?min = 0):Array<Int>
@@ -339,57 +362,6 @@ class CoolUtil
 	{
 		Paths.getMusic(sound, library);
 	}
-
-	#if !mobile
-	private static var colorArray:Array<FlxColor> =
-	[
-		FlxColor.fromRGB(148, 0, 211),
-		FlxColor.fromRGB(75, 0, 130),
-		FlxColor.fromRGB(0, 0, 255),
-		FlxColor.fromRGB(0, 255, 0),
-		FlxColor.fromRGB(255, 255, 0),
-		FlxColor.fromRGB(255, 127, 0),
-		FlxColor.fromRGB(255, 0 , 0)
-	];
-
-	private static var currentColor:Int = 0;
-	private static var currentColor2:Int = 0;
-
-	public static function recolorCounters(skippedFrames:Int = 0, skippedFrames2:Int = 0):Void
-	{
-		if (OptionData.rainFPS && skippedFrames >= 6)
-		{
-			if (currentColor >= colorArray.length) {
-				currentColor = 0;
-			}
-
-			Main.fpsCounter.textColor = colorArray[currentColor];
-
-			currentColor++;
-			skippedFrames = 0;
-		}
-		else {
-			skippedFrames++;
-		}
-
-		#if !hl
-		if (OptionData.rainMemory && skippedFrames >= 6)
-		{
-			if (currentColor2 >= colorArray.length) {
-				currentColor2 = 0;
-			}
-
-			Main.memoryCounter.textColor = colorArray[currentColor2];
-
-			currentColor2++;
-			skippedFrames2 = 0;
-		}
-		else {
-			skippedFrames2++;
-		}
-		#end
-	}
-	#end
 
 	#if sys
 	public static function convPathShit(path:String):String

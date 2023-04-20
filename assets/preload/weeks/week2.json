@@ -3,53 +3,35 @@
 	"weekName": "Week 2",
 	"startUnlocked": true,
 	"hiddenUntilUnlocked": false,
+	"itemColor": [34, 51, 68],
 	"songs": [
 		{
 			"songID": "spookeez",
 			"songName": "Spookeez",
 			"character": "spooky",
-			
 			"color": [34, 51, 68],
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		},
 		{
 			"songID": "south",
 			"songName": "South",
 			"character": "spooky",
-			
 			"color": [34, 51, 68],
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		},
 		{
 			"songID": "monster",
 			"songName": "Monster",
 			"character": "monster",
-			
 			"color": [34, 51, 68],
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		}
 	],
-	"difficulties": [
-		["Easy", "Normal", "Hard"],
-		["easy", "normal", "hard"],
-		["-easy", "",     "-hard"]
-	],
-	"defaultDifficulty": "normal",
+	"difficulties": [],
+	"defaultDifficulty": "",
 	"weekCharacters": ["spooky", "bf", "gf"],
 	"weekBackground": "halloween",
 	"weekBefore": "week1",

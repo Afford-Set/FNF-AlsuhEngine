@@ -8,14 +8,14 @@ environment:
 
 install:
   - haxelib install hmm
-  - haxelib run lime rebuild extension-webm linux
+  - haxelib run openfl rebuild extension-webm linux
   - haxelib list
 
 test_script:
-  - haxelib run lime test linux
+  - haxelib run openfl test linux
 
 build_script:
-  - haxelib run lime build linux
+  - haxelib run openfl build linux
 
 after_build:
   - tar -cvf AlsuhEngine-Linux.tar -C /home/appveyor/projects/fnf-alsuhengine-linux/export/release/linux/bin .\

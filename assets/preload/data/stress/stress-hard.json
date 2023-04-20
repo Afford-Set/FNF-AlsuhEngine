@@ -5094,43 +5094,7 @@
 		"validScore": true,
 		"arrowSkin": "",
 		"speed": 2.6,
-		"events": [
-			[
-				62022.4719101124,
-				[
-					[
-						"Play Animation",
-						"singDOWN-alt",
-						"dad"
-					],
-					[
-						"Set Property",
-						"defaultCamZoom",
-						"1.08"
-					],
-					[
-						"Camera Follow Pos",
-						"320",
-						"504"
-					]
-				]
-			],
-			[
-				64719.1011235955,
-				[
-					[
-						"Camera Follow Pos",
-						"",
-						""
-					],
-					[
-						"Set Property",
-						"defaultCamZoom",
-						"0.9"
-					]
-				]
-			]
-		],
+		"events": [],
 		"gfVersion": "pico-speaker",
 		"arrowSkin2": "",
 		"needsVoices": true,

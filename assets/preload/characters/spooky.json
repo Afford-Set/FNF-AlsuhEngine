@@ -1,5 +1,6 @@
 {
 	"char_name": "Skid and Pump (Spooky Kids)",
+	"skip_dance": false,
 	"animations": [
 		{
 			"loop": false,

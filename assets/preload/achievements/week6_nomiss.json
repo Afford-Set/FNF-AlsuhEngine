@@ -1,0 +1,17 @@
+{
+	"week_nomiss": "week6",
+	"index": -1,
+	"lua_code": "",
+	"save_tag": "week6_nomiss",
+	"desc": "Beat Week 6 on Hard with no Combo Breaks.",
+	"diff": "hard",
+	"name": "Highscore!!",
+	"color": [
+		255,
+		120,
+		191
+	],
+	"song": "",
+	"hidden": false,
+	"misses": 0
+}

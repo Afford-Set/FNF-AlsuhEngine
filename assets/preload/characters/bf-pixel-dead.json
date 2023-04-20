@@ -1,53 +1,47 @@
 {
+	"char_name": "Boyfriend",
 	"animations": [
 		{
-			"offsets": [
-				-30,
-				-12
-			],
 			"loop": false,
+			"offsets": [
+				-10,
+				-32
+			],
+			"fps": 24,
 			"anim": "deathConfirm",
-			"fps": 24,
-			"name": "RETRY CONFIRM",
-			"indices": []
+			"indices": [],
+			"name": "RETRY CONFIRM"
 		},
 		{
-			"offsets": [
-				-30,
-				-12
-			],
-			"loop": true,
-			"anim": "deathLoop",
-			"fps": 24,
-			"name": "Retry Loop",
-			"indices": []
-		},
-		{
-			"offsets": [
-				0,
-				0
-			],
 			"loop": false,
-			"anim": "firstDeath",
+			"offsets": [
+				-10,
+				-32
+			],
 			"fps": 24,
-			"name": "BF Dies pixel",
-			"indices": []
+			"anim": "deathLoop",
+			"indices": [],
+			"name": "Retry Loop"
+		},
+		{
+			"loop": false,
+			"offsets": [
+				20,
+				-20
+			],
+			"fps": 24,
+			"anim": "firstDeath",
+			"indices": [],
+			"name": "BF Dies pixel"
 		}
 	],
 	"no_antialiasing": true,
-	"gameover_properties": [
-		"bf-dead",
-		"fnf_loss_sfx",
-		"gameOver",
-		"gameOverEnd"
-	],
 	"image": "characters/bfPixelsDEAD",
 	"position": [
 		0,
 		350
 	],
 	"healthicon": "bf-pixel",
-	"char_name": "Boyfriend",
 	"flip_x": true,
 	"healthbar_colors": [
 		123,

@@ -2,15 +2,15 @@
 <TextureAtlas imagePath="chart_quant.png">
 	<!-- Created with Adobe Animate version 21.0.5.40714 -->
 	<!-- http://www.adobe.com/products/animate.html -->
-	<SubTexture name="chart_quant0000" x="1" y="1" width="26" height="20"/>
-	<SubTexture name="chart_quant0001" x="28" y="1" width="26" height="20"/>
-	<SubTexture name="chart_quant0002" x="55" y="1" width="26" height="20"/>
-	<SubTexture name="chart_quant0003" x="82" y="1" width="26" height="20"/>
-	<SubTexture name="chart_quant0004" x="1" y="22" width="26" height="20"/>
-	<SubTexture name="chart_quant0005" x="28" y="22" width="26" height="20"/>
-	<SubTexture name="chart_quant0006" x="55" y="22" width="26" height="20"/>
-	<SubTexture name="chart_quant0007" x="82" y="22" width="26" height="20"/>
-	<SubTexture name="chart_quant0008" x="1" y="43" width="26" height="20"/>
-	<SubTexture name="chart_quant0009" x="1" y="22" width="26" height="20"/>
-	<SubTexture name="chart_quant0010" x="1" y="22" width="26" height="20"/>
+	<SubTexture name="chart_quant instance 10000" x="0" y="0" width="26" height="20"/>
+	<SubTexture name="chart_quant instance 10001" x="0" y="25" width="26" height="20"/>
+	<SubTexture name="chart_quant instance 10002" x="0" y="50" width="26" height="20"/>
+	<SubTexture name="chart_quant instance 10003" x="31" y="0" width="26" height="20"/>
+	<SubTexture name="chart_quant instance 10004" x="62" y="0" width="26" height="20"/>
+	<SubTexture name="chart_quant instance 10005" x="31" y="25" width="26" height="20"/>
+	<SubTexture name="chart_quant instance 10006" x="62" y="25" width="26" height="20"/>
+	<SubTexture name="chart_quant instance 10007" x="31" y="50" width="26" height="20"/>
+	<SubTexture name="chart_quant instance 10008" x="62" y="50" width="26" height="20"/>
+	<SubTexture name="chart_quant instance 10009" x="62" y="0" width="26" height="20"/>
+	<SubTexture name="chart_quant instance 10010" x="62" y="0" width="26" height="20"/>
 </TextureAtlas>

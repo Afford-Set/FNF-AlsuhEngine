@@ -1,14 +1,15 @@
 {
+	"char_name": "Girlfriend",
+	"skip_dance": false,
 	"animations": [
 		{
-			"loop": false,
 			"offsets": [
-				-3,
+				0,
 				0
 			],
-			"anim": "danceLeft",
+			"loop": false,
 			"fps": 24,
-			"name": "GF IDLE",
+			"anim": "danceLeft",
 			"indices": [
 				30,
 				0,
@@ -26,17 +27,17 @@
 				12,
 				13,
 				14
-			]
+			],
+			"name": "GF IDLE"
 		},
 		{
-			"loop": false,
 			"offsets": [
 				0,
 				0
 			],
-			"anim": "danceRight",
+			"loop": false,
 			"fps": 24,
-			"name": "GF IDLE",
+			"anim": "danceRight",
 			"indices": [
 				15,
 				16,
@@ -53,18 +54,41 @@
 				27,
 				28,
 				29
-			]
+			],
+			"name": "GF IDLE"
 		},
 		{
-			"loop": false,
 			"offsets": [
 				0,
 				0
 			],
-			"anim": "singUP",
+			"loop": false,
 			"fps": 24,
-			"name": "GF IDLE",
-			"indices": []
+			"anim": "singUP",
+			"indices": [],
+			"name": "GF IDLE"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"indices": [],
+			"fps": 24,
+			"anim": "sad",
+			"loop": false,
+			"name": "GF SAD"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"indices": [],
+			"fps": 24,
+			"anim": "cheer",
+			"loop": false,
+			"name": "GF CHEER"
 		}
 	],
 	"no_antialiasing": true,
@@ -73,17 +97,16 @@
 		0,
 		0
 	],
-	"healthicon": "gf",
-	"char_name": "Girlfriend",
+	"healthicon": "gf-pixel",
 	"flip_x": false,
 	"healthbar_colors": [
-		165,
-		0,
-		77
+		215,
+		59,
+		130
 	],
 	"camera_position": [
-		0,
-		0
+		-20,
+		80
 	],
 	"sing_duration": 4,
 	"scale": 5.99999999999999

@@ -2,27 +2,20 @@
 	"weekID": "tutorial",
 	"weekName": "Tutorial",
 	"startUnlocked": true,
-	"defaultDifficulty": "normal",
+	"defaultDifficulty": "",
 	"hiddenUntilUnlocked": false,
+	"itemColor": [165, 0, 77],
 	"songs": [
 		{
 			"songID": "tutorial",
 			"songName": "Tutorial",
 			"character": "gf",
 			"color": [165, 0, 77],
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		}
 	],
-	"difficulties": [
-		["Easy", "Normal", "Hard"],
-		["easy", "normal", "hard"],
-		["-easy", "",     "-hard"]
-	],
+	"difficulties": [],
 	"weekCharacters": ["", "bf", "gf"],
 	"weekBackground": "stage",
 	"weekBefore": "tutorial",

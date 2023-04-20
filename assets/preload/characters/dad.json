@@ -1,5 +1,4 @@
 {
-	"char_name": "Daddy Dearest",
 	"animations": [
 		{
 			"offsets": [
@@ -122,12 +121,20 @@
 		}
 	],
 	"no_antialiasing": false,
+	"gameover_properties": [
+		"bf-dead",
+		"fnf_loss_sfx",
+		"gameOver",
+		"gameOverEnd"
+	],
 	"image": "characters/DADDY_DEAREST",
 	"position": [
 		0,
 		0
 	],
+	"skip_dance": false,
 	"healthicon": "dad",
+	"char_name": "Daddy Dearest",
 	"flip_x": false,
 	"healthbar_colors": [
 		175,

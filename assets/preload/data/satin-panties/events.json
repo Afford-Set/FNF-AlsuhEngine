@@ -1,10 +1,5 @@
 {
 	"song": {
-		"speed": 1.8,
-		"stage": null,
-		"player1": "bf-car",
-		"player2": "mom-car",
-		"player3": null,
 		"events": [
 			[
 				21818.1818181818,
@@ -26,17 +21,6 @@
 					]
 				]
 			]
-		],
-		"notes": [],
-		"splashSkin": "noteSplashes",
-		"arrowSkin2": "",
-		"gfVersion": null,
-		"bpm": 110,
-		"splashSkin2": "noteSplashes",
-		"arrowSkin": "",
-		"needsVoices": true,
-		"songID": "satin-panties",
-		"songName": "Satin Panties",
-		"song": "Satin Panties"
+		]
 	}
 }

@@ -1,0 +1,17 @@
+{
+	"week_nomiss": "",
+	"index": -1,
+	"lua_code": "",
+	"save_tag": "two_keys",
+	"desc": "Finish a Song pressing only two keys.",
+	"diff": "",
+	"name": "Just the Two of Us",
+	"color": [
+		255,
+		228,
+		0
+	],
+	"song": "",
+	"hidden": false,
+	"misses": -1
+}

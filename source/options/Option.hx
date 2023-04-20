@@ -111,19 +111,20 @@ class Option
 	{
 		Reflect.setProperty(OptionData, variable, value);
 
-		#if LUA_ALLOWED
 		if (onPause && PlayState.instance != null && !blockedOnPause) // for lua shit
 		{
 			var existsShit:Bool = OptionData.luaPrefsMap.exists(variable);
-			var ourName:String = existsShit ? OptionData.luaPrefsMap.get(variable)[0] : null;
-
-			if (existsShit && ourName != null) {
-				PlayState.instance.setOnLuas(ourName, value);
-			}
+			var names:Array<String> = existsShit ? OptionData.luaPrefsMap.get(variable)[0] : null;
 
 			OptionData.loadLuaPrefs();
+
+			if (names != null && names.length > 0)
+			{
+				for (i in names) {
+					PlayState.instance.setOnLuas(i, value);
+				}
+			}
 		}
-		#end
 	}
 
 	private function set_blockedOnPause(value:Bool):Bool

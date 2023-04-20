@@ -4,7 +4,7 @@ package options;
 import Discord.DiscordClient;
 #end
 
-import shaders.ColorSwap;
+import shaderslmfao.ColorSwap;
 import options.OptionsMenuState;
 
 import flixel.FlxG;
@@ -13,7 +13,11 @@ import flixel.text.FlxText;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
+#if (flixel >= "5.3.0")
+import flixel.sound.FlxSound;
+#else
 import flixel.system.FlxSound;
+#end
 import flixel.effects.FlxFlicker;
 
 using StringTools;
@@ -45,8 +49,6 @@ class NotesSubState extends MusicBeatSubState
 
 	public override function create():Void
 	{
-		super.create();
-		
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Options Menu - Notes", null);
 		#end
@@ -86,22 +88,30 @@ class NotesSubState extends MusicBeatSubState
 			add(levelInfo);
 	
 			var levelDifficulty:FlxText = new FlxText(20, 20 + 32, 0, '', 32);
-			levelDifficulty.text += CoolUtil.getDifficultyName(PlayState.lastDifficulty, PlayState.difficulties).toUpperCase();
+			levelDifficulty.text += CoolUtil.difficultyString(true);
 			levelDifficulty.scrollFactor.set();
 			levelDifficulty.setFormat(Paths.getFont('vcr.ttf'), 32);
 			levelDifficulty.updateHitbox();
 			levelDifficulty.x = FlxG.width - (levelDifficulty.width + 20);
 			add(levelDifficulty);
 	
-			var blueballedTxt:FlxText = new FlxText(20, 20 + 64, 0, '', 32);
-			blueballedTxt.text = 'Blue balled: ' + PlayState.deathCounter;
-			blueballedTxt.scrollFactor.set();
-			blueballedTxt.setFormat(Paths.getFont('vcr.ttf'), 32);
-			blueballedTxt.updateHitbox();
-			blueballedTxt.x = FlxG.width - (blueballedTxt.width + 20);
-			add(blueballedTxt);
+			var pos:Int = 64;
+			var blueballedTxt:FlxText = null;
+			
+			if (OptionData.naughtyness)
+			{
+				blueballedTxt = new FlxText(20, 20 + 64, 0, '', 32);
+				blueballedTxt.text = 'Blue balled: ' + PlayState.deathCounter;
+				blueballedTxt.scrollFactor.set();
+				blueballedTxt.setFormat(Paths.getFont('vcr.ttf'), 32);
+				blueballedTxt.updateHitbox();
+				blueballedTxt.x = FlxG.width - (blueballedTxt.width + 20);
+				add(blueballedTxt);
 	
-			var chartingText:FlxText = new FlxText(20, 20 + 96, 0, "CHARTING MODE", 32);
+				pos = 96;
+			}
+	
+			var chartingText:FlxText = new FlxText(20, 20 + pos, 0, "CHARTING MODE", 32);
 			chartingText.scrollFactor.set();
 			chartingText.setFormat(Paths.getFont('vcr.ttf'), 32);
 			chartingText.x = FlxG.width - (chartingText.width + 20);
@@ -109,12 +119,12 @@ class NotesSubState extends MusicBeatSubState
 			chartingText.visible = PlayState.chartingMode;
 			add(chartingText);
 	
-			var practiceText:FlxText = new FlxText(20, 20 + (PlayState.chartingMode ? 128 : 96), 0, 'PRACTICE MODE', 32);
+			var practiceText:FlxText = new FlxText(20, 20 + (pos + (PlayState.chartingMode ? 32 : 0)), 0, 'PRACTICE MODE', 32);
 			practiceText.scrollFactor.set();
 			practiceText.setFormat(Paths.getFont('vcr.ttf'), 32);
 			practiceText.x = FlxG.width - (practiceText.width + 20);
 			practiceText.updateHitbox();
-			practiceText.alpha = PlayStateChangeables.practiceMode ? 1 : 0;
+			practiceText.alpha = PlayState.instance.practiceMode ? 1 : 0;
 			add(practiceText);
 		}
 		
@@ -140,7 +150,13 @@ class NotesSubState extends MusicBeatSubState
 			}
 
 			var note:FlxSprite = new FlxSprite(posX, yPos);
-			note.frames = Paths.getSparrowAtlas('notes/NOTE_assets');
+			var notePath:String = 'notes/NOTE_assets';
+
+			if (Paths.fileExists('images/NOTE_assets.png', IMAGE)) {
+				notePath = 'NOTE_assets';
+			}
+
+			note.frames = Paths.getSparrowAtlas(notePath);
 
 			var animations:Array<String> = Note.colArray.copy();
 			animations[i] += ' instance';
@@ -168,8 +184,9 @@ class NotesSubState extends MusicBeatSubState
 		add(hsbText);
 
 		changeSelection();
-
 		if (isPause) cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
+
+		super.create();
 	}
 
 	var nextAccept:Int = 5;
@@ -184,11 +201,9 @@ class NotesSubState extends MusicBeatSubState
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
 		var pauseMusic:FlxSound = PauseSubState.pauseMusic;
 
-		if (isPause && pauseMusic != null && pauseMusic.volume < 0.5) {
+		if (OptionData.pauseMusic != 'None' && isPause && pauseMusic != null && pauseMusic.volume < 0.5) {
 			pauseMusic.volume += 0.01 * elapsed;
 		}
 
@@ -336,7 +351,7 @@ class NotesSubState extends MusicBeatSubState
 
 						FlxFlicker.flicker(grpNotes.members[curSelected], 1, 0.06, true);
 
-						FlxFlicker.flicker(grpNumbers.members[(curSelected * 3) + typeSelected], 1, 0.06, true, false, function(flick:FlxFlicker):Void {
+						FlxFlicker.flicker(grpNumbers.members[(curSelected * 3) + typeSelected], 1, 0.06, true, false, function(flk:FlxFlicker):Void {
 							selectType();
 						});
 
@@ -370,6 +385,8 @@ class NotesSubState extends MusicBeatSubState
 		if (nextAccept > 0) {
 			nextAccept -= 1;
 		}
+
+		super.update(elapsed);
 	}
 
 	function selectType():Void
@@ -492,8 +509,7 @@ class NotesSubState extends MusicBeatSubState
 		var roundedValue:Int = Math.round(curValue);
 		var max:Float = 180;
 
-		switch (typeSelected)
-		{
+		switch (typeSelected) {
 			case 1 | 2: max = 100;
 		}
 
@@ -531,15 +547,17 @@ class NotesSubState extends MusicBeatSubState
 
 	function reloadAllShitOnGame():Void
 	{
-		if (isPause && PlayState.instance != null)
+		var game:PlayState = PlayState.instance;
+
+		if (isPause && game != null)
 		{
-			PlayState.instance.notes.forEachAlive(function(note:Note):Void
+			game.notes.forEachAlive(function(note:Note):Void
 			{
 				@:privateAccess
 				var maxNote:Int = Note.maxNote;
 				var noteData:Int = note.noteData;
 
-				if (noteData > -1 && noteData < OptionData.arrowHSV.length)
+				if (noteData > -1 && noteData < OptionData.arrowHSV.length && !note.isCustomHSB)
 				{
 					note.colorSwap.hue = OptionData.arrowHSV[noteData % maxNote][0] / 360;
 					note.colorSwap.saturation = OptionData.arrowHSV[noteData % maxNote][1] / 100;
@@ -551,7 +569,7 @@ class NotesSubState extends MusicBeatSubState
 				note.noteSplashBrt = note.colorSwap.brightness;
 			});
 
-			PlayState.instance.playerStrums.forEachAlive(function(note:StrumNote):Void
+			game.playerStrums.forEachAlive(function(note:StrumNote):Void
 			{
 				var noteData:Int = note.noteData;
 
@@ -572,7 +590,7 @@ class NotesSubState extends MusicBeatSubState
 				}
 			});
 
-			PlayState.instance.opponentStrums.forEachAlive(function(note:StrumNote):Void
+			game.opponentStrums.forEachAlive(function(note:StrumNote):Void
 			{
 				var noteData:Int = note.noteData;
 
@@ -593,9 +611,9 @@ class NotesSubState extends MusicBeatSubState
 				}
 			});
 
-			PlayState.instance.grpNoteSplashes.forEachAlive(function(noteSpl:NoteSplash):Void
+			game.grpNoteSplashes.forEachAlive(function(noteSpl:NoteSplash):Void
 			{
-				if (noteSpl.note > -1 && noteSpl.note < OptionData.arrowHSV.length)
+				if (noteSpl.note > -1 && noteSpl.note < OptionData.arrowHSV.length && !noteSpl.isCustomHSB)
 				{
 					noteSpl.colorSwap.hue = OptionData.arrowHSV[noteSpl.note][0] / 360;
 					noteSpl.colorSwap.saturation = OptionData.arrowHSV[noteSpl.note][1] / 100;

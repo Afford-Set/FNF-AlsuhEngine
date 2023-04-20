@@ -22,127 +22,69 @@ class GameplayChangersSubState extends MusicBeatSubState
 	var curOption:GameplayOption;
 	var defaultValue:GameplayOption = new GameplayOption('Reset to Default Values');
 
-	var isPause:Bool = false;
-
-	public function new(?isPause:Bool = false):Void
-	{
-		super();
-
-		this.isPause = isPause;
-	}
-
 	var grpOptions:FlxTypedGroup<Alphabet>;
 	var checkboxGroup:FlxTypedGroup<CheckboxThingie>;
 	var grpTexts:FlxTypedGroup<AttachedText>;
 
 	function getOptions():Void
 	{
-		if (!isPause)
+		var goption:GameplayOption = new GameplayOption('Scroll Type', 'scrolltype', 'string', 'multiplicative', ["multiplicative", "constant"]);
+		optionsArray.push(goption);
+
+		var option:GameplayOption = new GameplayOption('Scroll Speed', 'scrollspeed', 'float', 1);
+		option.scrollSpeed = 2.0;
+		option.minValue = 0.35;
+		option.changeValue = 0.05;
+		option.decimals = 2;
+
+		if (goption.getValue() != "constant")
 		{
-			var goption:GameplayOption = new GameplayOption('Scroll Type', 'scrollType', 'string', 'multiplicative', ["multiplicative", "constant"]);
-			optionsArray.push(goption);
-	
-			var option:GameplayOption = new GameplayOption('Scroll Speed', 'scrollSpeed', 'float', 1);
-			option.scrollSpeed = 2.0;
-			option.minValue = 0.35;
-			option.changeValue = 0.05;
-			option.decimals = 2;
-	
-			if (goption.getValue() != "constant")
-			{
-				option.displayFormat = '%vX';
-				option.maxValue = 3;
-			}
-			else
-			{
-				option.displayFormat = "%v";
-				option.maxValue = 6;
-			}
-	
-			optionsArray.push(option);
+			option.displayFormat = '%vX';
+			option.maxValue = 3;
+		}
+		else
+		{
+			option.displayFormat = "%v";
+			option.maxValue = 6;
 		}
 
-		var option:GameplayOption = new GameplayOption('Playback Rate', 'playbackRate', 'float', 1);
+		optionsArray.push(option);
+
+		var option:GameplayOption = new GameplayOption('Playback Rate', 'songspeed', 'float', 1);
 		option.scrollSpeed = 1;
 		option.minValue = 0.5;
 		option.maxValue = 3.0;
 		option.changeValue = 0.05;
 		option.displayFormat = '%vX';
 		option.decimals = 2;
-		option.luaAllowed = true;
-		option.luaString = 'playbackRate';
 		optionsArray.push(option);
 
-		var option:GameplayOption = new GameplayOption('Health Gain Multiplier', 'healthGain', 'float', 1);
+		var option:GameplayOption = new GameplayOption('Health Gain Multiplier', 'healthgain', 'float', 1);
 		option.scrollSpeed = 2.5;
 		option.minValue = 0;
 		option.maxValue = 5;
 		option.changeValue = 0.1;
 		option.displayFormat = '%vX';
-		option.luaAllowed = true;
-		option.luaString = 'healthGainMult';
 		optionsArray.push(option);
 
-		var option:GameplayOption = new GameplayOption('Health Loss Multiplier', 'healthLoss', 'float', 1);
+		var option:GameplayOption = new GameplayOption('Health Loss Multiplier', 'healthloss', 'float', 1);
 		option.scrollSpeed = 2.5;
 		option.minValue = 0.5;
 		option.maxValue = 5;
 		option.changeValue = 0.1;
 		option.displayFormat = '%vX';
-		option.luaAllowed = true;
-		option.luaString = 'healthLossMult';
 		optionsArray.push(option);
 
-		if (!isPause)
-		{
-			var option:GameplayOption = new GameplayOption('Random Notes', 'randomNotes', 'bool', false);
-			optionsArray.push(option);
-
-			var option:GameplayOption = new GameplayOption('Instakill on Miss', 'instaKill', 'bool', false);
-			option.luaAllowed = true;
-			option.luaString = 'instakillOnMiss';
-			optionsArray.push(option);
-		}
-
-		var option:GameplayOption = new GameplayOption('Botplay', 'botPlay', 'bool', false);
-		option.onChange = function():Void
-		{
-			if (isPause && PlayState.instance != null)
-			{
-				PlayState.instance.cpuControlled = PlayStateChangeables.botPlay;
-				PlayState.instance.botplayTxt.alpha = 1;
-				PlayState.instance.botplaySine = 0;
-			}
-	
-			PlayState.usedPractice = PlayStateChangeables.botPlay;
-		};
-
-		option.luaAllowed = true;
-		option.luaString = 'botPlay';
+		var option:GameplayOption = new GameplayOption('Random Notes', 'randomnotes', 'bool', false);
 		optionsArray.push(option);
 
-		var option:GameplayOption = new GameplayOption('Practice Mode', 'practiceMode', 'bool', false);
-		option.onChange = function():Void
-		{
-			if (isPause)
-			{
-				if (PlayState.instance != null)
-				{
-					PlayState.instance.practiceMode = PlayStateChangeables.practiceMode;
+		var option:GameplayOption = new GameplayOption('Instakill on Miss', 'instakill', 'bool', false);
+		optionsArray.push(option);
 
-					if (PlayState.instance.practiceMode) {
-						FlxTween.tween(practiceText, {alpha: 1, y: practiceText.y + 5}, 0.4, {ease: FlxEase.quartInOut});
-					}
-					else {
-						FlxTween.tween(practiceText, {alpha: 0, y: practiceText.y - 5}, 0.4, {ease: FlxEase.quartInOut});
-					}
-				}
-			}
-	
-			PlayState.usedPractice = PlayStateChangeables.practiceMode;
-		};
-		option.luaAllowed = true;
-		option.luaString = 'practiceMode';
+		var option:GameplayOption = new GameplayOption('Practice Mode', 'practice', 'bool', false);
+		optionsArray.push(option);
+
+		var option:GameplayOption = new GameplayOption('Botplay', 'botplay', 'bool', false);
 		optionsArray.push(option);
 
 		defaultValue.type = 'amogus';
@@ -174,49 +116,6 @@ class GameplayChangersSubState extends MusicBeatSubState
 		bg.alpha = 0.6;
 		add(bg);
 
-		if (isPause)
-		{
-			var levelInfo:FlxText = new FlxText(20, 20, 0, '', 32);
-			levelInfo.text += PlayState.SONG.songName;
-			levelInfo.scrollFactor.set();
-			levelInfo.setFormat(Paths.getFont('vcr.ttf'), 32);
-			levelInfo.updateHitbox();
-			levelInfo.x = FlxG.width - (levelInfo.width + 20);
-			add(levelInfo);
-	
-			var levelDifficulty:FlxText = new FlxText(20, 20 + 32, 0, '', 32);
-			levelDifficulty.text += CoolUtil.getDifficultyName(PlayState.lastDifficulty, PlayState.difficulties).toUpperCase();
-			levelDifficulty.scrollFactor.set();
-			levelDifficulty.setFormat(Paths.getFont('vcr.ttf'), 32);
-			levelDifficulty.updateHitbox();
-			levelDifficulty.x = FlxG.width - (levelDifficulty.width + 20);
-			add(levelDifficulty);
-	
-			var blueballedTxt:FlxText = new FlxText(20, 20 + 64, 0, '', 32);
-			blueballedTxt.text = 'Blue balled: ' + PlayState.deathCounter;
-			blueballedTxt.scrollFactor.set();
-			blueballedTxt.setFormat(Paths.getFont('vcr.ttf'), 32);
-			blueballedTxt.updateHitbox();
-			blueballedTxt.x = FlxG.width - (blueballedTxt.width + 20);
-			add(blueballedTxt);
-
-			var chartingText:FlxText = new FlxText(20, 20 + 96, 0, "CHARTING MODE", 32);
-			chartingText.scrollFactor.set();
-			chartingText.setFormat(Paths.getFont('vcr.ttf'), 32);
-			chartingText.x = FlxG.width - (chartingText.width + 20);
-			chartingText.updateHitbox();
-			chartingText.visible = PlayState.chartingMode;
-			add(chartingText);
-	
-			practiceText = new FlxText(20, 15 + (PlayState.chartingMode ? 128 : 96) + (PlayStateChangeables.practiceMode ? 5 : 0), 0, 'PRACTICE MODE', 32);
-			practiceText.scrollFactor.set();
-			practiceText.setFormat(Paths.getFont('vcr.ttf'), 32);
-			practiceText.x = FlxG.width - (practiceText.width + 20);
-			practiceText.updateHitbox();
-			practiceText.alpha = PlayStateChangeables.practiceMode ? 1 : 0;
-			add(practiceText);
-		}
-
 		grpOptions = new FlxTypedGroup<Alphabet>();
 		add(grpOptions);
 
@@ -232,15 +131,12 @@ class GameplayChangersSubState extends MusicBeatSubState
 		{
 			var leOption:GameplayOption = optionsArray[i];
 
-			if (isPause) {
-				leOption.onPause = true;
-			}
-
 			var optionText:Alphabet = new Alphabet(200, 360, leOption.name, true);
 			optionText.isMenuItem = true;
 			optionText.scaleX = 0.8;
 			optionText.scaleY = 0.8;
 			optionText.targetY = i;
+			optionText.setPosition(300, 70 * i);
 			grpOptions.add(optionText);
 
 			switch (leOption.type)
@@ -249,7 +145,7 @@ class GameplayChangersSubState extends MusicBeatSubState
 				{
 					optionText.x += 110;
 					optionText.startPosition.x += 110;
-					optionText.snapToPosition();
+					optionText.hasIcon = true;
 
 					var checkbox:CheckboxThingie = new CheckboxThingie(optionText.x - 105, optionText.y, leOption.getValue() == true);
 					checkbox.sprTracker = optionText;
@@ -271,8 +167,6 @@ class GameplayChangersSubState extends MusicBeatSubState
 				}
 				case 'int' | 'float' | 'percent' | 'string':
 				{
-					optionText.snapToPosition();
-
 					var valueText:AttachedText = new AttachedText(Std.string(leOption.getValue()), optionText.width, -72, true, 0.8);
 					valueText.sprTracker = optionText;
 					valueText.copyAlpha = true;
@@ -282,9 +176,6 @@ class GameplayChangersSubState extends MusicBeatSubState
 
 					leOption.setChild(valueText);
 				}
-				default: {
-					optionText.snapToPosition();
-				}
 			}
 
 			updateTextFrom(leOption);
@@ -292,8 +183,6 @@ class GameplayChangersSubState extends MusicBeatSubState
 
 		changeSelection();
 		reloadCheckboxes();
-
-		if (isPause) cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 	}
 
 	var flickering:Bool = false;
@@ -307,22 +196,10 @@ class GameplayChangersSubState extends MusicBeatSubState
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
 		if (controls.BACK || FlxG.mouse.justPressedRight)
 		{
-			PlayStateChangeables.saveChangeables();
-
-			if (isPause)
-			{
-				PlayState.isNextSubState = true;
-
-				FlxG.state.closeSubState();
-				FlxG.state.openSubState(new PauseSubState(true));
-			}
-			else {
-				close();
-			}
+			OptionData.savePrefs();
+			close();
 
 			FlxG.sound.play(Paths.getSound('cancelMenu'));
 		}
@@ -334,14 +211,12 @@ class GameplayChangersSubState extends MusicBeatSubState
 				if (controls.UI_UP_P)
 				{
 					changeSelection(-1);
-
 					holdTime = 0;
 				}
 
 				if (controls.UI_DOWN_P)
 				{
 					changeSelection(1);
-
 					holdTime = 0;
 				}
 
@@ -369,7 +244,7 @@ class GameplayChangersSubState extends MusicBeatSubState
 					{
 						flickering = true;
 
-						FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flick:FlxFlicker):Void
+						FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flk:FlxFlicker):Void
 						{
 							reset();
 							FlxG.sound.play(Paths.getSound('cancelMenu'));
@@ -387,13 +262,13 @@ class GameplayChangersSubState extends MusicBeatSubState
 				}
 				else
 				{
-					if (curOption.type == 'bool' && !curOption.blockedOnPause)
+					if (curOption.type == 'bool')
 					{
 						if (OptionData.flashingLights)
 						{
 							flickering = true;
 
-							FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flick:FlxFlicker):Void {
+							FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flk:FlxFlicker):Void {
 								changeBool(curOption);
 							});
 
@@ -409,7 +284,7 @@ class GameplayChangersSubState extends MusicBeatSubState
 						{
 							flickering = true;
 
-							FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flick:FlxFlicker):Void
+							FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flk:FlxFlicker):Void
 							{
 								flickering = false;
 								curOption.change();
@@ -424,7 +299,7 @@ class GameplayChangersSubState extends MusicBeatSubState
 				}
 			}
 
-			if (curOption.type != 'bool' && curOption.type != 'menu' && curOption != defaultValue && !curOption.blockedOnPause)
+			if (curOption.type != 'bool' && curOption.type != 'menu' && curOption != defaultValue)
 			{
 				if (controls.UI_LEFT || controls.UI_RIGHT)
 				{
@@ -444,12 +319,7 @@ class GameplayChangersSubState extends MusicBeatSubState
 							{
 								case 'int' | 'float' | 'percent':
 								{
-									holdValue = curOption.getValue() + add;
-
-									if (holdValue < curOption.minValue)
-										holdValue = curOption.minValue;
-									else if (holdValue > curOption.maxValue)
-										holdValue = curOption.maxValue;
+									holdValue = CoolUtil.boundTo(curOption.getValue() + add, curOption.minValue, curOption.maxValue);
 
 									switch (curOption.type)
 									{
@@ -460,7 +330,7 @@ class GameplayChangersSubState extends MusicBeatSubState
 										}
 										case 'float' | 'percent':
 										{
-											holdValue = FlxMath.roundDecimal(holdValue, curOption.decimals);
+											holdValue = CoolUtil.roundDecimal(holdValue, curOption.decimals);
 											curOption.setValue(holdValue);
 										}
 									}
@@ -468,19 +338,33 @@ class GameplayChangersSubState extends MusicBeatSubState
 								case 'string':
 								{
 									var num:Int = curOption.curOption; // lol
-
-									if (controls.UI_LEFT_P)
-										--num;
-									else
-										num++;
-
-									if (num < 0)
-										num = curOption.options.length - 1;
-									else if (num >= curOption.options.length)
-										num = 0;
+									num = CoolUtil.boundSelection(num + (controls.UI_LEFT_P ? -1 : 1), curOption.options.length);
 
 									curOption.curOption = num;
-									curOption.setValue(curOption.options[num]); // lol
+									curOption.setValue(curOption.options[num]); //lol
+									
+									if (curOption.name == "Scroll Type")
+									{
+										var oOption:GameplayOption = getOptionByName("Scroll Speed");
+
+										if (oOption != null)
+										{
+											if (curOption.getValue() == "constant")
+											{
+												oOption.displayFormat = "%v";
+												oOption.maxValue = 6;
+											}
+											else
+											{
+												oOption.displayFormat = "%vX";
+												oOption.maxValue = 3;
+
+												if (oOption.getValue() > 3) oOption.setValue(3);
+											}
+
+											updateTextFrom(oOption);
+										}
+									}
 								}
 							}
 
@@ -491,22 +375,16 @@ class GameplayChangersSubState extends MusicBeatSubState
 						}
 						else if (curOption.type != 'string')
 						{
-							holdValue += curOption.scrollSpeed * elapsed * (controls.UI_LEFT ? -1 : 1);
-
-							if (holdValue < curOption.minValue) 
-								holdValue = curOption.minValue;
-							else if (holdValue > curOption.maxValue)
-								holdValue = curOption.maxValue;
+							holdValue = CoolUtil.boundTo(holdValue + curOption.scrollSpeed * elapsed * (controls.UI_LEFT ? -1 : 1), curOption.minValue, curOption.maxValue);
 
 							switch (curOption.type)
 							{
 								case 'int':
-								{
 									curOption.setValue(Math.round(holdValue));
-								}
 								case 'float' | 'percent':
 								{
-									curOption.setValue(FlxMath.roundDecimal(holdValue, curOption.decimals));
+									var blah:Float = CoolUtil.boundTo(holdValue + curOption.changeValue - (holdValue % curOption.changeValue), curOption.minValue, curOption.maxValue);
+									curOption.setValue(CoolUtil.roundDecimal(blah, curOption.decimals));
 								}
 							}
 
@@ -527,22 +405,16 @@ class GameplayChangersSubState extends MusicBeatSubState
 				{
 					if (curOption.type != 'string')
 					{
-						holdValue += -(curOption.scrollSpeed / 50) * FlxG.mouse.wheel;
-
-						if (holdValue < curOption.minValue) 
-							holdValue = curOption.minValue;
-						else if (holdValue > curOption.maxValue)
-							holdValue = curOption.maxValue;
+						holdValue = CoolUtil.boundTo(holdValue + (curOption.scrollSpeed / 50) * FlxG.mouse.wheel, curOption.minValue, curOption.maxValue);
 
 						switch (curOption.type)
 						{
 							case 'int':
-							{
 								curOption.setValue(Math.round(holdValue));
-							}
 							case 'float' | 'percent':
 							{
-								curOption.setValue(FlxMath.roundDecimal(holdValue, curOption.decimals));
+								var blah:Float = CoolUtil.boundTo(holdValue + curOption.changeValue - (holdValue % curOption.changeValue), curOption.minValue, curOption.maxValue);
+								curOption.setValue(CoolUtil.roundDecimal(blah, curOption.decimals));
 							}
 						}
 		
@@ -554,12 +426,7 @@ class GameplayChangersSubState extends MusicBeatSubState
 					else if (curOption.type == 'string')
 					{
 						var num:Int = curOption.curOption; // lol
-						num += (-1 * FlxG.mouse.wheel);
-
-						if (num < 0)
-							num = curOption.options.length - 1;
-						else if (num >= curOption.options.length)
-							num = 0;
+						num = CoolUtil.boundSelection(num + (1 * FlxG.mouse.wheel), curOption.options.length);
 
 						curOption.curOption = num;
 						curOption.setValue(curOption.options[num]); // lol
@@ -579,14 +446,36 @@ class GameplayChangersSubState extends MusicBeatSubState
 
 				FlxG.sound.play(Paths.getSound('scrollMenu'));
 
-				updateTextFrom(curOption);
-				reloadCheckboxes();
+				if (curOption.type != 'bool')
+				{
+					if (curOption.type == 'string') {
+						curOption.curOption = curOption.options.indexOf(curOption.getValue());
+					}
+
+					updateTextFrom(curOption);
+				}
+
+				if (curOption.name == 'Scroll Speed')
+				{
+					curOption.displayFormat = "%vX";
+					curOption.maxValue = 3;
+
+					if (curOption.getValue() > 3) {
+						curOption.setValue(3);
+					}
+
+					updateTextFrom(curOption);
+				}
+
+				curOption.change();
 			}
 		}
 
 		if (nextAccept > 0) {
 			nextAccept -= 1;
 		}
+
+		super.update(elapsed);
 	}
 
 	function changeBool(option:GameplayOption):Void
@@ -712,7 +601,6 @@ class GameplayOption
 	public var text(get, set):String;
 	public var onChange:Void->Void = null; //Pressed enter (on Bool type options) or pressed/held left/right (on other types)
 
-	public var blockedOnPause:Bool = false;
 	public var type(get, default):String = 'bool'; //bool, int (or integer), float (or fl), percent, string (or str)
 	// Bool will use checkboxes
 	// Everything else will use a text
@@ -720,7 +608,7 @@ class GameplayOption
 	public var showBoyfriend:Bool = false;
 	public var scrollSpeed:Float = 50; //Only works on int/float, defines how fast it scrolls per second while holding left/right
 
-	private var variable:String = null; //Variable from PlayStateChangeables.hx
+	private var variable:String = null; //Variable from OptionData.hx's gameplaySettings
 	public var defaultValue:Dynamic = null;
 
 	public var curOption:Int = 0; //Don't change this
@@ -802,18 +690,12 @@ class GameplayOption
 
 	public function getValue():Dynamic
 	{
-		return Reflect.getProperty(PlayStateChangeables, variable);
+		return OptionData.gameplaySettings.get(variable);
 	}
 
 	public function setValue(value:Dynamic):Void
 	{
-		Reflect.setProperty(PlayStateChangeables, variable, value);
-
-		#if LUA_ALLOWED
-		if (onPause && luaAllowed && luaString.length > 0 && !blockedOnPause) {
-			PlayState.instance.setOnLuas(luaString, value);
-		}
-		#end
+		OptionData.gameplaySettings.set(variable, value);
 	}
 
 	public function setChild(child:Alphabet):Void

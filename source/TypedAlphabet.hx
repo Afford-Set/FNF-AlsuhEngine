@@ -33,8 +33,6 @@ class TypedAlphabet extends Alphabet
 
 	override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
 		if (!finishedText)
 		{
 			var playedSound:Bool = false;
@@ -63,6 +61,8 @@ class TypedAlphabet extends Alphabet
 				_timeToUpdate = 0;
 			}
 		}
+
+		super.update(elapsed);
 	}
 
 	public function showCharacterUpTo(upTo:Int):Void

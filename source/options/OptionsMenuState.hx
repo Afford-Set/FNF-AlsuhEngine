@@ -4,12 +4,18 @@ package options;
 import Discord.DiscordClient;
 #end
 
+import Character;
+
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
+#if (flixel >= "5.3.0")
+import flixel.sound.FlxSound;
+#else
 import flixel.system.FlxSound;
+#end
 import flixel.effects.FlxFlicker;
 
 using StringTools;
@@ -44,13 +50,11 @@ class OptionsMenuState extends MusicBeatState
 				FlxG.sound.play(Paths.getSound('cancelMenu'));
 				FlxG.switchState(new CreditsMenuState());
 			}
-			#if REPLAYS_ALLOWED
 			case 'Replays':
 			{
 				FlxG.sound.play(Paths.getSound('cancelMenu'));
 				FlxG.switchState(new ReplaysMenuState());
 			}
-			#end
 			case 'Exit':
 			{
 				FlxG.sound.play(Paths.getSound('cancelMenu'));
@@ -64,10 +68,11 @@ class OptionsMenuState extends MusicBeatState
 	{
 		CustomFadeTransition.nextCamera = null;
 
-		super.create();
-
-		if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {
-			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
+		if (FlxG.sound.music != null)
+		{
+			if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {
+				FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
+			}
 		}
 
 		OptionData.savePrefs();
@@ -77,12 +82,14 @@ class OptionsMenuState extends MusicBeatState
 		#end
 
 		var bg:FlxSprite = new FlxSprite();
+
 		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
 			bg.loadGraphic(Paths.getImage('menuDesat'));
 		}
 		else {
 			bg.loadGraphic(Paths.getImage('bg/menuDesat'));
 		}
+
 		bg.color = 0xFFea71fd;
 		bg.updateHitbox();
 		bg.screenCenter();
@@ -108,6 +115,8 @@ class OptionsMenuState extends MusicBeatState
 		add(selectorRight);
 
 		changeSelection();
+
+		super.create();
 	}
 
 	public override function closeSubState():Void
@@ -178,7 +187,7 @@ class OptionsMenuState extends MusicBeatState
 					FlxFlicker.flicker(selectorLeft, 1, 0.04, true);
 					FlxFlicker.flicker(selectorRight, 1, 0.04, true);
 	
-					FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.04, true, false, function(flick:FlxFlicker):Void {
+					FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.04, true, false, function(flk:FlxFlicker):Void {
 						openSelectedSubstate(options[curSelected]);
 					});
 	
@@ -277,8 +286,6 @@ class OptionsSubState extends MusicBeatSubState
 
 	public override function create():Void
 	{
-		super.create();
-
 		OptionData.savePrefs();
 
 		#if DISCORD_ALLOWED
@@ -300,22 +307,30 @@ class OptionsSubState extends MusicBeatSubState
 		add(levelInfo);
 
 		var levelDifficulty:FlxText = new FlxText(20, 20 + 32, 0, '', 32);
-		levelDifficulty.text += CoolUtil.getDifficultyName(PlayState.lastDifficulty, PlayState.difficulties).toUpperCase();
+		levelDifficulty.text += CoolUtil.difficultyString(true);
 		levelDifficulty.scrollFactor.set();
 		levelDifficulty.setFormat(Paths.getFont('vcr.ttf'), 32);
 		levelDifficulty.updateHitbox();
 		levelDifficulty.x = FlxG.width - (levelDifficulty.width + 20);
 		add(levelDifficulty);
 
-		var blueballedTxt:FlxText = new FlxText(20, 20 + 64, 0, '', 32);
-		blueballedTxt.text = 'Blue balled: ' + PlayState.deathCounter;
-		blueballedTxt.scrollFactor.set();
-		blueballedTxt.setFormat(Paths.getFont('vcr.ttf'), 32);
-		blueballedTxt.updateHitbox();
-		blueballedTxt.x = FlxG.width - (blueballedTxt.width + 20);
-		add(blueballedTxt);
+		var pos:Int = 64;
+		var blueballedTxt:FlxText = null;
+		
+		if (OptionData.naughtyness)
+		{
+			blueballedTxt = new FlxText(20, 20 + 64, 0, '', 32);
+			blueballedTxt.text = 'Blue balled: ' + PlayState.deathCounter;
+			blueballedTxt.scrollFactor.set();
+			blueballedTxt.setFormat(Paths.getFont('vcr.ttf'), 32);
+			blueballedTxt.updateHitbox();
+			blueballedTxt.x = FlxG.width - (blueballedTxt.width + 20);
+			add(blueballedTxt);
 
-		var chartingText:FlxText = new FlxText(20, 20 + 96, 0, "CHARTING MODE", 32);
+			pos = 96;
+		}
+
+		var chartingText:FlxText = new FlxText(20, 20 + pos, 0, "CHARTING MODE", 32);
 		chartingText.scrollFactor.set();
 		chartingText.setFormat(Paths.getFont('vcr.ttf'), 32);
 		chartingText.x = FlxG.width - (chartingText.width + 20);
@@ -323,12 +338,12 @@ class OptionsSubState extends MusicBeatSubState
 		chartingText.visible = PlayState.chartingMode;
 		add(chartingText);
 
-		var practiceText:FlxText = new FlxText(20, 20 + (PlayState.chartingMode ? 128 : 96), 0, 'PRACTICE MODE', 32);
+		var practiceText:FlxText = new FlxText(20, 20 + (pos + (PlayState.chartingMode ? 32 : 0)), 0, 'PRACTICE MODE', 32);
 		practiceText.scrollFactor.set();
 		practiceText.setFormat(Paths.getFont('vcr.ttf'), 32);
 		practiceText.x = FlxG.width - (practiceText.width + 20);
 		practiceText.updateHitbox();
-		practiceText.alpha = PlayStateChangeables.practiceMode ? 1 : 0;
+		practiceText.alpha = PlayState.instance.practiceMode ? 1 : 0;
 		add(practiceText);
 
 		grpOptions = new FlxTypedGroup<Alphabet>();
@@ -352,8 +367,9 @@ class OptionsSubState extends MusicBeatSubState
 		add(selectorRight);
 
 		changeSelection();
-
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
+
+		super.create();
 	}
 
 	var flickering:Bool = false;
@@ -365,7 +381,7 @@ class OptionsSubState extends MusicBeatSubState
 
 		var pauseMusic:FlxSound = PauseSubState.pauseMusic;
 
-		if (pauseMusic != null && pauseMusic.volume < 0.5) {
+		if (OptionData.pauseMusic != 'None' && pauseMusic != null && pauseMusic.volume < 0.5) {
 			pauseMusic.volume += 0.01 * elapsed;
 		}
 
@@ -426,7 +442,7 @@ class OptionsSubState extends MusicBeatSubState
 					FlxFlicker.flicker(selectorLeft, 1, 0.04, true);
 					FlxFlicker.flicker(selectorRight, 1, 0.04, true);
 	
-					FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.04, true, false, function(flick:FlxFlicker):Void {
+					FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.04, true, false, function(flk:FlxFlicker):Void {
 						openSelectedSubstate(options[curSelected]);
 					});
 	

@@ -1,6 +1,7 @@
 package;
 
 import haxe.Json;
+import openfl.Lib;
 
 #if DISCORD_ALLOWED
 import Discord.DiscordClient;
@@ -34,7 +35,7 @@ class ModsMenuState extends MusicBeatState
 	static var changedAThing = false;
 
 	var bg:FlxSprite;
-	var intendedColor:Int;
+	var intendedColor:FlxColor;
 	var colorTween:FlxTween;
 
 	var noModsTxt:FlxText;
@@ -52,9 +53,6 @@ class ModsMenuState extends MusicBeatState
 	var buttonToggle:FlxButton;
 	var buttonsArray:Array<FlxButton> = [];
 
-	var installButton:FlxButton;
-	var removeButton:FlxButton;
-
 	var modsList:Array<Dynamic> = [];
 
 	var visibleWhenNoMods:Array<FlxBasic> = [];
@@ -64,21 +62,22 @@ class ModsMenuState extends MusicBeatState
 	{
 		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
-		WeekData.setDirectoryFromWeek();
 
-		super.create();
+		WeekData.setDirectoryFromWeek();
 
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Menus", null); // Updating Discord Rich Presence
 		#end
 
 		bg = new FlxSprite();
+
 		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
 			bg.loadGraphic(Paths.getImage('menuDesat'));
 		}
 		else {
 			bg.loadGraphic(Paths.getImage('bg/menuDesat'));
 		}
+
 		bg.antialiasing = OptionData.globalAntialiasing;
 		bg.screenCenter();
 		add(bg);
@@ -89,6 +88,14 @@ class ModsMenuState extends MusicBeatState
 		noModsTxt.borderSize = 2;
 		noModsTxt.screenCenter();
 		add(noModsTxt);
+
+		if (mods.length < 1)
+		{
+			FlxG.save.data.currentModWindowTitle = null;
+			FlxG.save.flush();
+
+			Lib.application.window.title = "Friday Night Funkin' - Alsuh Engine";
+		}
 
 		visibleWhenNoMods.push(noModsTxt);
 
@@ -113,7 +120,7 @@ class ModsMenuState extends MusicBeatState
 
 		var boolshit:Bool = true;
 
-		if (FileSystem.exists("modsList.txt"))
+		if (FileSystem.exists('modsList.txt'))
 		{
 			for (folder in Paths.getModDirectories())
 			{
@@ -148,6 +155,33 @@ class ModsMenuState extends MusicBeatState
 
 			updateButtonToggle();
 			FlxG.sound.play(Paths.getSound('scrollMenu'), 0.6);
+
+			if (modsList[curSelected][1])
+			{
+				var name:String = mods[curSelected].name;
+
+				if (name != null && name.length > 0)
+				{
+					FlxG.save.data.currentModWindowTitle = name;
+					FlxG.save.flush();
+		
+					Lib.application.window.title = "Friday Night Funkin' - " + name;
+				}
+				else
+				{
+					FlxG.save.data.currentModWindowTitle = null;
+					FlxG.save.flush();
+		
+					Lib.application.window.title = "Friday Night Funkin' - Alsuh Engine";
+				}
+			}
+			else
+			{
+				FlxG.save.data.currentModWindowTitle = null;
+				FlxG.save.flush();
+
+				Lib.application.window.title = "Friday Night Funkin' - Alsuh Engine";
+			}
 		});
 
 		buttonToggle.setGraphicSize(50, 50);
@@ -239,7 +273,6 @@ class ModsMenuState extends MusicBeatState
 			}
 
 			updateButtonToggle();
-
 			FlxG.sound.play(Paths.getSound('scrollMenu'), 0.6);
 		});
 
@@ -348,10 +381,12 @@ class ModsMenuState extends MusicBeatState
 
 		if (curSelected >= mods.length) curSelected = 0;
 
-		if (mods.length < 1)
+		if (mods.length < 1) {
 			bg.color = defaultColor;
-		else
+		}
+		else {
 			bg.color = mods[curSelected].color;
+		}
 
 		intendedColor = bg.color;
 
@@ -360,6 +395,8 @@ class ModsMenuState extends MusicBeatState
 
 		FlxG.sound.play(Paths.getSound('scrollMenu'));
 		FlxG.mouse.visible = true;
+
+		super.create();
 	}
 
 	function addToModsList(values:Array<Dynamic>):Void
@@ -393,7 +430,6 @@ class ModsMenuState extends MusicBeatState
 		if (mods.length > 1)
 		{
 			var doRestart:Bool = (mods[0].restart);
-
 			var newPos:Int = curSelected + change;
 
 			if (newPos < 0)
@@ -446,8 +482,6 @@ class ModsMenuState extends MusicBeatState
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
 		if (noModsTxt.visible)
 		{
 			noModsSine += 180 * elapsed;
@@ -467,7 +501,18 @@ class ModsMenuState extends MusicBeatState
 
 			if (needaReset)
 			{
+				var name:String = FlxG.save.data.currentModWindowTitle;
+
+				if (name != null && name.length > 0) {
+					Lib.application.window.title = "Friday Night Funkin' - " + name;
+				}
+				else {
+					Lib.application.window.title = "Friday Night Funkin' - Alsuh Engine";
+				}
+
 				TitleState.initialized = false;
+				TitleState.closedState = false;
+
 				FlxG.sound.music.fadeOut(0.3);
 
 				if (FreeplayMenuState.vocals != null)
@@ -478,7 +523,17 @@ class ModsMenuState extends MusicBeatState
 
 				FlxG.camera.fade(FlxColor.BLACK, 0.5, false, FlxG.resetGame, false);
 			}
-			else {
+			else
+			{
+				var name:String = FlxG.save.data.currentModWindowTitle;
+
+				if (name != null && name.length > 0) {
+					Lib.application.window.title = "Friday Night Funkin' - " + name;
+				}
+				else {
+					Lib.application.window.title = "Friday Night Funkin' - Alsuh Engine";
+				}
+
 				FlxG.switchState(new MainMenuState());
 			}
 		}
@@ -522,6 +577,7 @@ class ModsMenuState extends MusicBeatState
 		}
 
 		updatePosition(elapsed);
+		super.update(elapsed);
 	}
 
 	function setAllLabelsOffset(button:FlxButton, x:Float, y:Float):Void
@@ -547,7 +603,7 @@ class ModsMenuState extends MusicBeatState
 
 		curSelected = CoolUtil.boundSelection(curSelected + change, mods.length);
 
-		var newColor:Int = mods[curSelected].color;
+		var newColor:FlxColor = mods[curSelected].color;
 
 		if (newColor != intendedColor)
 		{
@@ -563,6 +619,26 @@ class ModsMenuState extends MusicBeatState
 					colorTween = null;
 				}
 			});
+		}
+
+		if (modsList[curSelected][1])
+		{
+			var name:String = mods[curSelected].name;
+
+			if (name != null && name.length > 0)
+			{
+				FlxG.save.data.currentModWindowTitle = name;
+				FlxG.save.flush();
+
+				Lib.application.window.title = "Friday Night Funkin' - " + name;
+			}
+		}
+		else
+		{
+			FlxG.save.data.currentModWindowTitle = null;
+			FlxG.save.flush();
+
+			Lib.application.window.title = "Friday Night Funkin' - Alsuh Engine";
 		}
 
 		var i:Int = 0;
@@ -586,13 +662,13 @@ class ModsMenuState extends MusicBeatState
 				for (obj in stuffArray)
 				{
 					remove(obj);
-					insert(members.length, obj);
+					insert(length, obj);
 				}
 
 				for (obj in buttonsArray)
 				{
 					remove(obj);
-					insert(members.length, obj);
+					insert(length, obj);
 				}
 			}
 

@@ -2,54 +2,36 @@
 	"weekID": "week4",
 	"weekName": "Week 4",
 	"startUnlocked": true,
-	"defaultDifficulty": "normal",
+	"defaultDifficulty": "",
 	"hiddenUntilUnlocked": false,
+	"itemColor": [252, 150, 215],
 	"songs": [
 		{
 			"songID": "satin-panties",
 			"songName": "Satin Panties",
 			"character": "mom",
-			
 			"color": [252, 150, 215],
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		},
 		{
 			"songID": "high",
 			"songName": "High",
 			"character": "mom",
-			
 			"color": [252, 150, 215],
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		},
 		{
 			"songID": "milf",
 			"songName": "M.I.L.F",
 			"character": "mom",
-			
 			"color": [252, 150, 215],
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		}
 	],
-	"difficulties": [
-		["Easy", "Normal", "Hard"],
-		["easy", "normal", "hard"],
-		["-easy", "",     "-hard"]
-	],
+	"difficulties": [],
 	"weekCharacters": ["mom", "bf", "gf"],
 	"weekBackground": "limo",
 	"weekBefore": "week3",

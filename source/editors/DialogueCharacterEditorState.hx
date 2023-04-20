@@ -31,6 +31,7 @@ import openfl.net.FileReference;
 import flixel.input.FlxKeyManager;
 import openfl.events.IOErrorEvent;
 import flixel.group.FlxSpriteGroup;
+import flixel.addons.ui.FlxUIButton;
 import flixel.addons.ui.FlxUITabMenu;
 import flixel.addons.ui.FlxUICheckBox;
 import flixel.addons.ui.FlxUIInputText;
@@ -64,8 +65,8 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 	var offsetIdleText:FlxText;
 	var animText:FlxText;
 
-	var camGame:FlxCamera;
-	var camHUD:FlxCamera;
+	var camGame:SwagCamera;
+	var camHUD:SwagCamera;
 
 	var mainGroup:FlxSpriteGroup;
 	var hudGroup:FlxSpriteGroup;
@@ -78,16 +79,14 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 
 	public override function create():Void
 	{
-		super.create();
-
 		persistentUpdate = persistentDraw = true;
 
-		camGame = new FlxCamera();
-		camHUD = new FlxCamera();
+		camGame = new SwagCamera();
 		camGame.bgColor = FlxColor.fromHSL(0, 0, 0.5);
-		camHUD.bgColor.alpha = 0;
-
 		FlxG.cameras.reset(camGame);
+
+		camHUD = new SwagCamera();
+		camHUD.bgColor.alpha = 0;
 		FlxG.cameras.add(camHUD, false);
 
 		FlxG.cameras.setDefaultDrawTarget(camGame, true);
@@ -173,8 +172,9 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 		addEditorBox();
 
 		FlxG.mouse.visible = true;
-
 		updateCharTypeBox();
+
+		super.create();
 	}
 
 	var UI_typebox:FlxUITabMenu;
@@ -222,7 +222,7 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 
 	function addTypeUI():Void
 	{
-		var tab_group = new FlxUI(null, UI_typebox);
+		var tab_group:FlxUI = new FlxUI(null, UI_typebox);
 		tab_group.name = "Character Type";
 
 		leftCheckbox = new FlxUICheckBox(10, 20, null, null, "Left", 100);
@@ -262,7 +262,7 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 
 	function addAnimationsUI():Void
 	{
-		var tab_group = new FlxUI(null, UI_mainbox);
+		var tab_group:FlxUI = new FlxUI(null, UI_mainbox);
 		tab_group.name = "Animations";
 
 		animationDropDown = new FlxUIDropDownMenuCustom(10, 30, FlxUIDropDownMenuCustom.makeStrIdLabelArray([''], true), function(animation:String):Void
@@ -295,7 +295,7 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 		idleInputText = new FlxUIInputText(loopInputText.x, loopInputText.y + 40, 150, '', 8);
 		blockPressWhileTypingOn.push(idleInputText);
 		
-		var addUpdateButton:FlxButton = new FlxButton(10, idleInputText.y + 30, "Add/Update", function():Void
+		var addUpdateButton:FlxUIButton = new FlxUIButton(10, idleInputText.y + 30, "Add/Update", function():Void
 		{
 			var theAnim:String = animationInputText.text.trim();
 
@@ -344,8 +344,8 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 				animationDropDown.selectedLabel = lastSelected;
 			}
 		});
-		
-		var removeUpdateButton:FlxButton = new FlxButton(100, addUpdateButton.y, "Remove", function():Void
+
+		var removeUpdateButton:FlxUIButton = new FlxUIButton(100, addUpdateButton.y, "Remove", function():Void
 		{
 			for (i in 0...character.jsonFile.animations.length) 
 			{
@@ -377,7 +377,7 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 				}
 			}
 		});
-		
+
 		tab_group.add(new FlxText(animationDropDown.x, animationDropDown.y - 18, 0, 'Animations:'));
 		tab_group.add(new FlxText(animationInputText.x, animationInputText.y - 18, 0, 'Animation name:'));
 		tab_group.add(new FlxText(loopInputText.x, loopInputText.y - 18, 0, 'Loop name on .XML file:'));
@@ -416,7 +416,7 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 
 	function addCharacterUI():Void
 	{
-		var tab_group = new FlxUI(null, UI_mainbox);
+		var tab_group:FlxUI = new FlxUI(null, UI_mainbox);
 		tab_group.name = "Character";
 
 		imageInputText = new FlxUIInputText(10, 30, 80, character.jsonFile.image, 8);
@@ -442,20 +442,9 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 		tab_group.add(scaleStepper);
 		tab_group.add(noAntialiasingCheckbox);
 
-		var reloadImageButton:FlxButton = new FlxButton(10, scaleStepper.y + 60, "Reload Image", function():Void
-		{
-			reloadCharacter();
-		});
-
-		var loadButton:FlxButton = new FlxButton(reloadImageButton.x + 100, reloadImageButton.y, "Load Character", function():Void
-		{
-			loadCharacter();
-		});
-
-		var saveButton:FlxButton = new FlxButton(loadButton.x, reloadImageButton.y - 25, "Save Character", function():Void
-		{
-			saveCharacter();
-		});
+		var reloadImageButton:FlxUIButton = new FlxUIButton(10, scaleStepper.y + 60, "Reload Image", reloadCharacter, true);
+		var loadButton:FlxUIButton = new FlxUIButton(reloadImageButton.x + 100, reloadImageButton.y, "Load Character", loadCharacter, true);
+		var saveButton:FlxUIButton = new FlxUIButton(loadButton.x, reloadImageButton.y - 25, "Save Character", saveCharacter, true);
 
 		tab_group.add(reloadImageButton);
 		tab_group.add(loadButton);

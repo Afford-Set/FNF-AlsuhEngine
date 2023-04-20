@@ -62,7 +62,7 @@ class ChartParser
 					{
 						oldNote = result[result.length - 1];
 
-						var sustainNote:Note = new Note(daStrumTime + (stepCroch * susNote) + (stepCroch / FlxMath.roundDecimal(instance.songSpeed, 2)), swagNote.noteData, oldNote, true, false, gottaHitNote);
+						var sustainNote:Note = new Note(daStrumTime + (stepCroch * susNote) + (stepCroch / CoolUtil.roundDecimal(instance.songSpeed, 2)), swagNote.noteData, oldNote, true, false, gottaHitNote);
 						sustainNote.gfNote = (section.gfSection && (notes[1] < 4));
 						sustainNote.noteType = swagNote.noteType;
 						sustainNote.scrollFactor.set();
@@ -96,8 +96,10 @@ class ChartParser
 					}
 				}
 
-				if (!instance.noteTypeMap.exists(swagNote.noteType)) {
-					instance.noteTypeMap.set(swagNote.noteType, true);
+				var noteTypeArray:Array<String> = instance.noteTypeArray; // Fuck you HTML5
+
+				if (!noteTypeArray.contains(swagNote.noteType)) {
+					noteTypeArray.push(swagNote.noteType);
 				}
 			}
 		}
@@ -105,10 +107,10 @@ class ChartParser
 		return result;
 	}
 
-	@:deprecated("`ChartParser.parse()` is deprecated, use 'ChartParser.parseSongChart()' instead")
-	public static function parse(songName:String, section:Int):Array<Dynamic>
+	@:deprecated("`ChartParser.parseLudumChart()` is deprecated. use 'ChartParser.parseSongChart()' instead.")
+	public static function parseLudumChart(songName:String, section:Int):Array<Dynamic>
 	{
-		Debug.logWarn("`ChartParser.parse()` is deprecated! use 'ChartParser.parseSongChart()' instead");
+		Debug.logWarn("`ChartParser.parseLudumChart()` is deprecated! use 'ChartParser.parseSongChart()' instead.");
 
 		var regex:EReg = ~/[ \t]*((\r\n)|\r|\n)[ \t]*", "g"/;
 		var csvData:String = FlxStringUtil.imageToCSV(Paths.getFile('data/' + songName + '/' + songName + '_section' + section + '.png'));

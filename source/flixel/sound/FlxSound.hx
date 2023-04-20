@@ -1,4 +1,4 @@
-package flixel.system;
+package flixel.sound;
 
 import flixel.sound.FlxSoundGroup;
 import flash.events.IEventDispatcher;

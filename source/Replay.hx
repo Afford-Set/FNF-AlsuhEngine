@@ -1,50 +1,41 @@
 package;
 
 import haxe.Json;
+import haxe.format.JsonParser;
 
 #if sys
 import sys.io.File;
 #end
 
-import flixel.FlxG;
-import lime.utils.Assets;
-import openfl.events.Event;
-import flixel.util.FlxColor;
-import openfl.utils.Dictionary;
-import openfl.net.FileReference;
-import openfl.events.IOErrorEvent;
-
 using StringTools;
 
-#if REPLAYS_ALLOWED
 typedef KeyPress =
 {
-	public var time:Float;
-	public var key:String;
+	var time:Float;
+	var key:String;
 }
 
 typedef KeyRelease =
 {
-	public var time:Float;
-	public var key:String;
+	var time:Float;
+	var key:String;
 }
 
 typedef ReplayJSON =
 {
-	public var timestamp:Date;
-	public var weekID:String;
-	public var weekName:String;
-	public var songID:String;
-	public var songName:String;
-	public var songDiff:String;
-	public var difficulties:Array<Array<String>>;
-	public var songNotes:Array<Float>;
-	public var keyPresses:Array<KeyPress>;
-	public var keyReleases:Array<KeyRelease>;
-	public var currentModDirectory:Null<String>;
-
-	public var noteSpeed:Float;
-	public var isDownscroll:Bool;
+	var timestamp:Date;
+	var weekID:String;
+	var weekName:String;
+	var songID:String;
+	var songName:String;
+	var songDiff:Int;
+	var difficulties:Array<Dynamic>;
+	var songNotes:Array<Float>;
+	var keyPresses:Array<KeyPress>;
+	var keyReleases:Array<KeyRelease>;
+	var currentModDirectory:Null<String>;
+	var noteSpeed:Float;
+	var isDownscroll:Bool;
 }
 
 class Replay
@@ -59,12 +50,8 @@ class Replay
 		replay = {
 			songID: "tutorial",
 			songName: "Tutorial", 
-			songDiff: 'normal',
-			difficulties: [
-				['Easy',	'Normal',	'Hard'],
-				['easy',	'normal',	'hard'],
-				['-easy',	'',			'-hard']
-			],
+			songDiff: 1,
+			difficulties: CoolUtil.defaultDifficultes,
 			weekID: 'tutorial',
 			weekName: 'Tutorial',
 			noteSpeed: 1,
@@ -79,21 +66,19 @@ class Replay
 
 	public static function loadReplay(path:String):Replay
 	{
-		var rep:Replay = new Replay(path);
-		rep.roadFromJson();
-
-		return rep;
+		return new Replay(path).roadFromJson();
 	}
 
 	public function saveReplay(noteArray:Array<Float>):Void
 	{
+		#if REPLAYS_ALLOWED
 		var json = {
 			"songID": PlayState.SONG.songID,
 			"songName": PlayState.SONG.songName,
-			"weekID": PlayState.storyWeekText,
+			"weekID": PlayState.storyWeekID,
 			"weekName": PlayState.storyWeekName,
 			"songDiff": PlayState.lastDifficulty,
-			"difficulties": PlayState.difficulties,
+			"difficulties": CoolUtil.difficultyStuff,
 			"songNotes": noteArray,
 			"keyPresses": replay.keyPresses,
 			"keyReleases": replay.keyReleases,
@@ -104,48 +89,23 @@ class Replay
 		};
 
 		var data:String = Json.stringify(json, '\t');
-
-		#if sys
-		File.saveContent('assets/replays/replay-' + PlayState.SONG.songID + '-' + PlayState.lastDifficulty + '-time-' + Date.now().getTime() + '.json', data);
+		var path:String = 'replays/replay-' + PlayState.SONG.songID + '-' + PlayState.lastDifficulty + '-time-' + Date.now().getTime() + '.json';
+		File.saveContent(Paths.getPreloadPath(path), data);
 		#end
 	}
 
-	public function roadFromJson():Void
+	public function roadFromJson():Replay
 	{
-		#if sys
-		try
-		{
-			var repl:ReplayJSON = cast Json.parse(File.getContent('assets/replays/' + path));
+		#if REPLAYS_ALLOWED
+		try {
+			var repl:ReplayJSON = cast Json.parse(File.getContent(Paths.getPreloadPath('replays/' + path)));
 			replay = repl;
 		}
 		catch (e:Dynamic) {
 			Debug.logError(e);
 		}
 		#end
-	}
 
-	public static function resetVariables():Void
-	{
-		if (FlxG.save.data.botPlay != null) {
-			PlayStateChangeables.botPlay = FlxG.save.data.botPlay;
-		}
-		else {
-			PlayStateChangeables.botPlay = false;
-		}
-
-		if (FlxG.save.data.scrollSpeed != null) {
-			PlayStateChangeables.scrollSpeed = FlxG.save.data.scrollSpeed;
-		}
-		else {
-			PlayStateChangeables.scrollSpeed = 1;
-		}
-
-		if (FlxG.save.data.downScroll != null) {
-			OptionData.downScroll = FlxG.save.data.downScroll;
-		}
-		else {
-			OptionData.downScroll = false;
-		}
+		return this;
 	}
 }
-#end

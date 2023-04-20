@@ -84,8 +84,6 @@ class ResetScoreSubState extends MusicBeatSubState
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
 		bg.alpha += elapsed * 1.5;
 		if (bg.alpha > 0.6) bg.alpha = 0.6;
 
@@ -134,6 +132,8 @@ class ResetScoreSubState extends MusicBeatSubState
 			FlxG.sound.play(Paths.getSound('cancelMenu'), 1);
 			close();
 		}
+
+		super.update(elapsed);
 	}
 
 	function switchYes():Void

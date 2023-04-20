@@ -23,6 +23,7 @@ import openfl.net.FileFilter;
 import flixel.addons.ui.FlxUI;
 import openfl.net.FileReference;
 import openfl.events.IOErrorEvent;
+import flixel.addons.ui.FlxUIButton;
 import flixel.addons.ui.FlxUITabMenu;
 import flixel.addons.ui.FlxUICheckBox;
 import flixel.addons.ui.FlxUIInputText;
@@ -41,8 +42,6 @@ class MenuCharacterEditorState extends MusicBeatUIState
 
 	public override function create():Void
 	{
-		super.create();
-
 		persistentUpdate = true;
 
 		Conductor.changeBPM(102);
@@ -96,6 +95,8 @@ class MenuCharacterEditorState extends MusicBeatUIState
 		FlxG.mouse.visible = true;
 
 		updateCharTypeBox();
+
+		super.create();
 	}
 
 	var UI_typebox:FlxUITabMenu;
@@ -130,20 +131,12 @@ class MenuCharacterEditorState extends MusicBeatUIState
 
 		add(UI_mainbox);
 
-		var loadButton:FlxButton = new FlxButton(0, 480, "Load Character", function():Void
-		{
-			loadCharacter();
-		});
-
+		var loadButton:FlxUIButton = new FlxUIButton(0, 480, "Load Character", loadCharacter);
 		loadButton.screenCenter(X);
 		loadButton.x -= 60;
 		add(loadButton);
-	
-		var saveButton:FlxButton = new FlxButton(0, 480, "Save Character", function():Void
-		{
-			saveCharacter();
-		});
 
+		var saveButton:FlxUIButton = new FlxUIButton(0, 480, "Save Character", saveCharacter);
 		saveButton.screenCenter(X);
 		saveButton.x += 60;
 		add(saveButton);
@@ -156,7 +149,7 @@ class MenuCharacterEditorState extends MusicBeatUIState
 
 	function addTypeUI():Void
 	{
-		var tab_group = new FlxUI(null, UI_typebox);
+		var tab_group:FlxUI = new FlxUI(null, UI_typebox);
 		tab_group.name = "Character Type";
 
 		opponentCheckbox = new FlxUICheckBox(10, 20, null, null, "Opponent", 100);
@@ -202,7 +195,7 @@ class MenuCharacterEditorState extends MusicBeatUIState
 
 	function addCharacterUI():Void
 	{
-		var tab_group = new FlxUI(null, UI_mainbox);
+		var tab_group:FlxUI = new FlxUI(null, UI_mainbox);
 		tab_group.name = "Character";
 		
 		imageInputText = new FlxUIInputText(10, 20, 80, characterFile.image, 8);
@@ -236,10 +229,8 @@ class MenuCharacterEditorState extends MusicBeatUIState
 			characterFile.flipX = flipXCheckbox.checked;
 		};
 
-		var reloadImageButton:FlxButton = new FlxButton(180, confirmInputText.y + 95, "Reload Char", function():Void {
-			reloadSelectedCharacter();
-		});
-		
+		var reloadImageButton:FlxUIButton = new FlxUIButton(180, confirmInputText.y + 95, "Reload Char", reloadSelectedCharacter);
+
 		scaleStepper = new FlxUINumericStepper(190, imageInputText.y, 1, 1, 0.1, 30, 2);
 
 		isGfCheckbox = new FlxUICheckBox(190, scaleStepper.y + 32, null, null, "Is GF?", 100);
@@ -254,16 +245,16 @@ class MenuCharacterEditorState extends MusicBeatUIState
 
 		fpsConfirmStepper = new FlxUINumericStepper(190, fpsAltStepper.y + 40, 1, 24, 1, 120, 2);
 
-		var confirmDescText = new FlxText(10, confirmInputText.y - 18, 0, 'Start Press animation on the .XML:');
-		tab_group.add(new FlxText(10, imageInputText.y - 18, 0, 'Image file name:'));
-		tab_group.add(new FlxText(10, idleInputText.y - 18, 0, 'Idle animation on the .XML:'));
-		tab_group.add(new FlxText(10, idleAltInputText.y - 28, 0, 'Alternative idle\nanimation on the .XML:'));
-		tab_group.add(new FlxText(scaleStepper.x, scaleStepper.y - 18, 0, 'Scale:'));
-		tab_group.add(new FlxText(10, animationIndicesInputText.y - 18, 0, 'Animation Indices:'));
-		tab_group.add(new FlxText(10, animationAltIndicesInputText.y - 18, 0, 'Alternative Animation Indices:'));
+		var confirmDescText = new FlxText(10, confirmInputText.y - 17.4, 0, 'Start Press animation on the .XML:');
+		tab_group.add(new FlxText(10, imageInputText.y - 17.4, 0, 'Image file name:'));
+		tab_group.add(new FlxText(10, idleInputText.y - 17.4, 0, 'Idle animation on the .XML:'));
+		tab_group.add(new FlxText(10, idleAltInputText.y - 25.4, 0, 'Alternative idle\nanimation on the .XML:'));
+		tab_group.add(new FlxText(scaleStepper.x, scaleStepper.y - 17, 0, 'Scale:'));
+		tab_group.add(new FlxText(10, animationIndicesInputText.y - 17.4, 0, 'Animation Indices:'));
+		tab_group.add(new FlxText(10, animationAltIndicesInputText.y - 17.4, 0, 'Alternative Animation Indices:'));
 		tab_group.add(new FlxText(fpsStepper.x, fpsStepper.y - 18, 0, 'Anim FPS:'));
-		tab_group.add(new FlxText(fpsAltStepper.x - 5, fpsAltStepper.y - 18, 0, 'Alt Anim FPS:'));
-		tab_group.add(new FlxText(fpsConfirmStepper.x - 15, fpsConfirmStepper.y - 18, 0, 'Confirm Anim FPS:'));
+		tab_group.add(new FlxText(fpsAltStepper.x - 5, fpsAltStepper.y - 17.4, 0, 'Alt Anim FPS:'));
+		tab_group.add(new FlxText(fpsConfirmStepper.x - 15, fpsConfirmStepper.y - 17.4, 0, 'Confirm Anim FPS:'));
 		tab_group.add(isGfCheckbox);
 		tab_group.add(flipXCheckbox);
 		tab_group.add(reloadImageButton);
@@ -524,14 +515,12 @@ class MenuCharacterEditorState extends MusicBeatUIState
 		{
 			var leChar:MenuCharacter = grpWeekCharacters.members[i];
 
-			if (leChar.isDanced && !leChar.heyed)
-			{
+			if (leChar.isDanced && !leChar.heyed) {
 				leChar.dance();
 			}
 			else
 			{
-				if (curBeat % 2 == 0 && !leChar.heyed)
-				{
+				if (curBeat % 2 == 0 && !leChar.heyed) {
 					leChar.dance();
 				}
 			}

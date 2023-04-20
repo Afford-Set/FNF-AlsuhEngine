@@ -1,10 +1,5 @@
 {
 	"song": {
-		"speed": 1.5,
-		"stage": null,
-		"player1": "bf-pixel",
-		"player2": "spirit",
-		"player3": null,
 		"events": [
 			[
 				20526.3157894737,
@@ -486,17 +481,6 @@
 					]
 				]
 			]
-		],
-		"notes": [],
-		"splashSkin": "noteSplashes",
-		"arrowSkin2": "",
-		"gfVersion": null,
-		"bpm": 190,
-		"splashSkin2": "noteSplashes",
-		"arrowSkin": "",
-		"needsVoices": true,
-		"songID": "thorns",
-		"songName": "Thorns",
-		"song": "Thorns"
+		]
 	}
 }

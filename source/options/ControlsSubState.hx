@@ -12,7 +12,11 @@ import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
 import flixel.group.FlxGroup;
+#if (flixel >= "5.3.0")
+import flixel.sound.FlxSound;
+#else
 import flixel.system.FlxSound;
+#end
 import flixel.effects.FlxFlicker;
 import flixel.input.keyboard.FlxKey;
 
@@ -71,10 +75,8 @@ class ControlsSubState extends MusicBeatSubState
 
 	public override function create():Void
 	{
-		super.create();
-
 		#if DISCORD_ALLOWED
-		DiscordClient.changePresence("In the Options Menu - Controls", null);
+		DiscordClient.changePresence("In the Options Menu - controls", null);
 		#end
 
 		var bg:FlxSprite = new FlxSprite();
@@ -112,22 +114,30 @@ class ControlsSubState extends MusicBeatSubState
 			add(levelInfo);
 	
 			var levelDifficulty:FlxText = new FlxText(20, 20 + 32, 0, '', 32);
-			levelDifficulty.text += CoolUtil.getDifficultyName(PlayState.lastDifficulty, PlayState.difficulties).toUpperCase();
+			levelDifficulty.text += CoolUtil.difficultyString(true);
 			levelDifficulty.scrollFactor.set();
 			levelDifficulty.setFormat(Paths.getFont('vcr.ttf'), 32);
 			levelDifficulty.updateHitbox();
 			levelDifficulty.x = FlxG.width - (levelDifficulty.width + 20);
 			add(levelDifficulty);
 	
-			var blueballedTxt:FlxText = new FlxText(20, 20 + 64, 0, '', 32);
-			blueballedTxt.text = 'Blue balled: ' + PlayState.deathCounter;
-			blueballedTxt.scrollFactor.set();
-			blueballedTxt.setFormat(Paths.getFont('vcr.ttf'), 32);
-			blueballedTxt.updateHitbox();
-			blueballedTxt.x = FlxG.width - (blueballedTxt.width + 20);
-			add(blueballedTxt);
+			var pos:Int = 64;
+			var blueballedTxt:FlxText = null;
+			
+			if (OptionData.naughtyness)
+			{
+				blueballedTxt = new FlxText(20, 20 + 64, 0, '', 32);
+				blueballedTxt.text = 'Blue balled: ' + PlayState.deathCounter;
+				blueballedTxt.scrollFactor.set();
+				blueballedTxt.setFormat(Paths.getFont('vcr.ttf'), 32);
+				blueballedTxt.updateHitbox();
+				blueballedTxt.x = FlxG.width - (blueballedTxt.width + 20);
+				add(blueballedTxt);
 	
-			var chartingText:FlxText = new FlxText(20, 20 + 96, 0, "CHARTING MODE", 32);
+				pos = 96;
+			}
+	
+			var chartingText:FlxText = new FlxText(20, 20 + pos, 0, "CHARTING MODE", 32);
 			chartingText.scrollFactor.set();
 			chartingText.setFormat(Paths.getFont('vcr.ttf'), 32);
 			chartingText.x = FlxG.width - (chartingText.width + 20);
@@ -135,12 +145,12 @@ class ControlsSubState extends MusicBeatSubState
 			chartingText.visible = PlayState.chartingMode;
 			add(chartingText);
 	
-			var practiceText:FlxText = new FlxText(20, 20 + (PlayState.chartingMode ? 128 : 96), 0, 'PRACTICE MODE', 32);
+			var practiceText:FlxText = new FlxText(20, 20 + (pos + (PlayState.chartingMode ? 32 : 0)), 0, 'PRACTICE MODE', 32);
 			practiceText.scrollFactor.set();
 			practiceText.setFormat(Paths.getFont('vcr.ttf'), 32);
 			practiceText.x = FlxG.width - (practiceText.width + 20);
 			practiceText.updateHitbox();
-			practiceText.alpha = PlayStateChangeables.practiceMode ? 1 : 0;
+			practiceText.alpha = PlayState.instance.practiceMode ? 1 : 0;
 			add(practiceText);
 		}
 
@@ -162,7 +172,6 @@ class ControlsSubState extends MusicBeatSubState
 
 			var optionText:Alphabet = new Alphabet(200, 300, optionShit[i][0], true);
 			optionText.isMenuItem = true;
-			optionText.lerpMult /= 2;
 
 			if (isCentered)
 			{
@@ -174,8 +183,10 @@ class ControlsSubState extends MusicBeatSubState
 			optionText.changeX = false;
 			optionText.distancePerItem.y = 60;
 			optionText.targetY = i - curSelected;
-			optionText.snapToPosition();
+			optionText.lerpMult /= 2;
 			grpOptions.add(optionText);
+
+			optionText.snapToPosition();
 
 			if (!isCentered)
 			{
@@ -187,8 +198,9 @@ class ControlsSubState extends MusicBeatSubState
 		}
 
 		changeSelection();
-
 		if (isPause) cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
+
+		super.create();
 	}
 
 	var flickering:Bool = false;
@@ -202,11 +214,9 @@ class ControlsSubState extends MusicBeatSubState
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
 		var pauseMusic:FlxSound = PauseSubState.pauseMusic;
 
-		if (isPause && pauseMusic != null && pauseMusic.volume < 0.5) {
+		if (OptionData.pauseMusic != 'None' && isPause && pauseMusic != null && pauseMusic.volume < 0.5) {
 			pauseMusic.volume += 0.01 * elapsed;
 		}
 
@@ -219,7 +229,7 @@ class ControlsSubState extends MusicBeatSubState
 
 			if (isPause)
 			{
-				PlayState.reloadControls(PlayState.instance);
+				PlayState.instance.keysArray = [for (i in PlayState.instance.controlArray) OptionData.keyBinds.get(i.toLowerCase()).copy()];
 
 				PlayState.isNextSubState = true;
 
@@ -235,7 +245,7 @@ class ControlsSubState extends MusicBeatSubState
 		{
 			if (rebindingKey)
 			{
-				var keyPressed:Int = FlxG.keys.firstJustPressed();
+				var keyPressed:Int = FlxG.keys.firstJustPressed(); // you can replace `FlxG.keys.firstJustPressed()` with `FlxG.keys.getIsDown()[0].ID`
 	
 				if (keyPressed > -1)
 				{
@@ -342,8 +352,7 @@ class ControlsSubState extends MusicBeatSubState
 						{
 							flickering = true;
 
-							FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flick:FlxFlicker):Void
-							{
+							FlxFlicker.flicker(grpOptions.members[curSelected], 1, 0.06, true, false, function(flk:FlxFlicker):Void {
 								reset();
 							});
 						}
@@ -360,8 +369,7 @@ class ControlsSubState extends MusicBeatSubState
 							flickering = true;
 
 							FlxFlicker.flicker(curAlt ? grpInputsAlt.members[getInputTextNum()] : grpInputs.members[getInputTextNum()],
-								1, 0.06, false, false, function(flick:FlxFlicker):Void
-							{
+								1, 0.06, false, false, function(flk:FlxFlicker):Void {
 								selectInput();
 							});
 							
@@ -386,6 +394,8 @@ class ControlsSubState extends MusicBeatSubState
 		if (nextAccept > 0) {
 			nextAccept -= 1;
 		}
+
+		super.update(elapsed);
 	}
 
 	function reset():Void
@@ -413,8 +423,7 @@ class ControlsSubState extends MusicBeatSubState
 
 		for (i in 0...curSelected)
 		{
-			if (optionShit[i].length > 1)
-			{
+			if (optionShit[i].length > 1) {
 				num++;
 			}
 		}
@@ -521,7 +530,7 @@ class ControlsSubState extends MusicBeatSubState
 
 	function reloadKeys():Void
 	{
-		while (grpInputs.members.length > 0)
+		while (grpInputs.length > 0)
 		{
 			var item:AttachedText = grpInputs.members[0];
 
@@ -530,7 +539,7 @@ class ControlsSubState extends MusicBeatSubState
 			item.destroy();
 		}
 
-		while (grpInputsAlt.members.length > 0)
+		while (grpInputsAlt.length > 0)
 		{
 			var item:AttachedText = grpInputsAlt.members[0];
 

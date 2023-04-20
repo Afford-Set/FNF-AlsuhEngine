@@ -1,10 +1,5 @@
 {
 	"song": {
-		"speed": 1.8,
-		"stage": null,
-		"player1": "bf",
-		"player2": "tankman",
-		"player3": null,
 		"events": [
 			[
 				5625,
@@ -156,17 +151,6 @@
 					]
 				]
 			]
-		],
-		"notes": [],
-		"splashSkin": "noteSplashes",
-		"arrowSkin2": "",
-		"gfVersion": null,
-		"bpm": 160,
-		"splashSkin2": "noteSplashes",
-		"arrowSkin": "",
-		"needsVoices": true,
-		"songID": "ugh",
-		"songName": "Ugh",
-		"song": "Ugh"
+		]
 	}
 }

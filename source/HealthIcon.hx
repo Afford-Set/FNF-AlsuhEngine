@@ -7,54 +7,63 @@ using StringTools;
 
 class HealthIcon extends FlxSprite
 {
+	public static var DEFAULT_WIDTH:Int = 150;
+
 	public var sprTracker:FlxSprite;
 
 	public var isPlayer:Bool = false;
-	public var character:String = 'bf';
+	public var character:String = '';
+
+	private var char(get, never):String;
 
 	public function new(char:String = 'bf', isPlayer:Bool = false):Void
 	{
 		super();
 
-		this.character = '';
 		this.isPlayer = isPlayer;
 
 		changeIcon(char);
-
-		antialiasing = char.endsWith('-pixel') ? false : OptionData.globalAntialiasing;
 		scrollFactor.set();
 	}
 
-	public function changeIcon(char:String):Void
+	public var iconOffsets:Array<Float> = [0, 0, 0];
+
+	public function changeIcon(char:String = 'face'):Void
 	{
-		if (char != this.character)
+		if (character != char)
 		{
-			var name:String = Paths.fileExists('images/icons/' + char + '.png', IMAGE) ? 'icons/' + char : 'icons/icon-' + char;
+			var name:String = 'icons/icon-' + char;
+
+			if (Paths.fileExists('images/icons/' + char + '.png', IMAGE)) {
+				name = 'icons/' + char;
+			}
 
 			if (Paths.fileExists('images/' + name + '.png', IMAGE))
 			{
 				var file:FlxGraphic = Paths.getImage(name);
 				loadGraphic(file); // Load stupidly first for getting the file size
 
-				if (width >= 450)
-				{
-					loadGraphic(file, true, Math.floor(width / 3), Math.floor(height)); // Then load it fr
-					animation.add(char, [0, 1, 2], 0, false, this.isPlayer);
+				var ken:Int = 3; // 3 - these alive, dead and win icons
+
+				if (width < DEFAULT_WIDTH * ken) {
+					ken = 2; // 2 - these alive and dead icons
 				}
-				else
-				{
-					loadGraphic(file, true, Math.floor(width / 2), Math.floor(height)); // Then load it fr
-					animation.add(char, [0, 1], 0, false, this.isPlayer);
-				}
+
+				loadGraphic(file, true, Math.floor(width / ken), Math.floor(height)); // Then load it fr
+
+				var pos:Float = (width - DEFAULT_WIDTH) / ken;
+				for (i in 0...ken) iconOffsets[i] = pos;
+
+				animation.add(char, [for (i in 0...ken) i], 0, false, isPlayer);
 
 				animation.play(char);
-				this.character = char;
+				antialiasing = OptionData.globalAntialiasing && !char.endsWith('-pixel');
+
+				character = char;
 			}
 			else {
-				changeIcon("face");
+				changeIcon();
 			}
-
-			antialiasing = char.endsWith('-pixel') ? false : OptionData.globalAntialiasing;
 		}
 	}
 
@@ -63,6 +72,19 @@ class HealthIcon extends FlxSprite
 		super.update(elapsed);
 
 		snapToPosition();
+	}
+
+	public var usePsych:Bool = false; // for lua
+
+	public override function updateHitbox():Void
+	{
+		super.updateHitbox();
+
+		if (usePsych)
+		{
+			offset.x = iconOffsets[0];
+			offset.y = iconOffsets[1];
+		}
 	}
 
 	public function snapToPosition():Void
@@ -76,4 +98,6 @@ class HealthIcon extends FlxSprite
 	{
 		return character;
 	}
+
+	private function get_char():String return character;
 }

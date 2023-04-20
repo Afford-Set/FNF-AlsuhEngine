@@ -1,10 +1,5 @@
 {
 	"song": {
-		"speed": 1.3,
-		"stage": null,
-		"player1": "bf",
-		"player2": "dad",
-		"player3": null,
 		"events": [
 			[
 				8000,
@@ -46,17 +41,6 @@
 					]
 				]
 			]
-		],
-		"notes": [],
-		"splashSkin": "noteSplashes",
-		"arrowSkin2": "",
-		"gfVersion": null,
-		"bpm": 120,
-		"splashSkin2": "noteSplashes",
-		"arrowSkin": "",
-		"needsVoices": true,
-		"songID": "fresh",
-		"songName": "Fresh",
-		"song": "Fresh"
+		]
 	}
 }

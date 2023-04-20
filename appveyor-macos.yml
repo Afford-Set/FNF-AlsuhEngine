@@ -8,14 +8,14 @@ environment:
 
 install:
   - haxelib install hmm
-  - haxelib run lime rebuild extension-webm macos
+  - haxelib run openfl rebuild extension-webm macos
   - haxelib list
 
 test_script:
-  - haxelib run lime test mac
+  - haxelib run openfl test mac
 
 build_script:
-  - haxelib run lime build mac
+  - haxelib run openfl build mac
 
 artifacts:
   - path: "Alsuh Engine.app"

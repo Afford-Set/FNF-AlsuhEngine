@@ -3,53 +3,35 @@
 	"weekName": "Week 7",
 	"startUnlocked": true,
 	"hiddenUntilUnlocked": false,
+	"itemColor": [246, 182, 4],
 	"songs": [
 		{
 			"songID": "ugh",
-			
 			"songName": "Ugh",
 			"character": "tankman",
 			"color": [246, 182, 4],
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		},
 		{
 			"songID": "guns",
 			"songName": "Guns",
-			
 			"character": "tankman",
 			"color": [246, 182, 4],
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		},
 		{
 			"songID": "stress",
-			
 			"songName": "Stress",
 			"character": "tankman",
 			"color": [246, 182, 4],
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		}
 	],
-	"difficulties": [
-		["Easy", "Normal", "Hard"],
-		["easy", "normal", "hard"],
-		["-easy", "",     "-hard"]
-	],
-	"defaultDifficulty": "normal",
+	"difficulties": [],
+	"defaultDifficulty": "",
 	"weekCharacters": ["tankman", "bf", "gf"],
 	"weekBackground": "tank",
 	"weekBefore": "week6",

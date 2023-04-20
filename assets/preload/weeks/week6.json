@@ -3,53 +3,35 @@
 	"weekName": "Week 6",
 	"startUnlocked": true,
 	"hiddenUntilUnlocked": false,
+	"itemColor": [255, 120, 191],
 	"songs": [
 		{
 			"songID": "senpai",
 			"songName": "Senpai",
-			
 			"character": "senpai-pixel",
 			"color": [255, 120, 191],
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		},
 		{
 			"songID": "roses",
-			
 			"songName": "Roses",
 			"character": "senpai-pixel",
 			"color": [255, 120, 191],
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		},
 		{
 			"songID": "thorns",
 			"songName": "Thorns",
-			
 			"character": "spirit-pixel",
 			"color": [255, 120, 191],
-			"difficulties": [
-				["Easy", "Normal", "Hard"],
-				["easy", "normal", "hard"],
-				["-easy", "",     "-hard"]
-			],
-			"defaultDifficulty": "normal"
+			"difficulties": [],
+			"defaultDifficulty": ""
 		}
 	],
-	"difficulties": [
-		["Easy", "Normal", "Hard"],
-		["easy", "normal", "hard"],
-		["-easy", "",     "-hard"]
-	],
-	"defaultDifficulty": "normal",
+	"difficulties": [],
+	"defaultDifficulty": "",
 	"weekCharacters": ["senpai", "bf", "gf"],
 	"weekBackground": "school",
 	"weekBefore": "week5",

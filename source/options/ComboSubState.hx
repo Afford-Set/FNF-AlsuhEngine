@@ -10,7 +10,11 @@ import flixel.text.FlxText;
 import flixel.math.FlxPoint;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
+#if (flixel >= "5.3.0")
+import flixel.sound.FlxSound;
+#else
 import flixel.system.FlxSound;
+#end
 import options.OptionsMenuState;
 import flixel.group.FlxSpriteGroup;
 
@@ -24,8 +28,6 @@ class ComboSubState extends MusicBeatSubState
 
 	public override function create():Void
 	{
-		super.create();
-
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Options Menu - Combo Position", null);
 		#end
@@ -47,22 +49,30 @@ class ComboSubState extends MusicBeatSubState
 		add(levelInfo);
 
 		var levelDifficulty:FlxText = new FlxText(20, 20 + 32, 0, '', 32);
-		levelDifficulty.text += CoolUtil.getDifficultyName(PlayState.lastDifficulty, PlayState.difficulties).toUpperCase();
+		levelDifficulty.text += CoolUtil.difficultyString(true);
 		levelDifficulty.scrollFactor.set();
 		levelDifficulty.setFormat(Paths.getFont('vcr.ttf'), 32);
 		levelDifficulty.updateHitbox();
 		levelDifficulty.x = FlxG.width - (levelDifficulty.width + 20);
 		add(levelDifficulty);
 
-		var blueballedTxt:FlxText = new FlxText(20, 20 + 64, 0, '', 32);
-		blueballedTxt.text = 'Blue balled: ' + PlayState.deathCounter;
-		blueballedTxt.scrollFactor.set();
-		blueballedTxt.setFormat(Paths.getFont('vcr.ttf'), 32);
-		blueballedTxt.updateHitbox();
-		blueballedTxt.x = FlxG.width - (blueballedTxt.width + 20);
-		add(blueballedTxt);
+		var pos:Int = 64;
+		var blueballedTxt:FlxText = null;
+		
+		if (OptionData.naughtyness)
+		{
+			blueballedTxt = new FlxText(20, 20 + 64, 0, '', 32);
+			blueballedTxt.text = 'Blue balled: ' + PlayState.deathCounter;
+			blueballedTxt.scrollFactor.set();
+			blueballedTxt.setFormat(Paths.getFont('vcr.ttf'), 32);
+			blueballedTxt.updateHitbox();
+			blueballedTxt.x = FlxG.width - (blueballedTxt.width + 20);
+			add(blueballedTxt);
 
-		var chartingText:FlxText = new FlxText(20, 20 + 96, 0, "CHARTING MODE", 32);
+			pos = 96;
+		}
+
+		var chartingText:FlxText = new FlxText(20, 20 + pos, 0, "CHARTING MODE", 32);
 		chartingText.scrollFactor.set();
 		chartingText.setFormat(Paths.getFont('vcr.ttf'), 32);
 		chartingText.x = FlxG.width - (chartingText.width + 20);
@@ -70,17 +80,23 @@ class ComboSubState extends MusicBeatSubState
 		chartingText.visible = PlayState.chartingMode;
 		add(chartingText);
 
-		var practiceText:FlxText = new FlxText(20, 20 + (PlayState.chartingMode ? 128 : 96), 0, 'PRACTICE MODE', 32);
+		var practiceText:FlxText = new FlxText(20, 20 + (pos + (PlayState.chartingMode ? 32 : 0)), 0, 'PRACTICE MODE', 32);
 		practiceText.scrollFactor.set();
 		practiceText.setFormat(Paths.getFont('vcr.ttf'), 32);
 		practiceText.x = FlxG.width - (practiceText.width + 20);
 		practiceText.updateHitbox();
-		practiceText.alpha = PlayStateChangeables.practiceMode ? 1 : 0;
+		practiceText.alpha = PlayState.instance.practiceMode ? 1 : 0;
 		add(practiceText);
 
 		rating = new FlxSprite();
-		rating.loadGraphic(Paths.getImage('ratings/sick'));
-		rating.screenCenter();
+
+		if (Paths.fileExists('images/sick.png', IMAGE)) {
+			rating.loadGraphic(Paths.getImage('sick'));
+		}
+		else {
+			rating.loadGraphic(Paths.getImage('ratings/sick'));
+		}
+
 		rating.setGraphicSize(Std.int(rating.width * 0.7));
 		rating.updateHitbox();
 		rating.antialiasing = OptionData.globalAntialiasing;
@@ -100,7 +116,14 @@ class ComboSubState extends MusicBeatSubState
 		for (i in seperatedScore)
 		{
 			var numScore:FlxSprite = new FlxSprite(43 * daLoop);
-			numScore.loadGraphic(Paths.getImage('numbers/num' + i));
+
+			if (Paths.fileExists('images/num' + i + '.png', IMAGE)) {
+				numScore.loadGraphic(Paths.getImage('num'));
+			}
+			else {
+				numScore.loadGraphic(Paths.getImage('numbers/num' + i));
+			}
+
 			numScore.setGraphicSize(Std.int(numScore.width * 0.5));
 			numScore.updateHitbox();
 			numScore.antialiasing = OptionData.globalAntialiasing;
@@ -116,26 +139,24 @@ class ComboSubState extends MusicBeatSubState
 		repositionCombo();
 
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
+
+		super.create();
 	}
 
-	var holdingObjectType:Null<Bool> = null;
+	var holdingObjectType:String = '';
 
 	var startMousePos:FlxPoint = new FlxPoint();
 	var startComboOffset:FlxPoint = new FlxPoint();
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
 		var pauseMusic:FlxSound = PauseSubState.pauseMusic;
 
-		if (pauseMusic != null && pauseMusic.volume < 0.5) {
+		if (OptionData.pauseMusic != 'None' && pauseMusic != null && pauseMusic.volume < 0.5) {
 			pauseMusic.volume += 0.01 * elapsed;
 		}
 
-		var addNum:Int = 1;
-
-		if (FlxG.keys.pressed.ALT) addNum = 10;
+		var addNum:Int = FlxG.keys.pressed.SHIFT ? 10 : 1;
 
 		var controlArray:Array<Bool> =
 		[
@@ -147,7 +168,12 @@ class ComboSubState extends MusicBeatSubState
 			FlxG.keys.justPressed.A,
 			FlxG.keys.justPressed.D,
 			FlxG.keys.justPressed.W,
-			FlxG.keys.justPressed.S
+			FlxG.keys.justPressed.S,
+
+			FlxG.keys.justPressed.J,
+			FlxG.keys.justPressed.L,
+			FlxG.keys.justPressed.I,
+			FlxG.keys.justPressed.K
 		];
 
 		if (controlArray.contains(true))
@@ -174,6 +200,14 @@ class ComboSubState extends MusicBeatSubState
 							OptionData.comboOffset[3] += addNum;
 						case 7:
 							OptionData.comboOffset[3] -= addNum;
+						case 8:
+							OptionData.comboOffset[4] -= addNum;
+						case 9:
+							OptionData.comboOffset[4] += addNum;
+						case 10:
+							OptionData.comboOffset[5] += addNum;
+						case 11:
+							OptionData.comboOffset[5] -= addNum;
 					}
 				}
 			}
@@ -184,22 +218,21 @@ class ComboSubState extends MusicBeatSubState
 		if (FlxG.mouse.justPressed)
 		{
 			holdingObjectType = null;
+			FlxG.mouse.getScreenPosition(FlxG.cameras.list[FlxG.cameras.list.length], startMousePos);
 
-			FlxG.mouse.getScreenPosition(FlxG.cameras.list[FlxG.cameras.list.length - 1], startMousePos);
-
-			if (startMousePos.x - comboNums.x >= 0 && startMousePos.x - comboNums.x <= comboNums.width && startMousePos.y - comboNums.y >= 0 && startMousePos.y - comboNums.y <= comboNums.height)
+			if (startMousePos.x - rating.x >= 0 && startMousePos.x - rating.x <= rating.width &&
+				startMousePos.y - rating.y >= 0 && startMousePos.y - rating.y <= rating.height)
 			{
-				holdingObjectType = true;
-
-				startComboOffset.x = OptionData.comboOffset[2];
-				startComboOffset.y = OptionData.comboOffset[3];
-			}
-			else if (startMousePos.x - rating.x >= 0 && startMousePos.x - rating.x <= rating.width && startMousePos.y - rating.y >= 0 && startMousePos.y - rating.y <= rating.height)
-			{
-				holdingObjectType = false;
-
+				holdingObjectType = 'rating';
 				startComboOffset.x = OptionData.comboOffset[0];
 				startComboOffset.y = OptionData.comboOffset[1];
+			}
+			else if (startMousePos.x - comboNums.x >= 0 && startMousePos.x - comboNums.x <= comboNums.width &&
+				startMousePos.y - comboNums.y >= 0 && startMousePos.y - comboNums.y <= comboNums.height)
+			{
+				holdingObjectType = 'numscore';
+				startComboOffset.x = OptionData.comboOffset[2];
+				startComboOffset.y = OptionData.comboOffset[3];
 			}
 		}
 
@@ -212,10 +245,20 @@ class ComboSubState extends MusicBeatSubState
 			if (FlxG.mouse.justMoved)
 			{
 				var mousePos:FlxPoint = FlxG.mouse.getScreenPosition(FlxG.cameras.list[FlxG.cameras.list.length - 1]);
-				var addNum:Int = holdingObjectType ? 2 : 0;
 
-				OptionData.comboOffset[addNum + 0] = Math.round((mousePos.x - startMousePos.x) + startComboOffset.x);
-				OptionData.comboOffset[addNum + 1] = -Math.round((mousePos.y - startMousePos.y) - startComboOffset.y);
+				switch (holdingObjectType)
+				{
+					case 'rating':
+					{
+						OptionData.comboOffset[0] = Math.round((mousePos.x - startMousePos.x) + startComboOffset.x);
+						OptionData.comboOffset[1] = -Math.round((mousePos.y - startMousePos.y) - startComboOffset.y);
+					}
+					case 'numscore':
+					{
+						OptionData.comboOffset[2] = Math.round((mousePos.x - startMousePos.x) + startComboOffset.x);
+						OptionData.comboOffset[3] = -Math.round((mousePos.y - startMousePos.y) - startComboOffset.y);
+					}
+				}
 
 				repositionCombo();
 			}
@@ -243,6 +286,8 @@ class ComboSubState extends MusicBeatSubState
 			FlxG.state.closeSubState();
 			FlxG.state.openSubState(new OptionsSubState());
 		}
+
+		super.update(elapsed);
 	}
 
 	function createTexts():Void
@@ -278,11 +323,11 @@ class ComboSubState extends MusicBeatSubState
 	function repositionCombo():Void
 	{
 		rating.screenCenter();
-		rating.x = FlxG.width * 0.55 - 135 + OptionData.comboOffset[0];
+		rating.x = 580 + OptionData.comboOffset[0];
 		rating.y -= 60 + OptionData.comboOffset[1];
 
 		comboNums.screenCenter();
-		comboNums.x = FlxG.width * 0.55 - 175 + OptionData.comboOffset[2];
+		comboNums.x = 529 + OptionData.comboOffset[2];
 		comboNums.y += 80 - OptionData.comboOffset[3];
 
 		reloadTexts();

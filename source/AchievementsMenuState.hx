@@ -8,9 +8,11 @@ import Achievements;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.FlxSubState;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
+import flixel.tweens.FlxTween;
 
 using StringTools;
 
@@ -19,8 +21,8 @@ class AchievementsMenuState extends MusicBeatState
 	#if ACHIEVEMENTS_ALLOWED
 	private static var curSelected:Int = 0;
 
-	var achievements:Array<String> = [];
-	var achievementIndex:Array<Int> = [];
+	var curAchieve:Achievement = null;
+	var achievements:Array<Achievement> = [];
 
 	private var grpTexts:FlxTypedGroup<Alphabet>;
 	private var grpAchievements:FlxTypedGroup<AttachedAchievement>;
@@ -28,27 +30,34 @@ class AchievementsMenuState extends MusicBeatState
 	private var descBox:FlxSprite;
 	private var descText:FlxText;
 
+	var bg:FlxSprite;
+
+	var startingTweenBGColor:Bool = true;
+	var startColor:FlxColor = FlxColor.WHITE;
+	var intendedColor:FlxColor;
+	var colorTween:FlxTween;
+
 	override function create():Void
 	{
-		super.create();
-
-		persistentUpdate = persistentDraw = true;
-
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("Achievements Menu", null);
 		#end
 
-		var menuBG:FlxSprite = new FlxSprite();
-		if (Paths.fileExists('images/menuBGBlue.png', IMAGE)) {
-			menuBG.loadGraphic(Paths.getImage('menuBGBlue'));
+		bg = new FlxSprite();
+
+		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
+			bg.loadGraphic(Paths.getImage('menuDesat'));
 		}
 		else {
-			menuBG.loadGraphic(Paths.getImage('bg/menuBGBlue'));
+			bg.loadGraphic(Paths.getImage('bg/menuDesat'));
 		}
-		menuBG.updateHitbox();
-		menuBG.screenCenter();
-		menuBG.antialiasing = OptionData.globalAntialiasing;
-		add(menuBG);
+
+		bg.updateHitbox();
+		bg.screenCenter();
+		bg.scrollFactor.set();
+		bg.color = startColor;
+		bg.antialiasing = OptionData.globalAntialiasing;
+		add(bg);
 
 		grpTexts = new FlxTypedGroup<Alphabet>();
 		add(grpTexts);
@@ -57,32 +66,41 @@ class AchievementsMenuState extends MusicBeatState
 		add(grpAchievements);
 
 		Achievements.loadAchievements();
-	
+
 		for (i in 0...Achievements.achievementsStuff.length)
 		{
-			if (!Achievements.achievementsStuff[i][3] || Achievements.achievementsMap.exists(Achievements.achievementsStuff[i][2]))
-			{
-				achievements.push(Achievements.achievementsStuff[i]);
-				achievementIndex.push(i);
+			var daAchieve:Achievement = Achievements.achievementsStuff[i];
+
+			if (!daAchieve.hidden || Achievements.achievementsMap.exists(daAchieve.save_tag)) {
+				achievements.push(daAchieve);
 			}
 		}
 
 		for (i in 0...achievements.length)
 		{
-			var achieveName:String = Achievements.achievementsStuff[achievementIndex[i]][2];
-			var unlocked:String = Achievements.isAchievementUnlocked(achieveName) ? Achievements.achievementsStuff[achievementIndex[i]][0] : '?';
+			var daAchieve:Achievement = achievements[i];
+			var unlocked:Bool = Achievements.isAchievementUnlocked(daAchieve.save_tag);
 
-			var leText:Alphabet = new Alphabet(280, 270, unlocked, false);
+			if (daAchieve.fileName != null) {
+				Paths.currentModDirectory = daAchieve.fileName;
+			}
+
+			var leText:Alphabet = new Alphabet(280, 270, unlocked ? daAchieve.name : '?', false);
 			leText.isMenuItem = true;
 			leText.targetY = i - curSelected;
-			leText.snapToPosition();
+			leText.setPosition(280, (100 * i) + 210);
+			leText.hasIcon = true;
 			grpTexts.add(leText);
 
-			var icon:AttachedAchievement = new AttachedAchievement(leText.x - 105, leText.y, achieveName);
+			var icon:AttachedAchievement = new AttachedAchievement(leText.x - 105, leText.y, daAchieve.save_tag);
 			icon.sprTracker = leText;
 			icon.ID = i;
 			grpAchievements.add(icon);
+
+			Paths.currentModDirectory = '';
 		}
+
+		if (curSelected >= achievements.length) curSelected = 0;
 
 		descBox = new FlxSprite();
 		descBox.makeGraphic(1, 1, FlxColor.BLACK);
@@ -96,6 +114,8 @@ class AchievementsMenuState extends MusicBeatState
 		add(descText);
 
 		changeSelection();
+
+		super.create();
 	}
 
 	var holdTime:Float = 0;
@@ -107,6 +127,10 @@ class AchievementsMenuState extends MusicBeatState
 		if (controls.BACK || FlxG.mouse.justPressedRight)
 		{
 			persistentUpdate = false;
+
+			if (colorTween != null) {
+				colorTween.cancel();
+			}
 
 			FlxG.sound.play(Paths.getSound('cancelMenu'));
 			FlxG.switchState(new MainMenuState());
@@ -145,6 +169,55 @@ class AchievementsMenuState extends MusicBeatState
 		}
 	}
 
+	public override function openSubState(SubState:FlxSubState):Void
+	{
+		super.openSubState(SubState);
+
+		if (!startingTweenBGColor && colorTween != null) {
+			colorTween.active = false;
+		}
+	}
+
+	public override function closeSubState():Void
+	{
+		super.closeSubState();
+
+		if (startingTweenBGColor)
+		{
+			var newColor:FlxColor = 0xFF1B1B41;
+
+			if (Achievements.isAchievementUnlocked(curAchieve.save_tag))
+			{
+				var col:Array<Int> = curAchieve.color;
+				newColor = FlxColor.fromRGB(col[0], col[1], col[2]);
+			}
+
+			if (intendedColor != newColor)
+			{
+				if (colorTween != null) {
+					colorTween.cancel();
+				}
+
+				intendedColor = newColor;
+
+				colorTween = FlxTween.color(bg, 1, startColor, intendedColor,
+				{
+					onComplete: function(twn:FlxTween):Void {
+						colorTween = null;
+					}
+				});
+			}
+
+			startingTweenBGColor = false;
+		}
+		else
+		{
+			if (colorTween != null) {
+				colorTween.active = true;
+			}
+		}
+	}
+
 	function changeSelection(change:Int = 0):Void
 	{
 		curSelected = CoolUtil.boundSelection(curSelected + change, achievements.length);
@@ -163,6 +236,35 @@ class AchievementsMenuState extends MusicBeatState
 			}
 		}
 
+		curAchieve = achievements[curSelected];
+
+		if (!startingTweenBGColor)
+		{
+			var newColor:FlxColor = 0xFF1B1B41;
+
+			if (Achievements.isAchievementUnlocked(curAchieve.save_tag))
+			{
+				var col:Array<Int> = curAchieve.color;
+				newColor = FlxColor.fromRGB(col[0], col[1], col[2]);
+			}
+
+			if (newColor != intendedColor)
+			{
+				if (colorTween != null) {
+					colorTween.cancel();
+				}
+
+				intendedColor = newColor;
+
+				colorTween = FlxTween.color(bg, 1, bg.color, intendedColor,
+				{
+					onComplete: function(twn:FlxTween):Void {
+						colorTween = null;
+					}
+				});
+			}
+		}
+
 		for (achievement in grpAchievements)
 		{
 			achievement.alpha = 0.6;
@@ -171,14 +273,20 @@ class AchievementsMenuState extends MusicBeatState
 				achievement.alpha = 1;
 			}
 		}
-	
-		descText.text = Achievements.achievementsStuff[achievementIndex[curSelected]][1];
+
+		var desc:String = curAchieve.desc;
+		var visible:Bool = desc != null && desc.length > 0;
+
+		descText.text = desc;
 		descText.screenCenter(Y);
 		descText.y += 270;
 
 		descBox.setPosition(descText.x - 10, descText.y - 10);
 		descBox.setGraphicSize(Std.int(descText.width + 20), Std.int(descText.height + 25));
 		descBox.updateHitbox();
+
+		descText.visible = visible;
+		descBox.visible = visible;
 
 		FlxG.sound.play(Paths.getSound('scrollMenu'), 0.4);
 	}

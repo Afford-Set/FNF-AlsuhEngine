@@ -6,17 +6,17 @@ import Discord.DiscordClient;
 
 import Replay;
 
-import flixel.FlxG;
-#if sys
+#if REPLAYS_ALLOWED
 import sys.io.File;
 import sys.FileSystem;
 #end
+
+import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.group.FlxGroup;
 
 using StringTools;
 
-#if REPLAYS_ALLOWED
 class ReplaysMenuState extends MusicBeatState
 {
 	var curSelected:Int = 0;
@@ -28,16 +28,17 @@ class ReplaysMenuState extends MusicBeatState
 
 	public override function create():Void
 	{
-		super.create();
-
 		persistentUpdate = true;
 
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Replays Menu", null); // Updating Discord Rich Presence
 		#end
 
-		if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {
-			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
+		if (FlxG.sound.music != null)
+		{
+			if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {
+				FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
+			}
 		}
 
 		var bg:FlxSprite = new FlxSprite();
@@ -52,10 +53,10 @@ class ReplaysMenuState extends MusicBeatState
 		bg.antialiasing = OptionData.globalAntialiasing;
 		add(bg);
 
-		#if sys
-		replaysArray = FileSystem.readDirectory('assets/replays');
-		#end
+		#if REPLAYS_ALLOWED
+		replaysArray = FileSystem.readDirectory(Paths.getPreloadPath('replays'));
 		replaysArray.sort(Reflect.compare);
+		#end
 
 		if (replaysArray.length > 0)
 		{
@@ -65,7 +66,8 @@ class ReplaysMenuState extends MusicBeatState
 				actualNames[i] = string;
 		
 				var rep:Replay = Replay.loadReplay(string);
-				replaysArray[i] = rep.replay.songName + ' - ' + CoolUtil.getDifficultyName(rep.replay.songDiff) + ' ' + rep.replay.timestamp;
+				var diff:String = rep.replay.difficulties[rep.replay.songDiff][1];
+				replaysArray[i] = rep.replay.songName + ' - ' + diff + ' ' + rep.replay.timestamp;
 			}
 		}
 		else {
@@ -85,46 +87,49 @@ class ReplaysMenuState extends MusicBeatState
 		}
 
 		changeSelection();
+
+		super.create();
 	}
 
 	var holdTime:Float = 0;
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
 		if (controls.BACK || FlxG.mouse.justPressedRight)
 		{
 			FlxG.sound.play(Paths.getSound('cancelMenu'));
 			FlxG.switchState(new OptionsMenuState());
 		}
 
-		if (controls.UI_DOWN || controls.UI_UP)
+		if (replaysArray.length > 0)
 		{
-			if (controls.UI_UP_P)
+			if (controls.UI_DOWN || controls.UI_UP)
 			{
-				FlxG.sound.play(Paths.getSound('scrollMenu'));
-				changeSelection(-1);
+				if (controls.UI_UP_P)
+				{
+					FlxG.sound.play(Paths.getSound('scrollMenu'));
+					changeSelection(-1);
 
-				holdTime = 0;
-			}
+					holdTime = 0;
+				}
 
-			if (controls.UI_DOWN_P)
-			{
-				FlxG.sound.play(Paths.getSound('scrollMenu'));
-				changeSelection(1);
+				if (controls.UI_DOWN_P)
+				{
+					FlxG.sound.play(Paths.getSound('scrollMenu'));
+					changeSelection(1);
 
-				holdTime = 0;
-			}
+					holdTime = 0;
+				}
 
-			var checkLastHold:Int = Math.floor((holdTime - 0.5) * 10);
-			holdTime += elapsed;
-			var checkNewHold:Int = Math.floor((holdTime - 0.5) * 10);
+				var checkLastHold:Int = Math.floor((holdTime - 0.5) * 10);
+				holdTime += elapsed;
+				var checkNewHold:Int = Math.floor((holdTime - 0.5) * 10);
 
-			if (holdTime > 0.5 && checkNewHold - checkLastHold > 0)
-			{
-				changeSelection((checkNewHold - checkLastHold) * (controls.UI_UP ? -1 : 1));
-				FlxG.sound.play(Paths.getSound('scrollMenu'));
+				if (holdTime > 0.5 && checkNewHold - checkLastHold > 0)
+				{
+					changeSelection((checkNewHold - checkLastHold) * (controls.UI_UP ? -1 : 1));
+					FlxG.sound.play(Paths.getSound('scrollMenu'));
+				}
 			}
 
 			if (FlxG.mouse.wheel != 0) {
@@ -139,11 +144,14 @@ class ReplaysMenuState extends MusicBeatState
 				PlayState.rep = Replay.loadReplay(actualNames[curSelected]);
 
 				var replay:ReplayJSON = PlayState.rep.replay;
-
 				var songID:String = replay.songID;
 
-				var diffic:String = CoolUtil.fromSuffixToID(CoolUtil.getDifficultySuffix(replay.songDiff, false, replay.difficulties));
-				var ourPath:String = CoolUtil.formatSong(songID, diffic);
+				CoolUtil.difficultyStuff = replay.difficulties.copy();
+				var ourPath:String = songID + CoolUtil.difficultyStuff[replay.songDiff][2];
+
+				if (replay.currentModDirectory != null && replay.currentModDirectory.length > 0) {
+					Paths.currentModDirectory = replay.currentModDirectory;
+				}
 
 				if (Paths.fileExists('data/' + songID + '/' + ourPath + '.json', TEXT))
 				{
@@ -151,20 +159,13 @@ class ReplaysMenuState extends MusicBeatState
 					{
 						persistentUpdate = false;
 
-						if (replay.currentModDirectory != null && replay.currentModDirectory.length > 0) {
-							Paths.currentModDirectory = replay.currentModDirectory;
-						}
-
 						PlayState.SONG = Song.loadFromJson(ourPath, songID);
 						PlayState.gameMode = 'replay';
 						PlayState.isStoryMode = false;
-						PlayState.difficulties = replay.difficulties;
-						PlayState.lastDifficulty = replay.songDiff;
-						PlayState.storyDifficultyID = replay.songDiff;
-						PlayState.storyWeekText = replay.weekID;
+						PlayState.storyDifficulty = replay.songDiff;
+						PlayState.lastDifficulty = PlayState.storyDifficulty;
+						PlayState.storyWeekID = replay.weekID;
 						PlayState.storyWeekName = replay.weekName;
-
-						PlayStateChangeables.botPlay = true;
 
 						Debug.logInfo('Loading song ${PlayState.SONG.songName} from week ${PlayState.storyWeekName} into Replay...');
 		
@@ -186,6 +187,8 @@ class ReplaysMenuState extends MusicBeatState
 				FlxG.sound.play(Paths.getSound('cancelMenu'));
 			}
 		}
+
+		super.update(elapsed);
 	}
 
 	function changeSelection(change:Int = 0):Void
@@ -207,4 +210,3 @@ class ReplaysMenuState extends MusicBeatState
 		}
 	}
 }
-#end

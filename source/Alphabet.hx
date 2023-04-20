@@ -19,6 +19,7 @@ class Alphabet extends FlxSpriteGroup
 {
 	public var text(default, set):String;
 
+	public var hasIcon:Bool = false;
 	public var bold:Bool = false;
 	public var letters:Array<AlphaCharacter> = [];
 
@@ -172,7 +173,7 @@ class Alphabet extends FlxSpriteGroup
 	{
 		if (isMenuItem)
 		{
-			var lerpVal:Float = CoolUtil.boundTo(elapsed * (lerpMult * 54.5), 0, 1);
+			var lerpVal:Float = CoolUtil.boundTo(elapsed * (lerpMult * 53), 0, 1);
 
 			if (changeX) {
 				x = FlxMath.lerp(x, (targetY * distancePerItem.x) + startPosition.x, lerpVal);

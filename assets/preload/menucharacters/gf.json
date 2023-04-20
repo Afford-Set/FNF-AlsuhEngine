@@ -1,25 +1,13 @@
 {
+	"fpsAlt": 24,
 	"confirm_anim": "GF Cheer WHITE",
-	"idle_anim": "GF Dancing Beat WHITE",
-	"idle_animAlt": "GF Dancing Beat WHITE",
-	"indices": [
-		30,
-		0,
-		1,
-		2,
-		3,
-		4,
-		5,
-		6,
-		7,
-		8,
-		9,
-		10,
-		11,
-		12,
-		13,
-		14
+	"fps": 24,
+	"position": [
+		135,
+		160
 	],
+	"isGF": true,
+	"scale": 0.49,
 	"indicesAlt": [
 		15,
 		16,
@@ -37,15 +25,27 @@
 		28,
 		29
 	],
-	"isGF": true,
-	"position": [
-		135,
-		145
-	],
-	"scale": 0.49,
-	"fps": 24,
-	"fpsAlt": 24,
-	"fpsConfirm": 24,
+	"image": "Menu_GF",
 	"flipX": false,
-	"image": "Menu_Girlfriend"
+	"idle_anim": "GF Dancing Beat WHITE",
+	"idle_animAlt": "GF Dancing Beat WHITE",
+	"fpsConfirm": 24,
+	"indices": [
+		30,
+		0,
+		1,
+		2,
+		3,
+		4,
+		5,
+		6,
+		7,
+		8,
+		9,
+		10,
+		11,
+		12,
+		13,
+		14
+	]
 }

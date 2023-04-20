@@ -19,13 +19,8 @@ import haxe.CallStack;
 import openfl.events.UncaughtErrorEvent;
 #end
 
-#if WEBM_ALLOWED
-import webmlmfao.*;
-#end
-
 #if !mobile
 import openfl.display.FPS;
-import openfl.display.Memory;
 #end
 
 import openfl.Lib;
@@ -52,9 +47,6 @@ class Main extends Sprite
 
 	#if !mobile
 	public static var fpsCounter:FPS;
-	#if !hl
-	public static var memoryCounter:Memory;
-	#end
 	#end
 
 	// You can pretty much ignore everything from here on - your code should go in your states.
@@ -87,8 +79,19 @@ class Main extends Sprite
 
 	private function setupGame():Void
 	{
+		var stageWidth:Int = Lib.current.stage.stageWidth;
+		var stageHeight:Int = Lib.current.stage.stageHeight;
+
+		if (gamePropeties.zoom == -1.0)
+		{
+			var ratioX:Float = stageWidth / gamePropeties.width;
+			var ratioY:Float = stageHeight / gamePropeties.height;
+			gamePropeties.zoom = Math.min(ratioX, ratioY);
+			gamePropeties.width = Math.ceil(stageWidth / gamePropeties.zoom);
+			gamePropeties.height = Math.ceil(stageHeight / gamePropeties.zoom);
+		}
+
 		Debug.onInitProgram();
-		OptionData.loadDefaultKeys();
 
 		game = new FlxGame(gamePropeties.width,
 			gamePropeties.height,
@@ -104,36 +107,22 @@ class Main extends Sprite
 		fpsCounter = new FPS(10, 3, 0xFFFFFF);
 		addChild(fpsCounter);
 
-		if (fpsCounter != null) {
-			fpsCounter.visible = OptionData.fpsCounter;
-		}
-
 		Lib.current.stage.align = "tl";
 		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
 
-		#if !hl
-		memoryCounter = new Memory(10, 3, 0xFFFFFF);
-		addChild(memoryCounter);
-
-		if (memoryCounter != null) {
-			memoryCounter.visible = OptionData.memoryCounter;
+		if (fpsCounter != null) {
+			fpsCounter.visible = OptionData.fpsCounter;
 		}
-		#end
 		#end
 
 		Debug.onGameStart();
 
 		#if DISCORD_ALLOWED
-		if (!DiscordClient.isInitialized)
-		{
+		if (!DiscordClient.isInitialized) {
 			DiscordClient.initialize();
-
-			Application.current.window.onClose.add(function():Void {
-				DiscordClient.shutdown();
-			});
 		}
 		#end
-		
+
 		#if (CRASH_HANDLER && !hl)
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
 		#end

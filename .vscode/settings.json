@@ -1,4 +1,5 @@
 {
+	"lime.executable": "openfl",
 	"lime.targetConfigurations": [
 		{
 			"label": "Build Windows (Debug)",
@@ -24,6 +25,20 @@
 		{
 			"label": "Build Linux (Release)",
 			"target": "linux",
+			"args": [
+				"-release"
+			]
+		},
+		{
+			"label": "Build MacOS (Debug)",
+			"target": "mac",
+			"args": [
+				"-debug"
+			]
+		},
+		{
+			"label": "Build MacOS (Release)",
+			"target": "mac",
 			"args": [
 				"-release"
 			]

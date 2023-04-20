@@ -1,0 +1,17 @@
+{
+	"week_nomiss": "",
+	"index": -1,
+	"lua_code": "",
+	"save_tag": "hype",
+	"desc": "Finish a Song without going Idle.",
+	"diff": "",
+	"name": "Hyperactive",
+	"color": [
+		255,
+		228,
+		0
+	],
+	"song": "",
+	"hidden": false,
+	"misses": -1
+}

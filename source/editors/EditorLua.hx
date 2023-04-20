@@ -24,6 +24,7 @@ import flixel.FlxG;
 import flixel.FlxBasic;
 import flixel.FlxSprite;
 import flixel.FlxCamera;
+import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.math.FlxPoint;
 import flixel.util.FlxTimer;
@@ -31,7 +32,11 @@ import flixel.util.FlxColor;
 import flixel.tweens.FlxEase;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxTween;
+#if (flixel >= "5.3.0")
+import flixel.sound.FlxSound;
+#else
 import flixel.system.FlxSound;
+#end
 
 using StringTools;
 
@@ -69,6 +74,14 @@ class EditorLua
 		set('Function_Continue', Function_Continue);
 		set('inChartEditor', true);
 
+		// quick math skills
+		set('EPSILON', FlxMath.EPSILON);
+		set('MAX_VALUE_INT', FlxMath.MIN_VALUE_INT);
+		set('MAX_VALUE_INT', FlxMath.MAX_VALUE_INT);
+		set('MAX_VALUE_FLOAT', FlxMath.MIN_VALUE_FLOAT);
+		set('MAX_VALUE_FLOAT', FlxMath.MAX_VALUE_FLOAT);
+		set('SQUARE_ROOT_OF_TWO', FlxMath.SQUARE_ROOT_OF_TWO);
+
 		set('curBpm', Conductor.bpm);
 		set('bpm', PlayState.SONG.bpm);
 		set('scrollSpeed', PlayState.SONG.speed);
@@ -98,16 +111,16 @@ class EditorLua
 
 			if (fieldArray.length > 1)
 			{
-				var fieldArrayFromInstance:Dynamic = Reflect.getProperty(EditorPlayState.instance, getVariableByPrefix('EditorPlayState.instance', fieldArray[0]));
+				var fieldArrayFromInstance:Dynamic = Reflect.getProperty(EditorPlayState.instance, getVariableByTag('EditorPlayState.instance', fieldArray[0]));
 
 				for (i in 1...fieldArray.length - 1) {
-					fieldArrayFromInstance = Reflect.getProperty(fieldArrayFromInstance, getVariableByPrefix('EditorPlayState.instance', fieldArray[i]));
+					fieldArrayFromInstance = Reflect.getProperty(fieldArrayFromInstance, getVariableByTag('EditorPlayState.instance', fieldArray[i]));
 				}
 
 				return Reflect.getProperty(fieldArrayFromInstance, fieldArray[fieldArray.length - 1]);
 			}
 
-			return Reflect.getProperty(EditorPlayState.instance, getVariableByPrefix('EditorPlayState.instance', variable));
+			return Reflect.getProperty(EditorPlayState.instance, getVariableByTag('EditorPlayState.instance', variable));
 		});
 
 		Lua_helper.add_callback(lua, "setProperty", function(variable:String, value:Dynamic):Void
@@ -116,16 +129,16 @@ class EditorLua
 
 			if (fieldArray.length > 1)
 			{
-				var fieldArrayFromInstance:Dynamic = Reflect.getProperty(EditorPlayState.instance, getVariableByPrefix('EditorPlayState.instance', fieldArray[0]));
+				var fieldArrayFromInstance:Dynamic = Reflect.getProperty(EditorPlayState.instance, getVariableByTag('EditorPlayState.instance', fieldArray[0]));
 
 				for (i in 1...fieldArray.length - 1) {
-					fieldArrayFromInstance = Reflect.getProperty(fieldArrayFromInstance, getVariableByPrefix('EditorPlayState.instance', fieldArray[i]));
+					fieldArrayFromInstance = Reflect.getProperty(fieldArrayFromInstance, getVariableByTag('EditorPlayState.instance', fieldArray[i]));
 				}
 
 				return Reflect.setProperty(fieldArrayFromInstance, fieldArray[fieldArray.length - 1], value);
 			}
 
-			return Reflect.setProperty(EditorPlayState.instance, getVariableByPrefix('EditorPlayState.instance', variable), value);
+			return Reflect.setProperty(EditorPlayState.instance, getVariableByTag('EditorPlayState.instance', variable), value);
 		});
 
 		Lua_helper.add_callback(lua, "callFromObject", function(variable:String, ?arguments:Array<Dynamic>):Dynamic
@@ -134,16 +147,16 @@ class EditorLua
 
 			if (fieldArray.length > 1)
 			{
-				var fieldArrayFromInstance:Dynamic = Reflect.getProperty(EditorPlayState.instance, getVariableByPrefix('EditorPlayState.instance', fieldArray[0]));
+				var fieldArrayFromInstance:Dynamic = Reflect.getProperty(EditorPlayState.instance, getVariableByTag('EditorPlayState.instance', fieldArray[0]));
 
 				for (i in 1...fieldArray.length - 1) {
-					fieldArrayFromInstance = Reflect.getProperty(fieldArrayFromInstance, getVariableByPrefix('EditorPlayState.instance', fieldArray[i]));
+					fieldArrayFromInstance = Reflect.getProperty(fieldArrayFromInstance, getVariableByTag('EditorPlayState.instance', fieldArray[i]));
 				}
 
 				return Reflect.callMethod(null, Reflect.getProperty(fieldArrayFromInstance, fieldArray[fieldArray.length - 1]), arguments);
 			}
 
-			return Reflect.callMethod(null, Reflect.getProperty(EditorPlayState.instance, getVariableByPrefix('EditorPlayState.instance', variable)), arguments);
+			return Reflect.callMethod(null, Reflect.getProperty(EditorPlayState.instance, getVariableByTag('EditorPlayState.instance', variable)), arguments);
 		});
 
 		Lua_helper.add_callback(lua, "getPropertyFromGroup", function(obj:String, index:Int, variable:Dynamic):Dynamic
@@ -237,13 +250,12 @@ class EditorLua
 
 		Lua_helper.add_callback(lua, "getColorFromHex", function(color:String):Int
 		{
-			if (!color.startsWith('0x')) color = '0xff' + color;
-			return Std.parseInt(color);
+			return CoolUtil.getColorFromString(color);
 		});
 
 		Lua_helper.add_callback(lua, "setGraphicSize", function(obj:String, x:Int, y:Int = 0):Void
 		{
-			var sprite:FlxSprite = Reflect.getProperty(EditorPlayState.instance, getVariableByPrefix('EditorPlayState.instance', obj));
+			var sprite:FlxSprite = Reflect.getProperty(EditorPlayState.instance, getVariableByTag('EditorPlayState.instance', obj));
 
 			if (sprite != null)
 			{
@@ -255,7 +267,7 @@ class EditorLua
 
 		Lua_helper.add_callback(lua, "scaleObject", function(obj:String, x:Float, y:Float):Void
 		{
-			var sprite:FlxSprite = Reflect.getProperty(EditorPlayState.instance, getVariableByPrefix('EditorPlayState.instance', obj));
+			var sprite:FlxSprite = Reflect.getProperty(EditorPlayState.instance, getVariableByTag('EditorPlayState.instance', obj));
 
 			if (sprite != null)
 			{
@@ -267,7 +279,7 @@ class EditorLua
 
 		Lua_helper.add_callback(lua, "updateHitbox", function(obj:String):Void
 		{
-			var sprite:FlxSprite = Reflect.getProperty(EditorPlayState.instance, getVariableByPrefix('EditorPlayState.instance', obj));
+			var sprite:FlxSprite = Reflect.getProperty(EditorPlayState.instance, getVariableByTag('EditorPlayState.instance', obj));
 
 			if (sprite != null)
 			{
@@ -284,7 +296,7 @@ class EditorLua
 		#end
 	}
 
-	public static function getVariableByPrefix(o:String, prefix:String):String
+	public static function getVariableByTag(o:String, tag:String):String
 	{
 		var newVar:String = null;
 
@@ -292,16 +304,16 @@ class EditorLua
 		{
 			case 'EditorPlayState.instance':
 			{
-				switch (prefix.trim())
+				switch (tag.trim())
 				{
 					default: {
-						newVar = prefix.trim();
+						newVar = tag.trim();
 					}
 				}
 			}
 			case 'OptionData':
 			{
-				switch (prefix.trim())
+				switch (tag.trim())
 				{
 					case 'showFPS': {
 						newVar = 'fpsCounter';
@@ -309,104 +321,60 @@ class EditorLua
 					case 'fullscreen': {
 						newVar = 'fullScreen';
 					}
+					case 'saveSettings': {
+						newVar = 'savePrefs';
+					}
 					default: {
-						newVar = prefix.trim();
+						newVar = tag.trim();
 					}
 				}
 			}
 		}
 
 		if (newVar == null) {
-			newVar = prefix.trim();
+			newVar = tag.trim();
 		}
 
 		return newVar;
 	}
 
-	public static function getCallerByPrefix(o:String, prefix:String):String
-	{
-		var newCaller:String = null;
-
-		switch (o.trim())
-		{
-			case 'EditorPlayState.instance':
-			{
-				switch (prefix.trim())
-				{
-					default: {
-						newCaller = prefix.trim();
-					}
-				}
-			}
-			case 'OptionData':
-			{
-				switch (prefix.trim())
-				{
-					case 'saveSettings': {
-						newCaller = 'savePrefs';
-					}
-					default: {
-						newCaller = prefix.trim();
-					}
-				}
-			}
-		}
-
-		if (newCaller == null) {
-			newCaller = prefix.trim();
-		}
-
-		return newCaller;
-	}
-
-	public function call(event:String, args:Array<Dynamic>):Dynamic
+	public function call(func:String, args:Array<Dynamic>):Dynamic
 	{
 		#if LUA_ALLOWED
-		if (lua == null) {
-			return Function_Continue;
-		}
-
-		Lua.getglobal(lua, event);
-
-		for (arg in args) {
-			Convert.toLua(lua, arg);
-		}
-
-		var result:Null<Int> = Lua.pcall(lua, args.length, 1, 0);
-
-		if (result != null && resultIsAllowed(lua, result))
+		try
 		{
-			if (Lua.type(lua, -1) == Lua.LUA_TSTRING)
+			if (lua == null) return Function_Continue;
+			Lua.getglobal(lua, func);
+
+			var type:Int = Lua.type(lua, -1);
+
+			if (type != Lua.LUA_TFUNCTION)
 			{
-				var error:String = Lua.tostring(lua, -1);
 				Lua.pop(lua, 1);
-	
-				if (error == 'attempt to call a nil value') { //Makes it ignore warnings and not break stuff if you didn't put the functions on your lua file
-					return Function_Continue;
-				}
+				return Function_Continue;
 			}
 
-			var conv:Dynamic = Convert.fromLua(lua, result);
+			for (arg in args) Convert.toLua(lua, arg);
 
-			return conv;
+			var status:Int = Lua.pcall(lua, args.length, 1, 0);
+
+			if (status != Lua.LUA_OK) {
+				return Function_Continue;
+			}
+
+			var result:Dynamic = cast Convert.fromLua(lua, -1);
+			if (result == null) result = Function_Continue;
+
+			Lua.pop(lua, 1);
+			return result;
+		}
+		catch (e:Dynamic) {
+			Debug.logError(e);
 		}
 		#end
 
 		return Function_Continue;
 	}
-
-	#if LUA_ALLOWED
-	function resultIsAllowed(leLua:State, leResult:Null<Int>):Bool // Makes it ignore warnings
-	{
-		switch (Lua.type(leLua, leResult))
-		{
-			case Lua.LUA_TNIL | Lua.LUA_TBOOLEAN | Lua.LUA_TNUMBER | Lua.LUA_TSTRING | Lua.LUA_TTABLE:
-				return true;
-		}
-
-		return false;
-	}
-	#end
 
 	public function set(variable:String, data:Dynamic):Void
 	{

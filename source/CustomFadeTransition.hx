@@ -12,23 +12,23 @@ using StringTools;
 
 class CustomFadeTransition extends MusicBeatSubState
 {
-	public static var skipNextTransIn:Bool = false;
-	public static var skipNextTransOut:Bool = false;
-
 	public static var nextCamera:FlxCamera;
-	public static var finishCallback:Void->Void;
 
+	public var finishCallback:Void->Void;
 	private var leTween:FlxTween = null;
 
+	var duration:Float = 1;
 	var isTransIn:Bool = false;
+
 	var transBlack:FlxSprite;
 	var transGradient:FlxSprite;
 
-	public function new(duration:Float, isTransIn:Bool):Void
+	public function new(duration:Float, isTransIn:Bool, ?finishCallback:Void->Void = null):Void
 	{
 		super();
 
 		this.isTransIn = isTransIn;
+		this.finishCallback = finishCallback;
 
 		var zoom:Float = CoolUtil.boundTo(FlxG.camera.zoom, 0.05, 1);
 
@@ -69,8 +69,8 @@ class CustomFadeTransition extends MusicBeatSubState
 				ease: FlxEase.linear,
 				onComplete: function(twn:FlxTween):Void
 				{
-					if (finishCallback != null) {
-						finishCallback();
+					if (this.finishCallback != null) {
+						this.finishCallback();
 					}
 				}
 			});

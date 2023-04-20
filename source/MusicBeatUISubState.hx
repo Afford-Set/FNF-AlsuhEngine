@@ -17,11 +17,8 @@ class MusicBeatUISubState extends FlxUISubState
 	private var curDecStep:Float = 0;
 	private var curDecBeat:Float = 0;
 
-	private var controls(get, never):Controls;
-
-	inline function get_controls():Controls {
-		return PlayerSettings.player1.controls;
-	}
+	public var controls(get, never):Controls;
+	private function get_controls():Controls return Controls.instance;
 
 	public override function create():Void
 	{
@@ -34,10 +31,6 @@ class MusicBeatUISubState extends FlxUISubState
 	public override function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
-
-		#if !mobile
-		CoolUtil.recolorCounters(skippedFrames, skippedFrames2);
-		#end
 
 		var oldStep:Int = curStep;
 
@@ -52,7 +45,7 @@ class MusicBeatUISubState extends FlxUISubState
 	private function updateBeat():Void
 	{
 		curBeat = Math.floor(curStep / 4);
-		curDecBeat = curDecStep/4;
+		curDecBeat = curDecStep / 4;
 	}
 
 	private function updateCurStep():Void

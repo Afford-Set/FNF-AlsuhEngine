@@ -6,6 +6,7 @@
 		"gameOver",
 		"gameOverEnd"
 	],
+	"skip_dance": false,
 	"animations": [
 		{
 			"offsets": [

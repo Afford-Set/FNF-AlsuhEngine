@@ -2,7 +2,7 @@
 color 0a
 cd ..
 echo BUILDING GAME
-haxelib run lime build windows -debug
+haxelib run openfl build windows -debug
 echo.
 echo done.
 pause

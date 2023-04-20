@@ -12,7 +12,7 @@ class AttachedText extends Alphabet
 	public var copyVisible:Bool = false;
 	public var copyAlpha:Bool = false;
 
-	public function new(text:String = '', ?offsetX:Float = 0, ?offsetY:Float = 0, ?bold = false, ?scale:Float = 1):Void
+	public function new(text:String = '', ?offsetX:Float = 0, ?offsetY:Float = 0, ?bold:Bool = false, ?scale:Float = 1):Void
 	{
 		super(0, 0, text, bold);
 
@@ -27,9 +27,9 @@ class AttachedText extends Alphabet
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
 		snapToUpdateVariables();
+
+		super.update(elapsed);
 	}
 
 	public function snapToUpdateVariables():Void

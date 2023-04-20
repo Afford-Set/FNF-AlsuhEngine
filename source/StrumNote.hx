@@ -2,7 +2,7 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-import shaders.ColorSwap;
+import shaderslmfao.ColorSwap;
 import flixel.graphics.FlxGraphic;
 
 using StringTools;
@@ -71,11 +71,11 @@ class StrumNote extends FlxSprite
 		{
 			var ourGraphic:FlxGraphic = null;
 
-			if (Paths.fileExists('images/' + texture + '.png', IMAGE)) {
-				ourGraphic = Paths.getImage(texture);
-			}
-			else if (Paths.fileExists('images/pixelUI/' + texture + '.png', IMAGE)) {
+			if (Paths.fileExists('images/pixelUI/' + texture + '.png', IMAGE)) {
 				ourGraphic = Paths.getImage('pixelUI/' + texture);
+			}
+			else if (Paths.fileExists('images/' + texture + '.png', IMAGE)) {
+				ourGraphic = Paths.getImage(texture);
 			}
 			else if (Paths.fileExists('images/notes/pixel/' + texture + '.png', IMAGE)) {
 				ourGraphic = Paths.getImage('notes/pixel/' + texture);

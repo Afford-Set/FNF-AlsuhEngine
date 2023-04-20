@@ -1,5 +1,6 @@
 {
 	"char_name": "Senpai",
+	"skip_dance": false,
 	"animations": [
 		{
 			"offsets": [
@@ -58,7 +59,7 @@
 		}
 	],
 	"no_antialiasing": true,
-	"image": "characters/senpai",
+	"image": "characters/senpai_ANGRY",
 	"position": [
 		150,
 		360

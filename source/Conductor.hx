@@ -15,7 +15,7 @@ class Conductor
 	public static var bpm:Float = 100;
 	public static var crochet:Float = ((60 / bpm) * 1000); // beats in milliseconds
 	public static var stepCrochet:Float = crochet / 4; // steps in milliseconds
-	public static var songPosition:Float;
+	public static var songPosition:Float = 0;
 	public static var lastSongPos:Float;
 	public static var offset:Float = 0;
 
@@ -23,29 +23,29 @@ class Conductor
 
 	public static var bpmChangeMap:Array<BPMChangeEvent> = [];
 
-	public static function getDefaultRatings():Array<RatingData>
+	public static function getDefaultRatings():Array<Rating>
 	{
-		var good:RatingData = new RatingData('good');
+		var good:Rating = new Rating('good');
 		good.ratingMod = 0.7;
 		good.score = 200;
 		good.noteSplash = false;
 
-		var bad:RatingData = new RatingData('bad');
+		var bad:Rating = new Rating('bad');
 		bad.ratingMod = 0.4;
 		bad.score = 100;
 		bad.noteSplash = false;
 
-		var shit:RatingData = new RatingData('shit');
+		var shit:Rating = new Rating('shit');
 		shit.ratingMod = 0;
 		shit.score = 50;
 		shit.noteSplash = false;
 
-		return [new RatingData('sick'), good, bad, shit];
+		return [new Rating('sick'), good, bad, shit];
 	}
 
-	public static function judgeNote(ratingsData:Array<RatingData>, note:Note, diff:Float = 0):RatingData
+	public static function judgeNote(ratingsData:Array<Rating>, note:Note, diff:Float = 0):Rating
 	{
-		var data:Array<RatingData> = getDefaultRatings();
+		var data:Array<Rating> = getDefaultRatings();
 
 		if (ratingsData != null && ratingsData.length > 0) {
 			data = ratingsData;
@@ -61,11 +61,11 @@ class Conductor
 				return data[i];
 			}
 		}
-	
+
 		return data[data.length - 1];
 	}
 
-	public static function getRatingByName(ratingsData:Array<RatingData>, name:String):RatingData
+	public static function getRatingByName(ratingsData:Array<Rating>, name:String):Rating
 	{
 		if (ratingsData.length > 0)
 		{
@@ -77,7 +77,7 @@ class Conductor
 			}
 		}
 
-		return new RatingData('sick');
+		return new Rating('sick');
 	}
 
 	public static function getCrotchetAtTime(time:Float):Float
@@ -201,5 +201,44 @@ class Conductor
 
 		crochet = calculateCrochet(bpm);
 		stepCrochet = crochet / 4;
+	}
+}
+
+class Rating
+{
+	public var name:String = '';
+	public var defaultName:String = '';
+
+	public var image:String = '';
+	public var counter:String = '';
+
+	public var hitWindow(get, null):Null<Int> = 0; //ms
+	public var ratingMod:Float = 1;
+
+	public var score:Int = 350;
+
+	public var noteSplash:Bool = true;
+
+	public function new(name:String):Void
+	{
+		this.name = name;
+		this.defaultName = this.name;
+
+		this.image = name;
+		this.counter = defaultName + 's';
+
+		if (hitWindow == null) {
+			hitWindow = 0;
+		}
+	}
+
+	public function get_hitWindow():Null<Int>
+	{
+		return Reflect.getProperty(OptionData, defaultName + 'Window');
+	}
+
+	public function increase(blah:Int = 1):Void
+	{
+		Reflect.setProperty(PlayState.instance, counter, Reflect.getProperty(PlayState.instance, counter) + blah);
 	}
 }

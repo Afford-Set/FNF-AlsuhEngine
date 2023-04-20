@@ -6,6 +6,7 @@
 		"gameOver-pixel",
 		"gameOverEnd-pixel"
 	],
+	"skip_dance": false,
 	"animations": [
 		{
 			"loop": false,

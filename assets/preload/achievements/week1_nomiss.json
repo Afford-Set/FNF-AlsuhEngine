@@ -1,0 +1,17 @@
+{
+	"week_nomiss": "week1",
+	"index": -1,
+	"lua_code": "",
+	"save_tag": "week1_nomiss",
+	"desc": "Beat Week 1 on Hard with no Combo Breaks.",
+	"diff": "hard",
+	"name": "She Calls Me Daddy Too",
+	"color": [
+		146,
+		113,
+		253
+	],
+	"song": "",
+	"hidden": false,
+	"misses": 0
+}

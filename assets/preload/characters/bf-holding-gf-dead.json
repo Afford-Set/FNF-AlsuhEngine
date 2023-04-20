@@ -1,5 +1,6 @@
 {
 	"char_name": "Boyfriend and Girlfriend",
+	"skip_dance": false,
 	"animations": [
 		{
 			"offsets": [
@@ -9,7 +10,7 @@
 			"indices": [],
 			"fps": 24,
 			"anim": "deathLoop",
-			"loop": true,
+			"loop": false,
 			"name": "BF Dead with GF Loop"
 		},
 		{

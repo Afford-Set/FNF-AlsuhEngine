@@ -1,8 +1,9 @@
 package;
 
 import flixel.FlxSprite;
+import flixel.math.FlxRect;
 import editors.ChartingState;
-import shaders.ColorSwap;
+import shaderslmfao.ColorSwap;
 import editors.EditorPlayState;
 import flixel.graphics.FlxGraphic;
 
@@ -66,6 +67,7 @@ class Note extends FlxSprite
 	public static var pointers:Array<String> = ['LEFT', 'DOWN', 'UP', 'RIGHT'];
 
 	// Lua shit
+	public var isCustomHSB:Bool = false;
 	public var quickNoteSplash:Bool = false;
 	public var noteSplashHitByOpponent:Bool = false;
 	public var noteSplashDisabled:Bool = false;
@@ -82,24 +84,24 @@ class Note extends FlxSprite
 
 	public var copyX:Bool = true;
 	public var copyY:Bool = true;
-
 	public var copyAngle:Bool = true;
 	public var copyAlpha:Bool = true;
 
-	public static var hithealth_sick:Float = 0.025;
-	public static var hithealth_sick_sus:Float = 0.025;
-	public static var hithealth_good:Float = 0.02;
-	public static var hithealth_good_sus:Float = 0.02;
-	public static var hithealth_bad:Float = 0.01;
-	public static var hithealth_bad_sus:Float = 0.01;
-	public static var hithealth_shit:Float = 0;
-	public static var hithealth_shit_sus:Float = 0;
+	public var hitHealth_sick:Float = 0.025;
+	public var hitHealth_sick_sus:Float = 0.025; // amogus
+	public var hitHealth_good:Float = 0.02;
+	public var hitHealth_good_sus:Float = 0.02;
+	public var hitHealth_bad:Float = 0.01;
+	public var hitHealth_bad_sus:Float = 0.01;
+	public var hitHealth_shit:Float = 0;
+	public var hitHealth_shit_sus:Float = 0;
+	public var hitHealth_unknown:Float = 0;
 
 	public var healthDisabledOnGoodNoteHit:Bool = true;
-	public var hitHealth:Float = 0.025;
-	public var missHealth:Float = 0.0475;
+	public var hitHealth:Float = 0.023;
+	public var missHealth:Float = 0.023;
+	public var missHealth_sus:Float = 0.0115;
 	public var rating:String = 'unknown';
-	public var ratingSus:String = 'shit';
 	public var ratingMod:Float = 0; // 9 = unknown, 0.25 = shit, 0.5 = bad, 0.75 = good, 1 = sick
 	public var ratingDisabled:Bool = false;
 
@@ -141,9 +143,9 @@ class Note extends FlxSprite
 
 	private function set_noteType(value:String):String
 	{
-		noteSplashTexture = PlayState.SONG.splashSkin;
+		noteSplashTexture = mustPress ? PlayState.SONG.splashSkin : PlayState.SONG.splashSkin2;
 
-		if (noteData > -1 && noteData < OptionData.arrowHSV.length)
+		if (noteData > -1 && noteData < OptionData.arrowHSV.length && !isCustomHSB)
 		{
 			colorSwap.hue = OptionData.arrowHSV[noteData % maxNote][0] / 360;
 			colorSwap.saturation = OptionData.arrowHSV[noteData % maxNote][1] / 100;
@@ -157,7 +159,7 @@ class Note extends FlxSprite
 				case 'Hurt Note':
 				{
 					ignoreNote = mustPress;
-					reloadNote('HURT');
+					reloadNote('HURT', 'NOTE_assets');
 
 					noteSplashTexture = 'HURTnoteSplashes';
 
@@ -192,9 +194,12 @@ class Note extends FlxSprite
 			noteType = value;
 		}
 
-		noteSplashHue = colorSwap.hue;
-		noteSplashSat = colorSwap.saturation;
-		noteSplashBrt = colorSwap.brightness;
+		if (!isCustomHSB)
+		{
+			noteSplashHue = colorSwap.hue;
+			noteSplashSat = colorSwap.saturation;
+			noteSplashBrt = colorSwap.brightness;
+		}
 
 		return value;
 	}
@@ -210,7 +215,6 @@ class Note extends FlxSprite
 		this.prevNote = prevNote;
 		this.isSustainNote = isSustainNote;
 		this.inEditor = inEditor;
-		this.mustPress = mustPress;
 
 		x += (OptionData.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X) + 50;
 
@@ -221,6 +225,7 @@ class Note extends FlxSprite
 		if (!inEditor) this.strumTime += OptionData.noteOffset;
 
 		this.noteData = noteData;
+		this.mustPress = mustPress;
 
 		if (noteData > -1)
 		{
@@ -229,7 +234,7 @@ class Note extends FlxSprite
 			colorSwap = new ColorSwap();
 			shader = colorSwap.shader;
 
-			x += swagWidth * (noteData % maxNote);
+			x += swagWidth * noteData;
 
 			if (!isSustainNote && noteData > -1 && noteData < Note.maxNote)  // Doing this 'if' check to fix the warnings on Senpai songs
 			{
@@ -287,8 +292,10 @@ class Note extends FlxSprite
 					prevNote.scale.y *= instance.songSpeed;
 				}
 
-				if (PlayState.isPixelStage) {
+				if (PlayState.isPixelStage)
+				{
 					prevNote.scale.y *= 1.19;
+					prevNote.scale.y *= (6 / height); // Auto adjust note size
 				}
 
 				prevNote.updateHitbox();
@@ -347,13 +354,13 @@ class Note extends FlxSprite
 			{
 				var ourGraphic:FlxGraphic = null;
 
-				if (Paths.fileExists('images/' + blahblah + 'ENDS' + '.png', IMAGE)) {
-					ourGraphic = Paths.getImage(blahblah + 'ENDS');
-				}
-				else if (Paths.fileExists('images/pixelUI/' + blahblah + 'ENDS' + '.png', IMAGE)) {
+				if (Paths.fileExists('images/pixelUI/' + blahblah + 'ENDS.png', IMAGE)) {
 					ourGraphic = Paths.getImage('pixelUI/' + blahblah + 'ENDS');
 				}
-				else if (Paths.fileExists('images/notes/pixel/' + blahblah + 'ENDS' + '.png', IMAGE)) {
+				else if (Paths.fileExists('images/' + blahblah + 'ENDS.png', IMAGE)) {
+					ourGraphic = Paths.getImage(blahblah + 'ENDS');
+				}
+				else if (Paths.fileExists('images/notes/pixel/' + blahblah + 'ENDS.png', IMAGE)) {
 					ourGraphic = Paths.getImage('notes/pixel/' + blahblah + 'ENDS');
 				}
 				else {
@@ -373,11 +380,11 @@ class Note extends FlxSprite
 			{
 				var ourGraphic:FlxGraphic = null;
 
-				if (Paths.fileExists('images/' + blahblah + '.png', IMAGE)) {
-					ourGraphic = Paths.getImage(blahblah);
-				}
-				else if (Paths.fileExists('images/pixelUI/' + blahblah + '.png', IMAGE)) {
+				if (Paths.fileExists('images/pixelUI/' + blahblah + '.png', IMAGE)) {
 					ourGraphic = Paths.getImage('pixelUI/' + blahblah);
+				}
+				else if (Paths.fileExists('images/' + blahblah + '.png', IMAGE)) {
+					ourGraphic = Paths.getImage(blahblah);
 				}
 				else if (Paths.fileExists('images/notes/pixel/' + blahblah + '.png', IMAGE)) {
 					ourGraphic = Paths.getImage('notes/pixel/' + blahblah);
@@ -524,11 +531,23 @@ class Note extends FlxSprite
 			}
 		}
 
-		if (tooLate)
+		if (tooLate && !inEditor)
 		{
 			if (alpha > 0.3) {
 				alpha = 0.3;
 			}
 		}
+	}
+
+	@:noCompletion
+	override function set_clipRect(rect:FlxRect):FlxRect
+	{
+		clipRect = rect;
+
+		if (frames != null) {
+			frame = frames.frames[animation.frameIndex];
+		}
+
+		return rect;
 	}
 }

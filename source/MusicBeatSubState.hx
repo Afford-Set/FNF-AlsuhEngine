@@ -7,6 +7,8 @@ import flixel.FlxSubState;
 
 using StringTools;
 
+typedef MusicBeatSubstate = MusicBeatSubState;
+
 class MusicBeatSubState extends FlxSubState
 {
 	private var stepsToDo:Int = 0;
@@ -17,11 +19,8 @@ class MusicBeatSubState extends FlxSubState
 	private var curDecStep:Float = 0;
 	private var curDecBeat:Float = 0;
 
-	private var controls(get, never):Controls;
-
-	inline function get_controls():Controls {
-		return PlayerSettings.player1.controls;
-	}
+	public var controls(get, never):Controls;
+	private function get_controls():Controls return Controls.instance;
 
 	public override function create():Void
 	{
@@ -33,12 +32,6 @@ class MusicBeatSubState extends FlxSubState
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
-		#if !mobile
-		CoolUtil.recolorCounters(skippedFrames, skippedFrames2);
-		#end
-
 		var oldStep:Int = curStep;
 
 		updateCurStep();
@@ -47,12 +40,14 @@ class MusicBeatSubState extends FlxSubState
 		if (oldStep != curStep && curStep > 0) {
 			stepHit();
 		}
+
+		super.update(elapsed);
 	}
 
 	private function updateBeat():Void
 	{
 		curBeat = Math.floor(curStep / 4);
-		curDecBeat = curDecStep/4;
+		curDecBeat = curDecStep / 4;
 	}
 
 	private function updateCurStep():Void

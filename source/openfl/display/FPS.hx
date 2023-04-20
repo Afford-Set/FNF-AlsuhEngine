@@ -4,9 +4,18 @@ import haxe.Timer;
 #if flash
 import openfl.Lib;
 #end
+#if (openfl && !hl)
+import openfl.system.System;
+#end
 import openfl.events.Event;
+import flixel.math.FlxMath;
+import flixel.util.FlxColor;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
+#if gl_stats
+import openfl.display._internal.stats.Context3DStats;
+import openfl.display._internal.stats.DrawCallContext;
+#end
 
 /**
 	The FPS class provides an easy-to-use monitor to display
@@ -22,6 +31,10 @@ class FPS extends TextField
 		The current frame rate, expressed using frames-per-second
 	**/
 	public var currentFPS(default, null):Int;
+	#if (openfl && !hl)
+	private var memoryMegas:Float = 0;
+	private var memoryTotal:Float = 0;
+	#end
 
 	@:noCompletion private var cacheCount:Int;
 	@:noCompletion private var currentTime:Float;
@@ -40,7 +53,9 @@ class FPS extends TextField
 		mouseEnabled = false;
 
 		defaultTextFormat = new TextFormat("_sans", 14, color);
-		text = "FPS: ";
+
+		autoSize = LEFT;
+		multiline = true;
 
 		cacheCount = 0;
 		currentTime = 0;
@@ -65,20 +80,39 @@ class FPS extends TextField
 			times.shift();
 		}
 
-		var currentCount = times.length;
+		var currentCount:Int = times.length;
 		currentFPS = Math.round((currentCount + cacheCount) / 2);
-
-		var framerateOption:Int = #if html5 60 #else OptionData.framerate #end;
-		if (currentFPS > framerateOption) currentFPS = framerateOption;
+		if (currentFPS > OptionData.framerate) currentFPS = OptionData.framerate;
 
 		if (currentCount != cacheCount)
 		{
-			text = "FPS: " + currentFPS;
-			textColor = 0xFFFFFFFF;
+			text = '';
+			if (OptionData.fpsCounter) text += "FPS: " + currentFPS + "\n";
 
-			if (currentFPS < framerateOption / 2) {
-				textColor = 0xFFFF0000;
+			#if (openfl && !hl)
+			memoryMegas = Math.abs(CoolUtil.roundDecimal(System.totalMemory / 1000000, 1));
+			if (memoryMegas > memoryTotal) memoryTotal = memoryMegas;
+
+			if (OptionData.memoryCounter) text += "Memory: " + memoryMegas + " MB / " + memoryTotal + " MB";
+			#end
+
+			if (Main.fpsCounter != null) {
+				Main.fpsCounter.visible = text != null || text != '';
 			}
+
+			textColor = FlxColor.WHITE;
+
+			if (#if !hl memoryMegas > 3000 || #end currentFPS <= OptionData.framerate / 2) {
+				textColor = FlxColor.RED;
+			}
+
+			#if (gl_stats && !disable_cffi && (!html5 || !canvas))
+			text += "\ntotalDC: " + Context3DStats.totalDrawCalls();
+			text += "\nstageDC: " + Context3DStats.contextDrawCalls(DrawCallContext.STAGE);
+			text += "\nstage3DDC: " + Context3DStats.contextDrawCalls(DrawCallContext.STAGE3D);
+			#end
+
+			text += "\n";
 		}
 
 		cacheCount = currentCount;

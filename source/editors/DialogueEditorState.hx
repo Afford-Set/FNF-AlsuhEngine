@@ -27,6 +27,7 @@ import openfl.net.FileFilter;
 import flixel.addons.ui.FlxUI;
 import openfl.net.FileReference;
 import openfl.events.IOErrorEvent;
+import flixel.addons.ui.FlxUIButton;
 import flixel.addons.ui.FlxUITabMenu;
 import flixel.addons.ui.FlxUICheckBox;
 import flixel.addons.ui.FlxUIInputText;
@@ -48,8 +49,6 @@ class DialogueEditorState extends MusicBeatUIState
 
 	public override function create():Void
 	{
-		super.create();
-
 		persistentUpdate = persistentDraw = true;
 
 		FlxG.camera.bgColor = FlxColor.fromHSL(0, 0, 0.5);
@@ -116,6 +115,8 @@ class DialogueEditorState extends MusicBeatUIState
 		add(daText);
 
 		changeText();
+
+		super.create();
 	}
 
 	var UI_box:FlxUITabMenu;
@@ -146,7 +147,7 @@ class DialogueEditorState extends MusicBeatUIState
 
 	function addDialogueLineUI():Void
 	{
-		var tab_group = new FlxUI(null, UI_box);
+		var tab_group:FlxUI = new FlxUI(null, UI_box);
 		tab_group.name = "Dialogue Line";
 
 		characterInputText = new FlxUIInputText(10, 20, 80, DialogueCharacter.DEFAULT_CHARACTER, 8);
@@ -167,15 +168,8 @@ class DialogueEditorState extends MusicBeatUIState
 		lineInputText = new FlxUIInputText(10, soundInputText.y + 35, 200, DEFAULT_TEXT, 8);
 		blockPressWhileTypingOn.push(lineInputText);
 
-		var loadButton:FlxButton = new FlxButton(20, lineInputText.y + 25, "Load Dialogue", function():Void
-		{
-			loadDialogue();
-		});
-
-		var saveButton:FlxButton = new FlxButton(loadButton.x + 120, loadButton.y, "Save Dialogue", function():Void
-		{
-			saveDialogue();
-		});
+		var loadButton:FlxUIButton = new FlxUIButton(20, lineInputText.y + 25, "Load Dialogue", loadDialogue);
+		var saveButton:FlxUIButton = new FlxUIButton(loadButton.x + 120, loadButton.y, "Save Dialogue", saveDialogue);
 
 		tab_group.add(new FlxText(10, speedStepper.y - 18, 0, 'Interval/Speed (ms):'));
 		tab_group.add(new FlxText(10, characterInputText.y - 18, 0, 'Character:'));

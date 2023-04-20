@@ -2,7 +2,7 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-import shaders.ColorSwap;
+import shaderslmfao.ColorSwap;
 import flixel.graphics.FlxGraphic;
 
 using StringTools;
@@ -12,10 +12,9 @@ class NoteSplash extends FlxSprite
 	public static var amountOfSparePerson:Int = 2;
 
 	public var colorSwap:ColorSwap = null;
-	public var note:Int = 0;
+	public var isCustomHSB:Bool = false;
 
-	private var idleAnim:String;
-	private var textureLoaded:String = null;
+	public var note:Int = 0;
 
 	public function new(x:Float = 0, y:Float = 0, ?note:Int = 0):Void
 	{
@@ -24,24 +23,23 @@ class NoteSplash extends FlxSprite
 		this.note = note;
 
 		var skin:String = 'noteSplashes';
-		if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) skin = PlayState.SONG.splashSkin;
 
-		loadAnims(skin);
-		
+		if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) {
+			skin = PlayState.SONG.splashSkin;
+		}
+
 		colorSwap = new ColorSwap();
 		shader = colorSwap.shader;
-
-		setupNoteSplash(x, y, note);
 
 		antialiasing = OptionData.globalAntialiasing;
 	}
 
 	private var isPsychArray:Array<Array<Bool>> = [for (i in 0...Note.maxNote) [for (j in 0...amountOfSparePerson) false]];
 
-	public function setupNoteSplash(x:Float, y:Float, note:Int = 0, texture:String = null, mustPress:Bool = true, hueColor:Float = 0, satColor:Float = 0, brtColor:Float = 0):Void
+	public function setupNoteSplash(x:Float, y:Float, note:Int = 0, texture:String = null, mustPress:Bool = true, isCustomHSB:Bool = false, hueColor:Float = 0, satColor:Float = 0, brtColor:Float = 0):Void
 	{
 		if (PlayState.isPixelStage) {
-			setPosition(x + 30, (y + Note.swagWidth) / 2);
+			setPosition(x + 30, y + (Note.swagWidth / 2));
 		}
 		else {
 			setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
@@ -50,8 +48,9 @@ class NoteSplash extends FlxSprite
 		alpha = OptionData.splashOpacity;
 
 		this.note = note;
+		this.isCustomHSB = isCustomHSB;
 
-		if (texture == null)
+		if (texture == null || texture.length < 1)
 		{
 			texture = 'noteSplashes';
 
@@ -69,33 +68,29 @@ class NoteSplash extends FlxSprite
 			}
 		}
 
-		if (textureLoaded != texture)
-		{
-			if (PlayState.isPixelStage) {
-				loadPixelAnims(texture);
-			}
-			else {
-				loadAnims(texture);
-			}
+		loadTexture(texture);
+
+		if (PlayState.isPixelStage) {
+			loadPixelAnims();
+		}
+		else {
+			loadAnims();
 		}
 
-		colorSwap.hue = hueColor;
-		colorSwap.saturation = satColor;
-		colorSwap.brightness = brtColor;
+		if (!isCustomHSB)
+		{
+			colorSwap.hue = hueColor;
+			colorSwap.saturation = satColor;
+			colorSwap.brightness = brtColor;
+		}
 
 		var animNum:Int = FlxG.random.int(1, amountOfSparePerson);
 
-		if (isPsychArray[note][animNum]) {
-			offset.set(-10, 0);
+		if (isPsychArray[note][animNum] || PlayState.isPixelStage) {
+			offset.set(10, 10);
 		}
-		else
-		{
-			if (PlayState.isPixelStage) {
-				offset.set(10, 10);
-			}
-			else {
-				offset.set(-30, -15);
-			}
+		else {
+			offset.set(-30, -15);
 		}
 
 		var ourPrefix:String = 'note$note-$animNum';
@@ -106,20 +101,44 @@ class NoteSplash extends FlxSprite
 		}
 	}
 
-	function loadAnims(skin:String):Void
+	var pixelQuantity:Int = 4;
+
+	function loadTexture(skin:String):Void
 	{
-		if (Paths.fileExists('images/' + skin + '.png', IMAGE)) {
-			frames = Paths.getSparrowAtlas(skin);
-		}
-		else if (Paths.fileExists('images/pixelUI/' + skin + '.png', IMAGE)) {
-			frames = Paths.getSparrowAtlas('pixelUI/' + skin);
-		}
-		else {
-			frames = Paths.getSparrowAtlas('notes/' + skin);
-		}
+		if (PlayState.isPixelStage)
+		{
+			var pathShit:String = 'notes/pixel/' + skin;
 
-		scale.set(1, 1);
+			if (Paths.fileExists('images/pixelUI/' + skin + '.png', IMAGE)) {
+				pathShit = 'pixelUI/' + skin;
+			}
 
+			var graphic:FlxGraphic = Paths.getImage(pathShit);
+			loadGraphic(graphic);
+
+			width = width / (pixelQuantity * amountOfSparePerson);
+			height = height / Note.maxNote;
+	
+			loadGraphic(graphic, true, Math.floor(width), Math.floor(height));
+	
+			antialiasing = false;
+			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
+		}
+		else
+		{
+			var pathShit:String = 'notes/' + skin;
+
+			if (Paths.fileExists('images/' + skin + '.png', IMAGE)) {
+				pathShit = skin;
+			}
+
+			frames = Paths.getSparrowAtlas(pathShit);
+			scale.set(1, 1);
+		}
+	}
+
+	function loadAnims():Void
+	{
 		for (i in 0...Note.maxNote)
 		{
 			for (j in 1...amountOfSparePerson + 1)
@@ -145,57 +164,23 @@ class NoteSplash extends FlxSprite
 						animation.addByPrefix(ourPrefix, shit, 24, false);
 				}
 
-				animation.play(ourPrefix, true); // does precaches
+				animation.finishCallback = (_:String) -> kill();
 			}
 		}
 	}
 
-	function loadPixelAnims(skin:String):Void
+	function loadPixelAnims():Void
 	{
-		var graphic:FlxGraphic = null;
-
-		if (Paths.fileExists('images/' + skin + '.png', IMAGE)) {
-			graphic = Paths.getImage(skin);
-		}
-		else if (Paths.fileExists('images/pixelUI/' + skin + '.png', IMAGE)) {
-			graphic = Paths.getImage('pixelUI/' + skin);
-		}
-		else if (Paths.fileExists('images/notes/pixel/' + skin + '.png', IMAGE)) {
-			graphic = Paths.getImage('notes/pixel/' + skin);
-		}
-		else {
-			graphic = Paths.getImage('notes/' + skin);
-		}
-
-		loadGraphic(graphic);
-
-		width = width / 8;
-		height = height / Note.maxNote;
-
-		loadGraphic(graphic, true, Math.floor(width), Math.floor(height));
-
-		antialiasing = false;
-
-		setGraphicSize(Std.int(width * PlayState.daPixelZoom));
-
 		for (i in 0...Note.maxNote)
 		{
-			for (j in 1...amountOfSparePerson + 1) // I've been messing with this shit for a day already
+			for (j in 1...amountOfSparePerson + 1)
 			{
-				var quantity:Int = 4;
+				var min:Int = pixelQuantity * (j - 1) + i * (Note.maxNote * amountOfSparePerson);
+				var max:Int = min + pixelQuantity;
 
-				var min:Int = quantity * (j - 1) + i * (Note.maxNote * amountOfSparePerson);
-				var max:Int = min + quantity;
-		
 				animation.add('note' + i + '-' + j, [for (k in min...max) k], 12, false);
+				animation.finishCallback = (_:String) -> kill();
 			}
 		}
-	}
-
-	public override function update(elapsed:Float):Void
-	{
-		super.update(elapsed);
-
-		if (animation.curAnim != null) if (animation.curAnim.finished) kill();
 	}
 }

@@ -1,0 +1,17 @@
+{
+	"week_nomiss": "week3",
+	"index": -1,
+	"lua_code": "",
+	"save_tag": "week3_nomiss",
+	"desc": "Beat Week 3 on Hard with no Combo Breaks.",
+	"diff": "hard",
+	"name": "Call Me The Hitman",
+	"color": [
+		148,
+		22,
+		83
+	],
+	"song": "",
+	"hidden": false,
+	"misses": 0
+}

@@ -1,0 +1,17 @@
+{
+	"week_nomiss": "",
+	"index": -1,
+	"lua_code": "",
+	"save_tag": "debugger",
+	"desc": "Beat the \"Test\" Stage from the Chart Editor.",
+	"diff": "",
+	"name": "Debugger",
+	"color": [
+		133,
+		133,
+		133
+	],
+	"song": "",
+	"hidden": true,
+	"misses": -1
+}

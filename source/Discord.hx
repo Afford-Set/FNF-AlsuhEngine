@@ -5,6 +5,8 @@ import llua.Lua;
 import llua.State;
 #end
 
+import lime.app.Application;
+
 #if DISCORD_ALLOWED
 import Sys.sleep;
 import sys.thread.Thread;
@@ -15,33 +17,8 @@ using StringTools;
 
 class DiscordClient
 {
+	public static var clientID:String = '990565623425814568';
 	public static var isInitialized:Bool = false;
-
-	public function new():Void
-	{
-		Debug.logInfo("Discord Client starting...");
-
-		#if DISCORD_ALLOWED
-		DiscordRpc.start({
-			clientID: "990565623425814568",
-			onReady: onReady,
-			onError: onError,
-			onDisconnected: onDisconnected
-		});
-		#end
-
-		Debug.logInfo("Discord Client started.");
-
-		#if DISCORD_ALLOWED
-		while (true)
-		{
-			DiscordRpc.process();
-			sleep(2);
-		}
-
-		DiscordRpc.shutdown();
-		#end
-	}
 
 	public static function shutdown():Void
 	{
@@ -49,7 +26,7 @@ class DiscordClient
 		DiscordRpc.shutdown();
 		#end
 	}
-	
+
 	static function onReady():Void
 	{
 		#if DISCORD_ALLOWED
@@ -57,7 +34,7 @@ class DiscordClient
 			details: "In the Menus",
 			state: null,
 			largeImageKey: 'icon',
-			largeImageText: "Friday Night Funkin' Alsuh Engine"
+			largeImageText: "Friday Night Funkin' - Alsuh Engine"
 		});
 		#end
 	}
@@ -75,8 +52,40 @@ class DiscordClient
 	public static function initialize():Void
 	{
 		#if DISCORD_ALLOWED
-		Thread.create(function():Void {
-			new DiscordClient();
+		Debug.logInfo('Discord Client starting...');
+
+		var id:String = null;
+		var path:String = 'data/discordClientID.txt';
+
+		if (Paths.fileExists(path, TEXT)) {
+			id = Paths.getTextFromFile(path);
+		}
+
+		if (id != null && id.length > 0) {
+			clientID = id;
+		}
+
+		Thread.create(() ->
+		{
+			DiscordRpc.start({
+				clientID: clientID,
+				onReady: onReady,
+				onError: onError,
+				onDisconnected: onDisconnected
+			});
+
+			while (true) // using a FlxG.stage.addEventListener is too much fuss!
+			{
+				DiscordRpc.process();
+				sleep(2);
+			}
+
+			Debug.logInfo('Discord Client started.');
+			DiscordRpc.shutdown();
+
+			Application.current.window.onClose.add(function():Void {
+				DiscordClient.shutdown();
+			});
 		});
 		#end
 
@@ -106,7 +115,7 @@ class DiscordClient
 		#end
 	}
 
-	#if (DISCORD_ALLOWED && LUA_ALLOWED)
+	#if LUA_ALLOWED
 	public static function addLuaCallbacks(lua:State):Void
 	{
 		Lua_helper.add_callback(lua, "changePresence", function(details:String, state:Null<String>, ?smallImageKey:String, ?hasStartTimestamp:Bool, ?endTimestamp:Float):Void {

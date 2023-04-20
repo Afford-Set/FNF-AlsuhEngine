@@ -12,7 +12,7 @@ import flixel.group.FlxGroup;
 
 using StringTools;
 
-class MasterEditorMenu extends MusicBeatUIState
+class MasterEditorMenu extends MusicBeatState
 {
 	private var curSelected:Int = 0;
 	private var curDirectory:Int = 0;
@@ -24,7 +24,10 @@ class MasterEditorMenu extends MusicBeatUIState
 		'Dialogue Editor',
 		'Dialogue Portrait Editor',
 		'Character Editor',
-		'Chart Editor',
+		#if ACHIEVEMENTS_ALLOWED
+		'Achievement Editor',
+		#end
+		'Chart Editor'
 	];
 	private var directories:Array<String> = [null];
 
@@ -35,13 +38,14 @@ class MasterEditorMenu extends MusicBeatUIState
 	{
 		CustomFadeTransition.nextCamera = null;
 
-		super.create();
-
 		FlxG.mouse.visible = true;
 		FlxG.camera.bgColor = FlxColor.BLACK;
 
-		if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {
-			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
+		if (FlxG.sound.music != null)
+		{
+			if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {
+				FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
+			}
 		}
 
 		FlxG.mouse.visible = false;
@@ -75,7 +79,7 @@ class MasterEditorMenu extends MusicBeatUIState
 
 		#if MODS_ALLOWED
 		var textBG:FlxSprite = new FlxSprite(0, FlxG.height - 42);
-		textBG.makeGraphic(FlxG.width, 42, 0xFF000000);
+		textBG.makeGraphic(FlxG.width, 42, FlxColor.BLACK);
 		textBG.alpha = 0.6;
 		add(textBG);
 
@@ -95,6 +99,8 @@ class MasterEditorMenu extends MusicBeatUIState
 		#end
 
 		changeSelection();
+
+		super.create();
 	}
 
 	var holdTime:Float = 0;
@@ -102,8 +108,6 @@ class MasterEditorMenu extends MusicBeatUIState
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
 		if (controls.BACK || FlxG.mouse.justPressedRight)
 		{
 			FlxG.sound.play(Paths.getSound('cancelMenu'));
@@ -177,6 +181,8 @@ class MasterEditorMenu extends MusicBeatUIState
 		if (controls.ACCEPT || FlxG.mouse.justPressed) {
 			goToState(editorsArray[curSelected]);
 		}
+
+		super.update(elapsed);
 	}
 
 	function goToState(label:String):Void
@@ -189,6 +195,11 @@ class MasterEditorMenu extends MusicBeatUIState
 			case 'Menu Character Editor': {
 				FlxG.switchState(new MenuCharacterEditorState());
 			}
+			#if ACHIEVEMENTS_ALLOWED
+			case 'Achievement Editor': {
+				FlxG.switchState(new AchievementEditorState());
+			}
+			#end
 			case 'Character Editor':
 			{
 				LoadingState.loadAndSwitchState(new CharacterEditorState(Character.DEFAULT_CHARACTER, false), true, true);
@@ -206,9 +217,7 @@ class MasterEditorMenu extends MusicBeatUIState
 			}
 			case 'Chart Editor':
 			{
-				PlayState.SONG = Song.loadFromJson('test', 'test');
 				LoadingState.loadAndSwitchState(new ChartingState(), true, true);
-
 				return;
 			}
 		}

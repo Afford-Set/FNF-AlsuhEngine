@@ -1,5 +1,6 @@
 {
 	"char_name": "Tankman",
+	"skip_dance": false,
 	"animations": [
 		{
 			"offsets": [

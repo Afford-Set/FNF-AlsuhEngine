@@ -43,43 +43,35 @@
 
 	<classpath name="source" />
 
+	<!-- FORMAT CUSTOMIZATION -->
 	<define name="MP3_ALLOWED" if="web || flash || cpp"/>
-
 	<define name="FEATURE_OGG" if="cpp" unless="web || flash"/>
 	<define name="FEATURE_WAV" if="cpp" unless="web || flash"/>
 
 	<assets path="assets/preload" rename="assets" exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
 	<assets path="assets/preload" rename="assets" exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
 
+	<!-- ALSUH ENGINE CUSTOMIZATION -->
 	<define name="ACHIEVEMENTS_ALLOWED"/>
 	<define name="REPLAYS_ALLOWED" if="desktop"/>
 	<define name="MODS_ALLOWED" if="desktop" />
-	<define name="DISCORD_ALLOWED" if="desktop" unless="hl"/>
+	<define name="DISCORD_ALLOWED" if="desktop" unless="hl || neko"/> <!-- DELETE THIS TO REMOVE THE DISCORD RICH PRESENCE CONNECTION -->
 	<define name="ALSUH_WATERMARKS"/> <!-- DELETE THIS TO REMOVE WATERMARKS/DEV NAMES ON TITLE SCREEN AND STUFF -->
-
-	<!-- there lived a certain man in russia long ago -->
-	<!-- he was big and strong, in his eyes a flaming glow -->
-	<!-- <define name="systema" if="sys"/> -->
-	<!-- <define name="sistema" if="sys"/> -->
-
 	<define name="LUA_ALLOWED" if="cpp"/>
 	<define name="hscriptPos" />
-	<define name="VIDEOS_ALLOWED" if="desktop || android" unless="32bits || hl"/>
-	<define name="MP4_ALLOWED" if="VIDEOS_ALLOWED"/>
-	<define name="WEBM_ALLOWED" if="desktop" unless="32bits || hl"/>
-	<define name="CRASH_HANDLER" if="desktop release"/>
+	<define name="VIDEOS_ALLOWED" if="desktop || web" unless="32bits || hl || neko"/>
+	<define name="CRASH_HANDLER" if="desktop release" unless="neko"/>
 
 	<!-- DONT ENABLE THIS -->
-	<define name="CHECK_FOR_UPDATES" if="desktop"/>
+	<define name="CHECK_FOR_UPDATES" if="desktop || web"/>
 
 	<define name="PRELOAD_ALL" unless="web" />
 	<define name="NO_PRELOAD_ALL" unless="PRELOAD_ALL"/>
+	<define name="NO_PRELOAD_ALL"/>
 
 	<section if="PRELOAD_ALL">
 		<library name="songs"    preload="true" />
 		<library name="shared"   preload="true" />
-		<library name="tutorial" preload="true" />
-		<library name="week1"    preload="true" />
 		<library name="week2"    preload="true" />
 		<library name="week3"    preload="true" />
 		<library name="week4"    preload="true" />
@@ -87,12 +79,10 @@
 		<library name="week6"    preload="true" />
 		<library name="week7"    preload="true" />
 	</section>
-	
+
 	<section if="NO_PRELOAD_ALL">
 		<library name="songs"    preload="false" />
 		<library name="shared"   preload="false" />
-		<library name="tutorial" preload="false" />
-		<library name="week1"    preload="false" />
 		<library name="week2"    preload="false" />
 		<library name="week3"    preload="false" />
 		<library name="week4"    preload="false" />
@@ -109,10 +99,6 @@
 	<assets path="assets/songs"    library="songs"    exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
 	<assets path="assets/shared"   library="shared"   exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
 	<assets path="assets/shared"   library="shared"   exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
-	<assets path="assets/tutorial" library="tutorial" exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
-	<assets path="assets/tutorial" library="tutorial" exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
-	<assets path="assets/week1"    library="week1"    exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
-	<assets path="assets/week1"    library="week1"    exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
 	<assets path="assets/week2"    library="week2"    exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
 	<assets path="assets/week2"    library="week2"    exclude="*.fla|*.mp3"          unless="MP3_ALLOWED"/>
 	<assets path="assets/week3"    library="week3"    exclude="*.fla|*.ogg|*.wav"    if="MP3_ALLOWED"/>
@@ -147,11 +133,10 @@
 	<!--In case you want to use the ui package-->
 	<haxelib name="flixel-ui" />
 	<haxelib name="faxe" if='switch'/>
-	<haxelib name="hxCodec" if="VIDEOS_ALLOWED"/>
-	<haxelib name="actuate" if="desktop"/>
-	<haxelib name="extension-webm" if="WEBM_ALLOWED"/>
+	<haxelib name="hxCodec" if="VIDEOS_ALLOWED" unless="web"/>
+	<haxelib name="extension-webm" if="VIDEOS_ALLOWED" unless="web"/>
 	<haxelib name="linc_luajit" if="LUA_ALLOWED"/>
-	<haxelib name="discord_rpc" if="desktop"/>
+	<haxelib name="discord_rpc" if="DISCORD_ALLOWED"/>
 
 	<!-- Enables a terminal log prompt on debug builds -->
 	<haxelib name="hxcpp-debug-server" if="debug"/>

@@ -28,8 +28,8 @@ class MainMenuState extends MusicBeatState
 {
 	private static var curSelected:Int = 0;
 
-	private var camGame:FlxCamera;
-	private var camAchievement:FlxCamera;
+	private var camGame:SwagCamera;
+	private var camAchievement:SwagCamera;
 
 	var menuItems:Array<String> =
 	[
@@ -46,8 +46,8 @@ class MainMenuState extends MusicBeatState
 
 	var magenta:FlxSprite;
 
-	var camFollowPos:FlxObject;
 	var camFollow:FlxPoint;
+	var camFollowPos:FlxObject;
 
 	public static var engineVersion:String = '1.7.2h'; // This is also used for Discord RPC
 	public static var psychEngineVersion:String = '0.6.4';
@@ -70,8 +70,6 @@ class MainMenuState extends MusicBeatState
 
 	public override function create():Void
 	{
-		super.create();
-
 		#if MODS_ALLOWED
 		Paths.pushGlobalMods();
 		#end
@@ -82,18 +80,21 @@ class MainMenuState extends MusicBeatState
 		DiscordClient.changePresence("In the Menus", null); // Updating Discord Rich Presence
 		#end
 
-		debugKeys = OptionData.copyKey(OptionData.keyBinds.get('debug_1'));
+		debugKeys = OptionData.keyBinds.get('debug_1').copy();
 
-		if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {
-			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
+		if (FlxG.sound.music != null)
+		{
+			if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0) {
+				FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
+			}
 		}
 
 		persistentUpdate = persistentDraw = true;
 
-		camGame = new FlxCamera();
+		camGame = new SwagCamera();
 		FlxG.cameras.reset(camGame);
 
-		camAchievement = new FlxCamera();
+		camAchievement = new SwagCamera();
 		camAchievement.bgColor.alpha = 0;
 		FlxG.cameras.add(camAchievement, false);
 
@@ -186,17 +187,17 @@ class MainMenuState extends MusicBeatState
 
 		if (leDate.getDay() == 5 && leDate.getHours() >= 18)
 		{
-			var achieveID:Int = Achievements.getAchievementIndex('friday_night_play');
+			var achievement:Achievement = Achievements.getAchievement('friday_night_play');
 
-			if (!Achievements.isAchievementUnlocked(Achievements.achievementsStuff[achieveID][2])) //It's a friday night. WEEEEEEEEEEEEEEEEEE
+			if (!Achievements.isAchievementUnlocked(achievement.save_tag)) // It's a friday night. WEEEEEEEEEEEEEEEEEE
 			{
-				Achievements.achievementsMap.set(Achievements.achievementsStuff[achieveID][2], true);
+				Achievements.unlockAchievement(achievement.save_tag, false);
 				giveAchievement();
-
-				OptionData.savePrefs();
 			}
 		}
 		#end
+
+		super.create();
 	}
 
 	#if ACHIEVEMENTS_ALLOWED
@@ -212,11 +213,9 @@ class MainMenuState extends MusicBeatState
 
 	public override function update(elapsed:Float):Void
 	{
-		super.update(elapsed);
-
 		if (FlxG.sound.music.volume < 0.8)
 		{
-			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
+			FlxG.sound.music.volume += 0.5 * elapsed;
 			if (FreeplayMenuState.vocals != null) FreeplayMenuState.vocals.volume += 0.5 * elapsed;
 		}
 
@@ -271,15 +270,30 @@ class MainMenuState extends MusicBeatState
 
 			if (controls.ACCEPT || FlxG.mouse.justPressed)
 			{
-				if (menuItems[curSelected] == 'donate') {
-					CoolUtil.browserLoad('https://ninja-muffin24.itch.io/funkin');
+				if (OptionData.flashingLights) FlxFlicker.flicker(magenta, 1.1, 0.15, false);
+
+				selectedSomethin = true;
+
+				if (menuItems[curSelected] == 'donate')
+				{
+					grpMenuItems.forEach(function(spr:FlxSprite):Void
+					{
+						if (curSelected == spr.ID)
+						{
+							if (OptionData.flashingLights)
+							{
+								FlxFlicker.flicker(spr, 1, 0.06, true, false, function(flk:FlxFlicker):Void {
+									new FlxTimer().start(0.4, selectDonate);
+								});
+							}
+							else {
+								new FlxTimer().start(1.4, selectDonate);
+							}
+						}
+					});
 				}
 				else
 				{
-					if (OptionData.flashingLights) FlxFlicker.flicker(magenta, 1.1, 0.15, false);
-
-					selectedSomethin = true;
-
 					grpMenuItems.forEach(function(spr:FlxSprite):Void
 					{
 						if (curSelected != spr.ID)
@@ -299,7 +313,7 @@ class MainMenuState extends MusicBeatState
 						{
 							if (OptionData.flashingLights)
 							{
-								FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
+								FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flk:FlxFlicker):Void
 								{
 									new FlxTimer().start(0.4, function(tmr:FlxTimer):Void {
 										goToState(menuItems[curSelected]);
@@ -314,9 +328,9 @@ class MainMenuState extends MusicBeatState
 							}
 						}
 					});
-
-					FlxG.sound.play(Paths.getSound('confirmMenu'));
 				}
+
+				FlxG.sound.play(Paths.getSound('confirmMenu'));
 			}
 			#if desktop
 			else if (FlxG.keys.anyJustPressed(debugKeys))
@@ -328,9 +342,17 @@ class MainMenuState extends MusicBeatState
 			#end
 		}
 
+		super.update(elapsed);
+
 		grpMenuItems.forEach(function(spr:FlxSprite):Void {
 			spr.screenCenter(X);
 		});
+	}
+
+	function selectDonate(tmr:FlxTimer):Void
+	{
+		selectedSomethin = false;
+		CoolUtil.browserLoad('https://www.kickstarter.com/projects/funkin/friday-night-funkin-the-full-ass-game/');
 	}
 
 	function goToState(daChoice:String):Void
@@ -345,12 +367,14 @@ class MainMenuState extends MusicBeatState
 			case 'mods':
 				FlxG.switchState(new ModsMenuState());
 			#end
+			#if ACHIEVEMENTS_ALLOWED
 			case 'awards':
 				FlxG.switchState(new AchievementsMenuState());
+			#end
 			case 'credits':
 				FlxG.switchState(new CreditsMenuState());
 			case 'options':
-				LoadingState.loadAndSwitchState(new options.OptionsMenuState(), false #if PRELOAD_ALL , true #end);
+				LoadingState.loadAndSwitchState(new options.OptionsMenuState(), false, true);
 		}
 	}
 

@@ -1,0 +1,17 @@
+{
+	"week_nomiss": "week2",
+	"index": -1,
+	"lua_code": "",
+	"save_tag": "week2_nomiss",
+	"desc": "Beat Week 2 on Hard with no Combo Breaks.",
+	"diff": "hard",
+	"name": "No More Tricks",
+	"color": [
+		34,
+		51,
+		68
+	],
+	"song": "",
+	"hidden": false,
+	"misses": 0
+}

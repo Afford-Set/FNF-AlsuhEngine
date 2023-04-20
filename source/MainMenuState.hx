@@ -171,7 +171,7 @@ class MainMenuState extends MusicBeatState
 
 		FlxG.camera.follow(camFollowPos, null, 1);
 
-		var text:String = 'v ' + gameVersion + #if ALSUH_WATERMARKS (OptionData.watermarks ? ' - FNF | v ' + engineVersion.trim() + ' - Alsuh Engine' : '') #end;
+		var text:String = 'v ' + gameVersion #if ALSUH_WATERMARKS + (OptionData.watermarks ? ' - FNF | v ' + engineVersion.trim() + ' - Alsuh Engine' : '') #end;
 
 		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, text, 12);
 		versionShit.setFormat(Paths.getFont('vcr.ttf'), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);

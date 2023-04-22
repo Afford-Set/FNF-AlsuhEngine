@@ -47,7 +47,6 @@ class Highscore
 
 		var save:FlxSave = new FlxSave();
 		save.bind('highscore_v2', CoolUtil.getSavePath());
-		
 		save.data.weekScores = weekScores;
 		save.flush();
 	}
@@ -127,9 +126,11 @@ class Highscore
 		}
 	}
 
-	@:deprecated()
+	@:deprecated("`Highscore.floorDecimal()` is deprecated. use 'CoolUtil.floorDecimal()' instead.")
 	public static function floorDecimal(number:Float, precision:Int = 0):Float
 	{
+		Debug.logWarn("`Highscore.floorDecimal()` is deprecated! use 'CoolUtil.floorDecimal()' instead.");
+
 		if (Math.isNaN(number)) number = 0;
 
 		if (precision < 1) {
@@ -145,10 +146,10 @@ class Highscore
 		return Math.floor(number * tempMult) / tempMult;
 	}
 
-	@:deprecated()
+	/*@:deprecated()
 	public static function getScoreText(deaths:Int, accuracy:Float, rating:String, ratingFC:String, health:Float, misses:Int, score:Int):String
 	{
 		return 'Deaths: ' + deaths + ' | Accuracy: ' + CoolUtil.floorDecimal(accuracy, 2) + '% | Rating: ' + rating +
 			(rating != 'N/A' ? ' (' + ratingFC + ')' : '') + ' | Health: ' + Math.floor(health * 50) + '% | Combo Breaks: ' + misses + ' | Score: ' + score;
-	}
+	}*/
 }

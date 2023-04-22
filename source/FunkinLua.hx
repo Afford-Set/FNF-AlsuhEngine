@@ -108,7 +108,11 @@ class FunkinLua
 				result = LuaL.dostring(lua, scriptCode);
 			}
 			else {
-				result = LuaL.dofile(lua, script);
+				var hui:String=script;
+				if(hui.contains(":")){
+					hui=hui.substring(hui.indexOf(":")+1,hui.length);
+				}
+				result = LuaL.dofile(lua, hui);
 			}
 
 			var resultStr:String = Lua.tostring(lua, result);
@@ -120,7 +124,11 @@ class FunkinLua
 				#if windows
 				lime.app.Application.current.window.alert(resultStr, 'Error on lua script!');
 				#else
-				luaTrace('Error loading lua script: "$script"\n' + resultStr, true, false, FlxColor.RED);
+				var hui:String=script;
+				if(hui.contains(":")){
+					hui=hui.substring(hui.indexOf(":")+1,hui.length);
+				}
+				luaTrace('Error loading lua script: "$hui"\n' + resultStr, true, false, FlxColor.RED);
 				#end
 
 				lua = null;
@@ -3415,7 +3423,7 @@ class FunkinLua
 		{
 			if (PlayState.instance.modchartSaves.exists(name))
 			{
-				var retVal:Dynamic = Reflect.field(PlayState.instance.modchartSaves.get(name).data, field);
+				var retVal:Dynamic = Reflect.getProperty(PlayState.instance.modchartSaves.get(name).data, field);
 				return retVal;
 			}
 
@@ -3427,7 +3435,7 @@ class FunkinLua
 		{
 			if (PlayState.instance.modchartSaves.exists(name))
 			{
-				Reflect.setField(PlayState.instance.modchartSaves.get(name).data, field, value);
+				Reflect.setProperty(PlayState.instance.modchartSaves.get(name).data, field, value);
 				return;
 			}
 

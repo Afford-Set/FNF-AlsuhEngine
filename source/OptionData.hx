@@ -115,16 +115,16 @@ class OptionData
 
 		for (field in Type.getClassFields(OptionData))
 		{
-			if (Type.typeof(Reflect.field(OptionData, field)) != TFunction)
+			if (Type.typeof(Reflect.getProperty(OptionData, field)) != TFunction)
 			{
 				if (!importantMap.get('saveBlackList').contains(field)) {
-					Reflect.setField(FlxG.save.data, field, Reflect.field(OptionData, field));
+					Reflect.setProperty(FlxG.save.data, field, Reflect.getProperty(OptionData, field));
 				}
 			}
 		}
 
 		for (flixelS in importantMap.get('flixelSound')) {
-			Reflect.setField(FlxG.save.data, flixelS, Reflect.field(FlxG.sound, flixelS));
+			Reflect.setProperty(FlxG.save.data, flixelS, Reflect.getProperty(FlxG.sound, flixelS));
 		}
 
 		FlxG.save.flush();
@@ -136,15 +136,15 @@ class OptionData
 
 		for (field in Type.getClassFields(OptionData))
 		{
-			if (Type.typeof(Reflect.field(OptionData, field)) != TFunction)
+			if (Type.typeof(Reflect.getProperty(OptionData, field)) != TFunction)
 			{
 				if (!importantMap.get('loadBlackList').contains(field))
 				{
-					var defaultValue:Dynamic = Reflect.field(OptionData, field);
-					var valueFromSave:Dynamic = Reflect.field(FlxG.save.data, field);
+					var defaultValue:Dynamic = Reflect.getProperty(OptionData, field);
+					var valueFromSave:Dynamic = Reflect.getProperty(FlxG.save.data, field);
 
 					var value:Dynamic = (valueFromSave != null ? valueFromSave : defaultValue);
-					Reflect.setField(OptionData, field, value); // classic
+					Reflect.setProperty(OptionData, field, value); // classic
 
 					switch (field)
 					{
@@ -262,10 +262,10 @@ class OptionData
 
 		for (flixelS in importantMap.get('flixelSound'))
 		{
-			var valueFromSave:Dynamic = Reflect.field(FlxG.save.data, flixelS);
+			var valueFromSave:Dynamic = Reflect.getProperty(FlxG.save.data, flixelS);
 
 			if (valueFromSave != null) {
-				Reflect.setField(FlxG.sound, flixelS, valueFromSave);
+				Reflect.setProperty(FlxG.sound, flixelS, valueFromSave);
 			}
 		}
 	}

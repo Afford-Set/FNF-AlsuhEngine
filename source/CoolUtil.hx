@@ -210,16 +210,6 @@ class CoolUtil
 		return '' + label.charAt(0).toUpperCase() + label.substr(1).toLowerCase();
 	}
 
-	public static function lerpColor(a:FlxColor, b:FlxColor, ratio:Float):FlxColor
-	{
-		return FlxColor.fromRGBFloat(
-			FlxMath.lerp(a.red, b.red, ratio),
-			FlxMath.lerp(a.green, b.green, ratio),
-			FlxMath.lerp(a.blue, b.blue, ratio),
-			FlxMath.lerp(a.alpha, b.alpha, ratio)
-		);
-	}
-
 	public static function boundTo(value:Float, min:Float, max:Float):Float
 	{
 		return Math.max(min, Math.min(max, value));
@@ -335,17 +325,27 @@ class CoolUtil
 		#end
 	}
 
-	/** Quick Function to Fix Save Files for Flixel 5
-		if you are making a mod, you are gonna wanna change "Afford-Set" to something else
-		so Base Alsuh saves won't conflict with yours
-		@BeastlyGabi
-	**/
-	public static function getSavePath(folder:String = 'Afford-Set'):String
+	/**
+	 * Returns save path to fix Flixel **5.0.0** and Alsuh Save bugs.
+	 * If `folder` is null or empty, result is official.
+	 */
+	public static function getSavePath(?folder:Null<String> = null):String
 	{
 		@:privateAccess
-		return #if (flixel < "5.0.0") folder #else FlxG.stage.application.meta.get('company')
-			+ '/'
-			+ FlxSave.validate(FlxG.stage.application.meta.get('file')) #end;
+		var company:String = FlxSave.validate(FlxG.stage.application.meta.get('company')); @:privateAccess
+		var result:Array<String> = [company, FlxSave.validate(FlxG.stage.application.meta.get('file'))];
+
+		if (folder != null && folder.length > 0)
+		{
+			@:privateAccess
+			var validatedFolder:String = FlxSave.validate(folder);
+
+			if (validatedFolder != company) {
+				result.push(validatedFolder);
+			}
+		}
+
+		return result.join('/');
 	}
 
 	public static function precacheImage(image:String, ?library:String = null):Void

@@ -402,20 +402,21 @@ class WeekEditorState extends MusicBeatUIState
 
 		if (weekFile.difficulties != null && weekFile.difficulties.length > 0)
 		{
-			var diffIDs:String = weekFile.difficulties[0][0];
-			var diffNames:String = weekFile.difficulties[0][1];
-			var diffSuffixes:String = weekFile.difficulties[0][2];
+			var diffIDs:Array<String> = [];
+			var diffNames:Array<String> = [];
+			var diffSuffixes:Array<String> = [];
 
-			for (i in 1...weekFile.difficulties.length)
+			for (i in 0...weekFile.difficulties.length)
 			{
-				diffIDs += ', ' + weekFile.difficulties[i][0];
-				diffNames += ', ' + weekFile.difficulties[i][1];
-				diffSuffixes += ', ' + weekFile.difficulties[i][2];
+				var diffLabel:Array<String> = weekFile.difficulties[i];
+				diffIDs.push(diffLabel[0]);
+				diffNames.push(diffLabel[1]);
+				diffSuffixes.push(diffLabel[2]);
 			}
 
-			difficultiesInputText.text = diffIDs;
-			difficultiesNamesInputText.text = diffNames;
-			difficultiesSuffixesInputText.text = diffSuffixes;
+			if (diffIDs.length > 0) difficultiesInputText.text = diffIDs.join(', ');
+			if (diffNames.length > 0) difficultiesNamesInputText.text = diffNames.join(', ');
+			if (diffSuffixes.length > 0) difficultiesSuffixesInputText.text = diffSuffixes.join(', ');
 		}
 
 		if (weekFile.defaultDifficulty != null) {
@@ -1232,12 +1233,13 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 		hideFreeplayCheckbox.callback = function():Void {
 			weekFile.hideFreeplay = hideFreeplayCheckbox.checked;
 		};
-		
+
 		var copyDiffs:FlxUIButton = new FlxUIButton(150, difficultiesSuffixesInputText.y + 40, "Copy Diffs", function():Void
 		{
 			var song:SongLabel = weekFile.songs[curSelected];
 
-			difficultiesCopy = song.difficulties;
+			var diffsShit:Array<Dynamic> = song.difficulties;
+			difficultiesCopy = diffsShit.copy();
 			defaultDifficultyCopy = song.defaultDifficulty;
 		});
 
@@ -1262,20 +1264,21 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 
 			if (song.difficulties != null && song.difficulties.length > 0)
 			{
-				var diffIDs:String = song.difficulties[0][0];
-				var diffNames:String = song.difficulties[0][1];
-				var diffSuffixes:String = song.difficulties[0][2];
-
-				for (i in 1...song.difficulties.length)
+				var diffIDs:Array<String> = [];
+				var diffNames:Array<String> = [];
+				var diffSuffixes:Array<String> = [];
+	
+				for (i in 0...song.difficulties.length)
 				{
-					diffIDs += ', ' + song.difficulties[i][0];
-					diffNames += ', ' + song.difficulties[i][1];
-					diffSuffixes += ', ' + song.difficulties[i][2];
+					var diffLabel:Array<String> = song.difficulties[i];
+					diffIDs.push(diffLabel[0]);
+					diffNames.push(diffLabel[1]);
+					diffSuffixes.push(diffLabel[2]);
 				}
-
-				difficultiesInputText.text = diffIDs;
-				difficultiesNamesInputText.text = diffNames;
-				difficultiesSuffixesInputText.text = diffSuffixes;
+	
+				if (diffIDs.length > 0) difficultiesInputText.text = diffIDs.join(', ');
+				if (diffNames.length > 0) difficultiesNamesInputText.text = diffNames.join(', ');
+				if (diffSuffixes.length > 0) difficultiesSuffixesInputText.text = diffSuffixes.join(', ');
 			}
 	
 			if (weekFile.songs[curSelected].defaultDifficulty != null) {
@@ -1353,20 +1356,21 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 	
 		if (song.difficulties != null && song.difficulties.length > 0)
 		{
-			var diffIDs:String = song.difficulties[0][0];
-			var diffNames:String = song.difficulties[0][1];
-			var diffSuffixes:String = song.difficulties[0][2];
+			var diffIDs:Array<String> = [];
+			var diffNames:Array<String> = [];
+			var diffSuffixes:Array<String> = [];
 
-			for (i in 1...song.difficulties.length)
+			for (i in 0...song.difficulties.length)
 			{
-				diffIDs += ', ' + song.difficulties[i][0];
-				diffNames += ', ' + song.difficulties[i][1];
-				diffSuffixes += ', ' + song.difficulties[i][2];
+				var diffLabel:Array<String> = song.difficulties[i];
+				diffIDs.push(diffLabel[0]);
+				diffNames.push(diffLabel[1]);
+				diffSuffixes.push(diffLabel[2]);
 			}
 
-			difficultiesInputText.text = diffIDs;
-			difficultiesNamesInputText.text = diffNames;
-			difficultiesSuffixesInputText.text = diffSuffixes;
+			if (diffIDs.length > 0) difficultiesInputText.text = diffIDs.join(', ');
+			if (diffNames.length > 0) difficultiesNamesInputText.text = diffNames.join(', ');
+			if (diffSuffixes.length > 0) difficultiesSuffixesInputText.text = diffSuffixes.join(', ');
 		}
 
 		if (weekFile.songs[curSelected].defaultDifficulty != null) {

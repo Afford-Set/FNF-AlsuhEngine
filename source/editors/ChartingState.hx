@@ -1183,10 +1183,14 @@ class ChartingState extends MusicBeatUIState
 		#end
 
 		if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared') {
-			directories.push(Paths.getLibraryPath('custom_notetypes/', Paths.currentLevel));
+			var lib:String=Paths.getLibraryPath('custom_notetypes/', Paths.currentLevel);
+			lib=lib.substring(lib.indexOf(':')+1,lib.length);
+			directories.push(lib);
 		}
 
-		directories.push(Paths.getLibraryPath('custom_notetypes/', 'shared'));
+		var lib:String=Paths.getLibraryPath('custom_notetypes/', 'shared');
+		lib=lib.substring(lib.indexOf(':')+1,lib.length);
+		directories.push(lib);
 		directories.push(Paths.getPreloadPath('custom_notetypes/'));
 
 		for (i in 0...directories.length)
@@ -1269,10 +1273,14 @@ class ChartingState extends MusicBeatUIState
 		#end
 
 		if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared') {
-			directories.push(Paths.getLibraryPath('custom_events/', Paths.currentLevel));
+			var lib:String=Paths.getLibraryPath('custom_events/', Paths.currentLevel);
+			lib=lib.substring(lib.indexOf(':')+1,lib.length);
+			directories.push(lib);
 		}
 
-		directories.push(Paths.getLibraryPath('custom_events/', 'shared'));
+		var lib:String=Paths.getLibraryPath('custom_events/', 'shared');
+		lib=lib.substring(lib.indexOf(':')+1,lib.length);
+		directories.push(lib);
 		directories.push(Paths.getPreloadPath('custom_events/'));
 
 		for (i in 0...directories.length)

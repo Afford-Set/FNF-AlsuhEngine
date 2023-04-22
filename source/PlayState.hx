@@ -1249,10 +1249,14 @@ class PlayState extends MusicBeatState
 		add(luaDebugGroup);
 
 		var filesPushed:Array<String> = []; // "GLOBAL" SCRIPTS
-		var foldersToCheck:Array<String> = [Paths.getLibraryPath('scripts/', 'shared'), Paths.getPreloadPath('scripts/')];
+		var sharedLibrary:String = Paths.getLibraryPath('scripts/', 'shared');
+		sharedLibrary = sharedLibrary.substring(sharedLibrary.indexOf(':') + 1, sharedLibrary.length);
+		var foldersToCheck:Array<String> = [sharedLibrary, Paths.getPreloadPath('scripts/')];
 
 		if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared') {
-			foldersToCheck.insert(0, Paths.getLibraryPath('scripts/', Paths.currentLevel));
+			var lib:String = Paths.getLibraryPath('scripts/', Paths.currentLevel);
+			lib = lib.substring(lib.indexOf(':') + 1, lib.length);
+			foldersToCheck.insert(0, lib);
 		}
 
 		#if MODS_ALLOWED
@@ -3733,14 +3737,16 @@ class PlayState extends MusicBeatState
 					}
 				}
 
+				#if MODS_ALLOWED
 				if (FlxG.keys.anyJustPressed(debugKeysCharacter))
 				{
 					var ret:Dynamic = callOnLuas('onOpenCharacterEditor', [], false);
-		
+
 					if (ret != FunkinLua.Function_Stop) {
 						openCharacterEditor();
 					}
 				}
+				#end
 			}
 		}
 

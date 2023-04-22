@@ -11,7 +11,6 @@ jobs:
           haxe-version: 4.2.5
       - name: Install Haxelib
         run: |
-          sudo apt-get update
           sudo apt-get install vlc-bin
           sudo apt-get install libvlc-dev
           sudo apt-get install libvlccore-dev

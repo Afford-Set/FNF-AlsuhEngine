@@ -61,11 +61,6 @@
 			"version": null
 		},
 		{
-			"name": "hxCodec",
-			"type": "haxelib",
-			"version": "2.6.1"
-		},
-		{
 			"name": "actuate",
 			"type": "haxelib",
 			"version": null
@@ -86,6 +81,13 @@
 			"dir": null,
 			"ref": "master",
 			"url": "https://github.com/Afford-Set/linc_discord-rpc"
+		},
+		{
+			"name": "hxCodec",
+			"type": "git",
+			"dir": null,
+			"ref": "main",
+			"url": "https://github.com/polybiusproxy/hxCodec"
 		},
 		{
 			"name": "extension-webm",

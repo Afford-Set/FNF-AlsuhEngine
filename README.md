@@ -1,4 +1,4 @@
-# Friday Night Funkin' - Alsuh Engine
+# Friday Night Funkin' - Alsuh Engine *(project closed)*
 
 **Alsuh Engine** - This is modified connecting version of Psych Engine and Kade Engine.
 

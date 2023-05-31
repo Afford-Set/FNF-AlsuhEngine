@@ -657,52 +657,61 @@ class WeekEditorState extends MusicBeatUIState
 			}
 			else if (sender == difficultiesInputText)
 			{
-				var splittedText:Array<String> = difficultiesInputText.text.trim().split(',');
-
-				if (splittedText.length > 0)
+				if (difficultiesInputText.text.length > 0)
 				{
-					for (i in 0...splittedText.length) 
-					{
-						if (weekFile.difficulties[i] == null || weekFile.difficulties[i].length < 1) {
-							weekFile.difficulties[i] = [];
-						}
+					var splittedText:Array<String> = difficultiesInputText.text.trim().split(',');
 
-						splittedText[i] = splittedText[i].trim();
-						weekFile.difficulties[i][0] = splittedText[i];
+					if (splittedText.length > 0)
+					{
+						for (i in 0...splittedText.length) 
+						{
+							if (weekFile.difficulties[i] == null || weekFile.difficulties[i].length < 1) {
+								weekFile.difficulties[i] = [];
+							}
+
+							splittedText[i] = splittedText[i].trim();
+							weekFile.difficulties[i][0] = splittedText[i];
+						}
 					}
 				}
 			}
 			else if (sender == difficultiesNamesInputText)
 			{
-				var splittedText:Array<String> = difficultiesNamesInputText.text.trim().split(',');
-
-				if (splittedText.length > 0)
+				if (difficultiesNamesInputText.text.length > 0)
 				{
-					for (i in 0...splittedText.length)
-					{
-						if (weekFile.difficulties[i] == null || weekFile.difficulties[i].length < 1) {
-							weekFile.difficulties[i] = [];
-						}
+					var splittedText:Array<String> = difficultiesNamesInputText.text.trim().split(',');
 
-						splittedText[i] = splittedText[i].trim();
-						weekFile.difficulties[i][1] = splittedText[i];
+					if (splittedText.length > 0)
+					{
+						for (i in 0...splittedText.length)
+						{
+							if (weekFile.difficulties[i] == null || weekFile.difficulties[i].length < 1) {
+								weekFile.difficulties[i] = [];
+							}
+	
+							splittedText[i] = splittedText[i].trim();
+							weekFile.difficulties[i][1] = splittedText[i];
+						}
 					}
 				}
 			}
 			else if (sender == difficultiesSuffixesInputText)
 			{
-				var splittedText:Array<String> = difficultiesSuffixesInputText.text.trim().split(',');
-
-				if (splittedText.length > 0)
+				if (difficultiesSuffixesInputText.text.length > 0)
 				{
-					for (i in 0...splittedText.length) 
-					{
-						if (weekFile.difficulties[i] == null || weekFile.difficulties[i].length < 1) {
-							weekFile.difficulties[i] = [];
-						}
+					var splittedText:Array<String> = difficultiesSuffixesInputText.text.trim().split(',');
 
-						splittedText[i] = splittedText[i].trim();
-						weekFile.difficulties[i][2] = splittedText[i];
+					if (splittedText.length > 0)
+					{
+						for (i in 0...splittedText.length) 
+						{
+							if (weekFile.difficulties[i] == null || weekFile.difficulties[i].length < 1) {
+								weekFile.difficulties[i] = [];
+							}
+	
+							splittedText[i] = splittedText[i].trim();
+							weekFile.difficulties[i][2] = splittedText[i];
+						}
 					}
 				}
 			}
@@ -1082,58 +1091,67 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 			}
 			else if (sender == difficultiesInputText)
 			{
-				var splittedText:Array<String> = difficultiesInputText.text.trim().split(',');
-
-				if (splittedText.length > 0)
+				if (difficultiesInputText.text.length > 0)
 				{
-					var song:SongLabel = weekFile.songs[curSelected];
+					var splittedText:Array<String> = difficultiesInputText.text.trim().split(',');
 
-					for (i in 0...splittedText.length)
+					if (splittedText.length > 0)
 					{
-						if (song.difficulties[i] == null || song.difficulties[i].length < 1) {
-							song.difficulties[i] = [];
-						}
+						var song:SongLabel = weekFile.songs[curSelected];
 
-						splittedText[i] = splittedText[i].trim();
-						song.difficulties[i][0] = splittedText[i];
+						for (i in 0...splittedText.length)
+						{
+							if (song.difficulties[i] == null || song.difficulties[i].length < 1) {
+								song.difficulties[i] = [];
+							}
+
+							splittedText[i] = splittedText[i].trim();
+							song.difficulties[i][0] = splittedText[i];
+						}
 					}
 				}
 			}
 			else if (sender == difficultiesNamesInputText)
 			{
-				var splittedText:Array<String> = difficultiesNamesInputText.text.trim().split(',');
-
-				if (splittedText.length > 0)
+				if (difficultiesNamesInputText.text.length > 0)
 				{
-					var song:SongLabel = weekFile.songs[curSelected];
+					var splittedText:Array<String> = difficultiesNamesInputText.text.trim().split(',');
 
-					for (i in 0...splittedText.length)
+					if (splittedText.length > 0)
 					{
-						if (song.difficulties[i] == null || song.difficulties[i].length < 1) {
-							song.difficulties[i] = [];
-						}
+						var song:SongLabel = weekFile.songs[curSelected];
 
-						splittedText[i] = splittedText[i].trim();
-						song.difficulties[i][1] = splittedText[i];
+						for (i in 0...splittedText.length)
+						{
+							if (song.difficulties[i] == null || song.difficulties[i].length < 1) {
+								song.difficulties[i] = [];
+							}
+
+							splittedText[i] = splittedText[i].trim();
+							song.difficulties[i][1] = splittedText[i];
+						}
 					}
 				}
 			}
 			else if (sender == difficultiesSuffixesInputText)
 			{
-				var splittedText:Array<String> = difficultiesSuffixesInputText.text.trim().split(',');
-
-				if (splittedText.length > 0)
+				if (difficultiesSuffixesInputText.text.length > 0)
 				{
-					var song:SongLabel = weekFile.songs[curSelected];
+					var splittedText:Array<String> = difficultiesSuffixesInputText.text.trim().split(',');
 
-					for (i in 0...splittedText.length)
+					if (splittedText.length > 0)
 					{
-						if (song.difficulties[i] == null || song.difficulties[i].length < 1) {
-							song.difficulties[i] = [];
-						}
+						var song:SongLabel = weekFile.songs[curSelected];
 
-						splittedText[i] = splittedText[i].trim();
-						song.difficulties[i][2] = splittedText[i];
+						for (i in 0...splittedText.length)
+						{
+							if (song.difficulties[i] == null || song.difficulties[i].length < 1) {
+								song.difficulties[i] = [];
+							}
+
+							splittedText[i] = splittedText[i].trim();
+							song.difficulties[i][2] = splittedText[i];
+						}
 					}
 				}
 			}
